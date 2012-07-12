@@ -1,7 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, HeartsActivity!</string>
+    <string name="hello">Droids have heart</string>
     <string name="app_name">Hearts</string>
-
+    <string name="showpile">Show Pile</string>
+    <string name="showvoids">Show Voids</string>
+    <string name="showhand">Show Hand</string>
+    <string name="pass">Pass</string>
+    <string name="info">Info</string>
+    <string name="playcard">Play Card</string>
+    <string name="pop">Pop</string>
+    <string name="name">Name</string>
+    <string name="Diff">Difficulty</string>
+    <string name="easy">Easy</string>
+    <string name="medium">Medium</string>
+    <string name="hard">Hard</string>
+    <string name="start">Start</string>
+    <string name="One">1</string>
+        <string-array name="Seat">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+        <string name="spadess">s</string>
+        <string name="clubsc">c</string>
+        <string name="diamondsd">d</string>
+        <string name="heartsh">h</string>
+        <string name="player1">p1</string>
+        <string name="player3">p3</string><string name="player2">p2</string>
+        
+        <string name="player4">p4</string>
+        
+        <string name="unknown">**</string>
+        
+        <string name="random">Random</string>
+        
+        <string name="next">Next</string>
+        
+        <string name="hint">Hint</string>
+        
+        <string name="Previous">Back</string>
+        
+        <string name="exit">Exit</string>
+        
+        <string name="menu">Menu</string>
+        
+        <string name="card1">Card1</string>
+        
+        <string name="card2">Card2</string>
+        <string name="card3">Card3</string>
+        <string name="card4">Card4</string>
+        <string name="playState">playState++</string>
+        <string name="clear">clear</string>
+        <string name="p1Score">p1 has 0 points</string>
+        <string name="p2Score">p2 has 0 points</string>
+        <string name="p3Score">p3 has 0 points</string>
+        <string name="p4Score">p4 has 0 points</string>
 </resources>

@@ -10,22 +10,101 @@
         android:layout_height="wrap_content"
         android:text="@string/hello" />
 
-    <GridLayout
-        android:id="@+id/grid1"
+    <LinearLayout
+        android:id="@+id/Startlayout"
         android:layout_width="match_parent"
-        android:layout_height="92dp"
-        android:columnCount="1" >
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
 
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.23"
+                android:text="@string/name"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <EditText
+                android:id="@+id/name"
+                android:layout_width="162dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="text"
+                android:text="@string/random" >
 
-    </GridLayout>
-    
-    <GridLayout
-           	android:id="@+id/grid2"
-           	android:layout_width="match_parent"
-           	android:layout_height="92dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_row="1" >
-   	</GridLayout>
+                <requestFocus />
+            </EditText>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/Diff"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center|fill_horizontal"
+            android:orientation="horizontal" >
+
+            <RadioGroup
+                android:id="@+id/difficulty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <RadioButton
+                    android:id="@+id/easy"
+                    android:tag="e"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/easy" />
+
+                <RadioButton
+                    android:id="@+id/medium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/medium" />
+
+                <RadioButton
+                    android:id="@+id/hard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hard" />
+
+                <Button
+                    android:id="@+id/start"
+                    android:layout_width="118dp"
+                    android:layout_height="wrap_content"
+                    android:onClick="onStartPressed"
+                    android:text="@string/start" />
+
+            </RadioGroup>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+    </LinearLayout>
 
 </LinearLayout>

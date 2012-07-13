@@ -325,7 +325,9 @@ public class Player extends HeartsActivity{
 	public void addToScore(int score){
 		this.score += score;
 	}
-	
+	public void addToTotalScore(int i){
+		totalScore+=i;
+	}
 	public int getScore(){
 		return score;
 	}
@@ -548,7 +550,7 @@ public class Player extends HeartsActivity{
 					}
 				}
 				if (low>curCard){
-					if(suit==curSuit){
+					aif(suit==curSuit){
 						low=curCard;
 					}
 					if(suit!=curSuit){

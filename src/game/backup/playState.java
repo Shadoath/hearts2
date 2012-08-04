@@ -18,8 +18,8 @@ public class playState  extends  HeartsActivity {
 			//Bundle mBundle=intent.getBundleExtra("ps");
 			result=intent.getIntExtra("re", result++);
 			//curState=mBundle.getInt("ps", curState++);
-			print("new ps Line=", 21);
-			curState= intent.getIntExtra("ps", curState=+1 );
+			print("new playstate Line=", 21);
+			curState= intent.getIntExtra("ps", curState);
 			
 		}
 		public void RTS(){

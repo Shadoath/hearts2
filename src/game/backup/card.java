@@ -1,21 +1,18 @@
 package game.backup;
 
-import game.shad.tempus.hearts.*;
-import android.graphics.Bitmap;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
 
 public class card {
     private static final String TAG = card.class.getSimpleName();
     
     private Bitmap bitmap;
     private boolean touched;
+    private Player owner = null;
     
 	final static int CLUBS = 0;
 	final static int DIAMONDS = 1;
@@ -77,7 +74,6 @@ public class card {
 		this.suit = suit;
 	}
 
-
 	
 
 	public int getZ(){
@@ -104,6 +100,12 @@ public class card {
         return y - (bitmap.getHeight() /2);
     }
     
+    public void setOwner(Player p){
+    		owner=p;
+    }
+    public Player getOwner(){
+		return owner;
+}
     public void draw(Canvas canvas) {
 		//Add z layer
         Paint paint = new Paint();
@@ -119,7 +121,7 @@ public class card {
         if(eventX >= (x-bitmap.getWidth() /2) && (eventX <= (x + bitmap.getWidth()/2))){
             if(eventY >= (y-bitmap.getHeight() /2) && (y <= (y+bitmap.getHeight() /2))){
                 setTouched(true);
-                bitmap = BitmapFactory.decodeResource(con.getResources(), R.drawable.heart_one_back);
+               // bitmap = BitmapFactory.decodeResource(con.getResources(), R.drawable.heart_one_back);
             }else{
                 setTouched(false);
             }
@@ -137,7 +139,7 @@ public class card {
 		setTouched(false);
 		this.x = eventX;
 		this.y = eventY;
-		bitmap = BitmapFactory.decodeResource(con.getResources(), R.drawable.heart_one);
+	//	bitmap = BitmapFactory.decodeResource(con.getResources(), R.drawable.heart_one);
 	}
 	
 }

@@ -1,0 +1,62 @@
+    <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="first_preferencescreen">
+        <PreferenceCategory
+            
+                android:title="Saving Basics">
+                <CheckBoxPreference
+                        android:title="Force Geotagging"
+                        android:defaultValue="false"
+                        android:summary="This saves all photos with last GPS location"
+                        android:key="forceGeotaggingMM" />
+                <CheckBoxPreference
+                        android:title="Delete untagged pictures"
+                        android:defaultValue="false"
+                        android:summary="Saves space, removes unwanted files"
+                        android:key="autoPictureDeleteMM" />
+                <CheckBoxPreference
+                        android:title="Use only date for file name"
+                        android:defaultValue="true"
+                        android:summary="False to add personal file name"
+                        android:key="dateForNameMM" />
+                <EditTextPreference
+                        android:title="File name Prefix"
+                        android:summary="Only used if not using date"
+                        android:defaultValue="GeoTag"
+                        android:key="filePrefixMM" />
+
+                
+        </PreferenceCategory>
+        
+        <PreferenceCategory
+                android:title="Server Settings">           
+		        <EditTextPreference
+		                android:name="Server address"
+		                android:summary="Url or IP of server"
+		                android:defaultValue="www."
+		                android:title="Server address"
+		                android:key="serverAddressMM" />
+		        <EditTextPreference
+                        android:name="Extra info"
+                        android:summary="Extra commands for server"
+                        android:title="Test"
+                        android:key="extraMM" />
+        </PreferenceCategory>
+        
+
+
+        
+        <PreferenceCategory
+	        	android:title="Extras">	 
+	      		<EditTextPreference
+	            android:key="welcomeMM"
+		            android:title="Welcome Message"
+		            android:summary="Define the Welcome message to be shown"
+		            android:dialogTitle="Welcome Message"
+		            android:dialogMessage="Provide a message"   
+		            android:defaultValue="Your awesome!" />
+
+	 
+	    </PreferenceCategory>
+</menu>
+    
+    

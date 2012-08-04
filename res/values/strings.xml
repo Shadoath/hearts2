@@ -23,14 +23,15 @@
         <item>3</item>
         <item>4</item>
     </string-array>
-        <string name="spadess">s</string>
-        <string name="clubsc">c</string>
-        <string name="diamondsd">d</string>
-        <string name="heartsh">h</string>
-        <string name="player1">p1</string>
-        <string name="player3">p3</string><string name="player2">p2</string>
+        <string name="spadess">s = ?</string>
+        <string name="clubsc">c = ?</string>
+        <string name="diamondsd">d = ?</string>
+        <string name="heartsh">h = ?</string>
+        <string name="player1">P1</string>
+        <string name="player3">P3</string>
+        <string name="player2">P2</string>
         
-        <string name="player4">p4</string>
+        <string name="player4">P4</string>
         
         <string name="unknown">**</string>
         
@@ -40,7 +41,7 @@
         
         <string name="hint">Hint</string>
         
-        <string name="Previous">Back</string>
+        <string name="Previous">DeBug</string>
         
         <string name="exit">Exit</string>
         
@@ -57,4 +58,8 @@
         <string name="p2Score">p2 has 0 points</string>
         <string name="p3Score">p3 has 0 points</string>
         <string name="p4Score">p4 has 0 points</string>
+        <string name="you">You</string>
+        <string name="startuphelp">Follow the colors, and if you get lost just hit \'Next\'.</string>
+        <string name="resume">Resume</string>
+        <string name="helperVoids">Track Voids</string>
 </resources>

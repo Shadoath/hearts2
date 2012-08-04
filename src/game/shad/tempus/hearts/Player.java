@@ -1,40 +1,40 @@
 package game.shad.tempus.hearts;
 
-
-
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TableRow;
 import android.widget.TextView;
-
 
 @SuppressLint("ParserError")
 public class Player extends HeartsActivity{
 	ArrayList<card> hand;
 	public ArrayList<ArrayList<card>> takenHands = new ArrayList<ArrayList<card>>();
 	public int seat=0; //position
-	public String realName;
-	public Color color;
-	public int state;   //using 1-4
+	public String realName = "";
+	public int colorInt = 0;
+	public int state = 0;   //using 1-4
 	public Player curPlayer;
-	public int score=0;
+	public int score = 0;
 	public int totalScore=0;
-	public int passTo=0;
+	public int passTo = 0;
 	ArrayList<card> clubs = new ArrayList<card>();     //0
-	int highClub=0;
-	int lowClub=0;
+	int highClub = 0;
+	int lowClub = 0;
 	ArrayList<card> diamonds = new ArrayList<card>();  //1
-	int highDiamonds=0;
-	int lowDiamonds=0;
+	int highDiamonds = 0;
+	int lowDiamonds = 0;
 	ArrayList<card> spades = new ArrayList<card>();	   //2
-	int highSpades=0;
-	int lowSpades=0;
+	int highSpades = 0;
+	int lowSpades = 0;
 	ArrayList<card> hearts = new ArrayList<card>();    //
-	int highHearts=0;
-	int lowHearts=0;
+	int highHearts = 0;
+	int lowHearts = 0;
+	public boolean winner = false;
 	public boolean voidClubs;
 	public boolean voidDiamonds;
 	public boolean voidHearts;
@@ -43,24 +43,60 @@ public class Player extends HeartsActivity{
 	public String diamondsString="";
 	public String heartsString="";
 	public String spadesString="";
+	public Button clubsButton;
+	public Button diamondsButton;
+	public Button spadesButton;
+	public Button heartsButton;
+	
+	
 	public LayoutInflater factory;
 
 	public View textEntryView;
 
-	
-	
-	
-	public Player(ArrayList<card> hand1, int score, int seat, String name){
+	public Player(ArrayList<card> hand1, int score, int seat, String name, int color){
 		this.hand = hand1;
 		this.score = score;
 		this.seat = seat;
-		realName = name;
-		this.color = color;
+		this.realName = name;
+		this.colorInt = color;
 		//this.deck = new Deck();
+		/*
+		switch(seat){
+		case 1:
+			clubsButton = (Button)  findViewById(R.id.p1clubsButton);
+			diamondsButton = (Button)  findViewById(R.id.p1diamondsButton);
+			spadesButton = (Button)  findViewById(R.id.p1spadesButton);
+			heartsButton = (Button)  findViewById(R.id.p1heartsButton);
+			break;
+		case 2:
+			clubsButton = (Button)  findViewById(R.id.p2clubsButton);
+			diamondsButton = (Button)  findViewById(R.id.p2diamondsButton);
+			spadesButton = (Button)  findViewById(R.id.p2spadesButton);
+			heartsButton = (Button)  findViewById(R.id.p2heartsButton);
+			break;
+		case 3:
+			clubsButton = (Button)  findViewById(R.id.p3clubsButton);
+			diamondsButton = (Button)  findViewById(R.id.p3diamondsButton);
+			spadesButton = (Button)  findViewById(R.id.p3spadesButton);
+			heartsButton = (Button)  findViewById(R.id.p3heartsButton);
+			break;
+		case 4:
+			clubsButton = (Button)  findViewById(R.id.p4clubsButton);
+			diamondsButton = (Button)  findViewById(R.id.p4diamondsButton);
+			spadesButton = (Button)  findViewById(R.id.p4spadesButton);
+			heartsButton = (Button)  findViewById(R.id.p4heartsButton);
+			break;
 		
+		}
+		*/
 		
 
 	}
+	/**Checks if void in said suit.....Should be redone.
+	 * this is not called from HeartsActivity but is an internal method.
+	 * @param i the suit value.
+	 * @return
+	 */
 	public boolean checkVoid(int i){
 		switch(i){
 		case 0:
@@ -91,24 +127,28 @@ public class Player extends HeartsActivity{
 		curPlayer=p;
 		print("player.go ="+curPlayer.getRealName(), 91);
 		if(pile.size()==0){
-			return nextCard=playLow(0); //get two of clubs		
+			return playLow(0); //get two of clubs	
+			//TODO start on different suits.  aka go for voids.
 		}
 		int suit=pile.get(0).getSuit();
 		if(checkVoid(suit)){
 			print("void--PlayHigh("+suit+")", 93);
 			if(suit<3){
+				//playing next suit
 				suit++;
 			}
-			else{
+			else{  //suit is too high try for clubs
+				//No real problems with sending the wrong suit the call for play high and play low are recursive
 				suit=0;
 			}
+			
 			return playHigh(suit);
-			//do all code for void crap
+			//TODO do all code for void crap
 
 		}
+		print("state ="+state, 34);
 		switch (state){  //REPLACED ps with STATE, removed call for it in constructor
 		case 1:{
-			print("state 1", 34);
 			switch (round){
 			case 0:
 			case 1: 
@@ -130,7 +170,6 @@ public class Player extends HeartsActivity{
 			}
 		}
 		case 2:
-			print("state 2", 34);
 
 			switch (round){
 			case 0:
@@ -152,7 +191,6 @@ public class Player extends HeartsActivity{
 				return playLow(suit);
 			}
 		case 3:		
-			print("state 3", 34);
 			switch (round){
 			case 0:
 			case 1: 
@@ -173,7 +211,14 @@ public class Player extends HeartsActivity{
 				return playLow(suit);
 			}
 		case 4:
-			print("state 4", 34);
+			if(checkForPoints(pile)){
+				print("Play low--POINTS!!", 177);
+				playLow(suit);
+			}
+			else
+				print("Play high--no points", 177);
+				playHigh(suit);
+
 			switch (round){
 			case 0:
 			case 1: 
@@ -197,7 +242,7 @@ public class Player extends HeartsActivity{
 		
 		
 		}
-		print("Out of all Loops --PlayHigh("+suit+")", 193);
+		print("Out of all Loops !!SHOULD NOT HAPPEN!!--PlayHigh("+suit+")", 193);
 
 		return playHigh(suit);
 
@@ -252,21 +297,21 @@ public class Player extends HeartsActivity{
 		switch(suit){
 		case 0:
 			if(clubs.size()==0){  //if suit is empty just recall this method with a higher suit.
-				return playHigh(suit+1);
+				return playHigh(++suit);
 			}
 			nextCard=clubs.get(clubs.size()-1);
 			clubs.remove(clubs.size()-1);
 			return nextCard;
 		case 1:
 			if(diamonds.size()==0){
-				return playHigh(suit+1);
+				return playHigh(++suit);
 			}
 			nextCard=diamonds.get(diamonds.size()-1);
 			diamonds.remove(diamonds.size()-1);
 			return nextCard;
 		case 2:
 			if(spades.size()==0){
-				return playHigh(suit+1);
+				return playHigh(++suit);
 			}
 			nextCard=spades.get(spades.size()-1);
 			spades.remove(spades.size()-1);
@@ -291,12 +336,12 @@ public class Player extends HeartsActivity{
 		return realName;
 	}
 	
-	public void setColor(Color c){
-		color=c;
+	public void setColor(int c){
+		colorInt=c;
 	}
 
-	public Color getColor(){
-		return color;
+	public int getColor(){
+		return colorInt;
 	}
 	public void setSeat(int s) {
 		seat=s;
@@ -402,15 +447,30 @@ public class Player extends HeartsActivity{
 		if(clubs.size()==0){
 			setClubsVoid(true);
 		}
-		if(diamonds.size()==0){
+		if(spades.size()==0){
 			setSpadesVoid(true);
 		}
-		if(spades.size()==0){
+		if(diamonds.size()==0){
 			setDiamondsVoid(true);
 		}
 		if(hearts.size()==0){
 			setHeartsVoid(true);
 		}
+		
+		//could this game be used to teach people hearts?
+		
+		if(voidHelper){
+			clubsButton.setText("c="+clubs.size());
+			clubsButton.setBackgroundColor(Color.MAGENTA);
+			diamondsButton.setText("d="+diamonds.size());
+			diamondsButton.setBackgroundColor(Color.MAGENTA);
+			spadesButton.setText("s="+spades.size());
+			spadesButton.setBackgroundColor(Color.MAGENTA);
+			heartsButton.setText("h="+hearts.size());
+			heartsButton.setBackgroundColor(Color.MAGENTA);
+		}
+
+
 	}
 	public void sortHand() {
 		ArrayList<card> thand=hand;
@@ -499,7 +559,7 @@ public class Player extends HeartsActivity{
 		    		break;
 
         	}
-	    	print(i+" ", 358);
+	    	//print(i+" ", 358); for debug
 	    	
 
         }
@@ -526,6 +586,34 @@ public class Player extends HeartsActivity{
         }
 }
 
+	public boolean checkForPoints(ArrayList<card> c) {
+		int points=0;
+		for(int i=0; i<c.size();i++){
+			int curCard = c.get(i).getValue();
+			int curSuit = c.get(i).getSuit();
+			if(curSuit==1){ //Diamonds  check for jack.
+				if(curCard==11){
+					points-=10;
+
+				}
+			}
+			if(curSuit==2){//Spades   check for queen
+				if(curCard==12){
+					points+=13;
+
+				}
+			}
+			if(curSuit==3){//heart--add points
+				points++;
+			}
+
+			
+		}
+		if(points>0){
+			return true;
+		}
+		return false;
+	}
 	/*
 
 	

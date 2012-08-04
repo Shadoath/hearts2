@@ -13,7 +13,7 @@ public class card {
     private Bitmap bitmap;
     private boolean touched;
     private Player owner = null;
-    
+    public boolean played = false;
 	final static int CLUBS = 0;
 	final static int DIAMONDS = 1;
 	final static int SPADES = 2;
@@ -26,13 +26,12 @@ public class card {
 	private int suit = 4;
 	private Context con;
 	
-	public card(int x, int y, int value, int suit, Bitmap bitmap, Context con){
+	public card(int x, int y, int value, int suit, Bitmap bitmap){
 		this.bitmap = bitmap;
 		this.x = x;
 		this.y = y;
 		this.value = value;
 		this.suit = suit;
-		this.con = con;
 	}
 	
 	public Bitmap getBitmap(){
@@ -82,6 +81,14 @@ public class card {
     
     public void setZ(int z){
         this.z = z;
+    }
+    
+    public boolean getPlayed(){
+        return played;
+    }
+    
+    public void setPlayed(boolean played){
+        this.played = played;
     }
     
     public boolean isTouched(){

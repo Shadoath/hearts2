@@ -18,9 +18,7 @@ public class mainMenu extends Activity{
 
 	public void onStartPressed(View v){
 		Intent gameIntent  =new Intent(this, game.shad.tempus.hearts.HeartsActivity.class);
-		EditText et = (EditText) findViewById(R.id.name);
 
-    	gameIntent.putExtra("name", et.getText());
 		RadioButton easy = (RadioButton) findViewById(R.id.easy);
 		RadioButton medium = (RadioButton) findViewById(R.id.medium);
 		RadioButton hard = (RadioButton) findViewById(R.id.hard);

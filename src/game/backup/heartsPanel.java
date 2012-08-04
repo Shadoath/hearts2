@@ -1,6 +1,7 @@
 package game.backup;
 
 import game.shad.tempus.hearts.*;
+
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -22,7 +23,7 @@ implements SurfaceHolder.Callback {
 	//public Player p3;
 	//public Player p4;
 	//public Player curPlayer;
-	public Deck pile;
+	//public Deck pile;
 	public int pileI=0;
 	public int playState=0;
 	//public playState game = new playState();

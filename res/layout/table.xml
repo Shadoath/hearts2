@@ -60,13 +60,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
-
+
                     <Button
                         android:id="@+id/p3clubsButton"
                         style="?android:attr/buttonStyleSmall"
-                        android:layout_width="50dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/clubsc" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -102,13 +103,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
-
+
                     <Button
                         android:id="@+id/p3heartsButton"
                         style="?android:attr/buttonStyleSmall"
-                        android:layout_width="50dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/heartsh" />
+
                 </LinearLayout>
             </LinearLayout>
         </TableRow>
@@ -151,139 +153,75 @@
 
         </LinearLayout>
     </LinearLayout>
-
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal|center_vertical" >
+
         <TableRow
             android:id="@+id/player4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
+
+            <SurfaceView
+                android:id="@+id/tableView"
+                android:layout_width="100dp"
+                android:layout_height="125dp" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                    <Button
-                        android:id="@+id/p4clubsButton"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/clubsc" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                    <Button
-                        android:id="@+id/p4diamondsButton"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content"
-                        android:text="@string/diamondsd" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                    <Button
-                        android:id="@+id/p4spadesButton"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content"
-                        android:text="@string/spadess" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                    <Button
-                        android:id="@+id/p4heatsButton"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/heartsh" />
-                </LinearLayout>
-            </LinearLayout>
         </TableRow>
-
+
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="0.91" >
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent" >
-
+            android:layout_width="98dp"
+            android:layout_height="101dp" >
+
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="42dp"
                 android:layout_height="match_parent"
                 android:orientation="vertical" >
-
+
                 <EditText
                     android:id="@+id/card4"
                     style="?android:attr/buttonStyleSmall"
-                    android:layout_width="50dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/card4" />
-
+
                 <EditText
                     android:id="@+id/card1"
                     style="?android:attr/buttonStyleSmall"
-                    android:layout_width="50dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/card1" />
 
             </LinearLayout>
-
+
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="42dp"
                 android:layout_height="match_parent"
                 android:orientation="vertical" >
-
+
                 <EditText
                     android:id="@+id/card3"
                     style="?android:attr/buttonStyleSmall"
-                    android:layout_width="50dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/card3" />
-
+
                 <EditText
                     android:id="@+id/card2"
                     style="?android:attr/buttonStyleSmall"
-                    android:layout_width="50dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/card2" />
 
             </LinearLayout>
         </LinearLayout>
-
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="0.71" >
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent" >
+            android:gravity="center_vertical|right" >
 
             <TableRow
                 android:id="@+id/player2"
@@ -298,13 +236,14 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" >
-
+
                         <Button
                             android:id="@+id/p2clubsButton"
                             style="?android:attr/buttonStyleSmall"
-                            android:layout_width="50dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/clubsc" />
+
                     </LinearLayout>
 
                     <LinearLayout
@@ -340,13 +279,14 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" >
-
+
                         <Button
                             android:id="@+id/p2heartsButton"
                             style="?android:attr/buttonStyleSmall"
-                            android:layout_width="50dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/heartsh" />
+
                     </LinearLayout>
                 </LinearLayout>
             </TableRow>
@@ -356,11 +296,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="0.05"
             android:orientation="vertical" >
 
             <TextView
@@ -391,12 +330,12 @@
                 android:text="@string/p4Score"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
         </LinearLayout>
-
+
         <LinearLayout
             android:id="@+id/player1"
             android:layout_width="wrap_content"
             android:layout_height="157dp"
-            android:layout_weight="0.15"
+            android:layout_weight="0.18"
             android:orientation="vertical" >
 
             <LinearLayout
@@ -413,19 +352,19 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" >
-
+
                         <Button
                             android:id="@+id/p1clubsButton"
                             style="?android:attr/buttonStyleSmall"
-                            android:layout_width="50dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="onp1ClubsButtonPressed"
                             android:text="@string/clubsc" />
-
+
                         <TextView
                             android:id="@+id/p1Clubs"
-                            android:layout_width="64dp"
-                            android:layout_height="28dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:text="@string/unknown"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -434,20 +373,20 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" >
-
+
                         <Button
                             android:id="@+id/p1diamondsButton"
                             style="?android:attr/buttonStyleSmall"
-                            android:layout_width="50dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:onClick="onp1DiamondsButtonPressed"
                             android:text="@string/diamondsd" />
-
+
                         <TextView
                             android:id="@+id/p1Diamonds"
-                            android:layout_width="64dp"
-                            android:layout_height="28dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:text="@string/unknown"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -468,19 +407,19 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" >
-
+
                         <Button
                             android:id="@+id/p1spadesButton"
                             style="?android:attr/buttonStyleSmall"
-                            android:layout_width="50dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="onp1SpadesButtonPressed"
                             android:text="@string/spadess" />
-
+
                         <TextView
                             android:id="@+id/p1Spades"
-                            android:layout_width="64dp"
-                            android:layout_height="28dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:text="@string/unknown"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -489,19 +428,19 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" >
-
+
                         <Button
                             android:id="@+id/p1heartsButton"
                             style="?android:attr/buttonStyleSmall"
-                            android:layout_width="50dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="onp1HeartsButtonPressed"
                             android:text="@string/heartsh" />
-
+
                         <TextView
                             android:id="@+id/p1Hearts"
-                            android:layout_width="64dp"
-                            android:layout_height="28dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:text="@string/unknown"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -509,13 +448,48 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/roundView"
+
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="109dp"
-            android:text="@string/random"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/roundView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/random"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <TextView
+                android:id="@+id/clubsPlayed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/unknown"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <TextView
+                android:id="@+id/diamondsPlayed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/unknown"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <TextView
+                android:id="@+id/spadesPlayed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/unknown"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <TextView
+                android:id="@+id/heartsPlayed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/unknown"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -560,14 +534,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/selectedCardTextBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/unknown"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
         <EditText
             android:id="@+id/bottomTV"
             android:layout_width="match_parent"
@@ -575,11 +541,11 @@
             android:clickable="false"
             android:ems="10"
             android:singleLine="true" />
-
+
         <EditText
             android:id="@+id/bottomTV2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:clickable="false"
             android:ems="10" >
 

@@ -13,7 +13,7 @@ public class card {
     private Bitmap bitmap;
     private boolean touched;
     private Player owner = null;
-    
+    public boolean played = false;
 	final static int CLUBS = 0;
 	final static int DIAMONDS = 1;
 	final static int SPADES = 2;
@@ -21,18 +21,20 @@ public class card {
 	final static int NOTSET = 4;
 	private int x;
 	private int y;
+	private int x1;
+	private int y1;
+	private int x2;
+	private int y2;
 	private int z;
 	private int value  = 0;
 	private int suit = 4;
 	private Context con;
 	
-	public card(int x, int y, int value, int suit, Bitmap bitmap, Context con){
+	public card( int value, int suit, Bitmap bitmap){
 		this.bitmap = bitmap;
-		this.x = x;
-		this.y = y;
+
 		this.value = value;
 		this.suit = suit;
-		this.con = con;
 	}
 	
 	public Bitmap getBitmap(){
@@ -43,21 +45,23 @@ public class card {
 		this.bitmap = bitmap;
 	}
 	
-	public int getX(){
-		return x;
-	}
 	
-	public void setX(int x){
-		this.x = x;
+	public void setCoords(int x1, int y1, int x2, int y2){
+		this.x1 = x1;
+		this.x1 = x2;
+		this.y1 = y1;
+		this.y2 = y1;
+		
 	}
+	public int[] getCoords(){
+		int[] a=new int[]{x1, y1, x2, y2};
+		return a;
+		
+		
+	}
+
 	
-	public int getY(){
-		return y;
-	}
-	
-	public void setY(int y){
-		this.y = y;
-	}
+
 	
 	public int getValue() {
 		return value;
@@ -82,6 +86,14 @@ public class card {
     
     public void setZ(int z){
         this.z = z;
+    }
+    
+    public boolean getPlayed(){
+        return played;
+    }
+    
+    public void setPlayed(boolean played){
+        this.played = played;
     }
     
     public boolean isTouched(){
@@ -111,7 +123,7 @@ public class card {
         Paint paint = new Paint();
         paint.setStrokeWidth(2);
         paint.setColor(Color.CYAN);
-        canvas.drawRect(150,350,400,600,paint);
+        canvas.drawRect(150,350,400,600, paint);
         
         canvas.drawBitmap(bitmap, x - (bitmap.getWidth() /2), y - (bitmap.getHeight() /2), null);
 

@@ -52,8 +52,8 @@ implements SurfaceHolder.Callback {
     {
         super(context);
         getHolder().addCallback(this);
-        heartOne = new card(250, 300, 1, 2, BitmapFactory.decodeResource(getResources(), R.drawable.heart_one),getContext());
-        heartTwo = new card(100, 300, 1, 2, BitmapFactory.decodeResource(getResources(), R.drawable.heart_one), getContext());
+        //heartOne = new card(250, 300, 1, 2, BitmapFactory.decodeResource(getResources(), R.drawable.heart_one),getContext());
+        //heartTwo = new card(100, 300, 1, 2, BitmapFactory.decodeResource(getResources(), R.drawable.heart_one), getContext());
 
         thread = new thread(getHolder(), this);
         setFocusable(true);
@@ -148,8 +148,8 @@ implements SurfaceHolder.Callback {
     public void render(Canvas canvas) {
         canvas.drawColor(Color.BLACK);
         heartOne.draw(canvas);
-        heartTwo.draw(canvas);
-	//Call card draw, via deck, draw avatars, draw board
+        //heartTwo.draw(canvas);
+        //Call card draw, via deck, draw avatars, draw board
 		
         displayFps(canvas, avgFps); 
         

@@ -1,13 +1,25 @@
 package game.shad.tempus.hearts;
 
+
+
 import java.util.ArrayList;
-import java.util.TimerTask;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.gesture.Gesture;
 import android.graphics.Color;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -16,15 +28,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class HeartsActivity extends Activity {
+public class HeartsActivity extends Activity{
 	
 	//current issues
 	//the pickup pile method needs to correctly pick who wins.  using when it was played needs aditional playstate check to confirm seat.
 	//playing someone elses cards....needs testing
 	// when doing the Play2clubs can play Ace instead due to getting the first item in array
+	//BOTS ARE CHEATING AND NOT PLAYING CARDS WHEN THEY SHOULD!!
 	//
 	public String name;
 	public card[] deck=new card[53];
+	public int[] cardArrayRes= new int[52];
 	public card[] deckCards=new card[4];
     public ArrayList<card> pile=new ArrayList<card>();
     public ArrayList<ArrayList<card>> roundHands= new ArrayList<ArrayList<card>>(); 
@@ -34,19 +48,20 @@ public class HeartsActivity extends Activity {
 	public Player p4;
 	public Player curPlayer;
 	public card cardToPlay;
+	public Intent gameIntent;
 	//public card[] pile = new card[4];
 	public int pileI=0;
-	public int playState=0;
-	public playState Thegame;
+
 	public int selectedCard=0;
 	public int selectedCardSuit=-1;
 	public int selectedCardPlace=0;
 	
     public EditText et1;
-    public TextView selectedCardTextBox;
     //Booleans for setting game states
-    public boolean playing=false;  //initialized to false but set true during check for 2
+    public boolean playing = false;  //initialized to false but set true during check for 2
     public boolean heartsBroken;
+    public boolean restart = false;
+    public boolean voidHelper;
     
     public int round=0;
     public int count=0;
@@ -62,6 +77,11 @@ public class HeartsActivity extends Activity {
     public TextView p1Spades;
     public TextView p1Hearts;
     
+    public TextView clubsPlayed;
+    public TextView diamondsPlayed;
+    public TextView spadesPlayed;
+    public TextView heartsPlayed;
+    
     public TextView roundView;
     
     public Button p2Main;
@@ -72,6 +92,21 @@ public class HeartsActivity extends Activity {
     public Button p1DiamondsB;
     public Button p1SpadesB;
     public Button p1HeartsB;
+    
+    public Button p2ClubsB;
+    public Button p2DiamondsB;
+    public Button p2SpadesB;
+    public Button p2HeartsB;
+    
+    public Button p3ClubsB;
+    public Button p3DiamondsB;
+    public Button p3SpadesB;
+    public Button p3HeartsB;
+    
+    public Button p4ClubsB;
+    public Button p4DiamondsB;
+    public Button p4SpadesB;
+    public Button p4HeartsB;
     
     public TextView p1tvScore;
     public TextView p2tvScore;
@@ -91,33 +126,91 @@ public class HeartsActivity extends Activity {
     public TextView bottomText;
     public TextView bottomText2;
     
+    private GestureDetector gestures;
+
 
     //Button used as a global place holder in function fixSides()
 	Button fixSidesButton;
+	public String eol = System.getProperty("line.separator");
 	int size;
 	int hsize;
 	int wsize;
 	
     /** Called when the activity is first created. */
-    @Override
+	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Intent.g
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.table);
-        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        gameIntent = getIntent();
+        
+        
+        
+        
+        
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        SurfaceView r = (SurfaceView) findViewById(R.id.tableView);
         //setContentView(new heartsPanel(this));
         
         //p1 =new Player();
-        
-        setContentView(R.layout.table);
-        firstStart();
+
+        setContentView(new heartsPanel(this));
+        firstStart(); 
         
     }
    
+    @Override
+    public void onStart(){
+    	print("onStart Called", 135);
+    	super.onStart();
+    	firstStart();
+    	//code to go here.
+    	Bundle b = gameIntent.getExtras();
+        this.name=(String) b.get("name").toString().trim();
+        this.voidHelper = (Boolean) b.get("voidHelper");
+        print(this.name, 148);
+        if (this.name.equalsIgnoreCase("Your name")){
+        	this.name = "You";
+        }
+        this.voidHelper = (boolean) b.getBoolean("voidHelper");
+        this.difficulty =  (Integer) b.get("diff");
+        print("difficulty= "+difficulty, 167);
+        this.restart = (Boolean) b.get("restart");
+        if(restart){
+        	print("restarting-onStart", 171);
+	    	makeDeck();
+			shuffle();
+	        deal();
+	        p1.sortHand();
+	        p2.sortHand();
+	        p3.sortHand();
+	        p4.sortHand();
+	
+	        trade();  //ha ha more like set who to trade too.
+	        //TODO let play select cards and trade.
+	        voidCheck();
+	    	//Should check for stuff
+	        start();
+        }
+        else{
+        	print("Game restarted", 174);
+        }
+		
+    	
+    }
 
 	@Override
 	public void onResume(){
+		print("onResume called", 192);
+        //setContentView(R.layout.table);
+		//firstStart();  //always a good plan to call this
+        //this could be a method to create a new hand.
+		//deal();
+        //checkForTwoMethod();
+        //displayCards(p1);
 		super.onResume();
+
+		/*
 		bottomText.setText("curPlayer is "+curPlayer.getRealName());
 		if(pile.size()>=1){
 			bottomText2.setText(""+pile.get(pile.size()-1).getOwner().getRealName()+" played last");
@@ -126,10 +219,96 @@ public class HeartsActivity extends Activity {
 		else{
 			bottomText2.setText(curPlayer.getRealName()+" needs to start");
 		}
-		
+		*/
 		
 	}
-    
+
+	@Override
+	public void onPause(){
+		print("on pause", 190);
+		super.onPause();
+		/*
+		Bundle b;
+		Parcelable p;
+		p1.
+		b.putParcelableArray("players", )
+		ParseObject gameScore = new ParseObject("GameScore");
+		gameScore.put("score", 1337);
+		gameScore.put("playerName", "Sean Plott");
+		gameScore.put("cheatMode", false);
+		try {
+		    gameScore.save();
+		} catch (ParseException e) {
+		    // e.getMessage() will have information on the error.
+		}
+		Test for crash fix from start up.
+		*/
+		
+	}
+	
+	
+	public void onRestoreInstanceState(Bundle savedInstanceState){
+		print("onRestoreInstanceState", 212);
+		restart=false;
+		
+		
+		
+		super.onRestoreInstanceState(savedInstanceState);
+		
+	}
+	@Override
+    public void onRestart(){
+    	print("onRestart()", 214);
+    	restart=true;
+    	//TODO set ALL points back to 0.
+    	super.onRestart();
+    	
+    }
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.mainmenu, menu);
+	    return true;
+	}
+	
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+	        case R.id.hint:
+	            print("Hint asked for", 250);
+				Toast.makeText(HeartsActivity.this, "Press Next",  Toast.LENGTH_SHORT).show();
+
+	            return true;
+	        case R.id.settings:
+	            print("Settings asked for", 253);
+	            MenuInflater inflater = getMenuInflater();
+	            Menu m = null;
+	            inflater.inflate(R.menu.preferences, m);
+	            return true;
+	        case R.id.restart:
+	        	print("restart pressed", 258);
+	        	restart = true;
+	        	
+	        	clearALL();
+	        	start();
+	            print("Restart game", 175);
+	            //TODO GAME variables reset.
+
+	            return true;
+	        case R.id.exit:
+	        	restart=true;
+	            print("Exit", 180);
+	            finish();
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+	}
+	
+
+	
 	/**
 	 * quick print method for debugging
 	 * @param i the String to be printed
@@ -140,12 +319,17 @@ public class HeartsActivity extends Activity {
 	
 	}
     
+    
+    
+    
     /**
+     * Basically declares all the views into  objects.
      * Should only be called from OnCreate(); and OnRestart();
+     * 
      */
-
     public void firstStart() {
-		p1Clubs = (TextView) findViewById(R.id.p1Clubs);
+    	print("firstStart()", 315);
+    	p1Clubs = (TextView) findViewById(R.id.p1Clubs);
     	p1Diamonds = (TextView) findViewById(R.id.p1Diamonds);
     	p1Spades = (TextView) findViewById(R.id.p1Spades);
     	p1Hearts = (TextView) findViewById(R.id.p1Hearts);
@@ -160,34 +344,59 @@ public class HeartsActivity extends Activity {
     	bottomText = (TextView) findViewById(R.id.bottomTV);
     	bottomText2 = (TextView) findViewById(R.id.bottomTV2);
 
-        p2Main =(Button)findViewById(R.id.p2Main);
-        p3Main =(Button)findViewById(R.id.p3Main);
-        p4Main =(Button)findViewById(R.id.p4Main);
+        p2Main = (Button) findViewById(R.id.p2Main);
+        p3Main = (Button) findViewById(R.id.p3Main);
+        p4Main = (Button) findViewById(R.id.p4Main);
 
+	
+    	
+        p1ClubsB =(Button)findViewById(R.id.p1clubsButton);
+        p1DiamondsB=(Button)findViewById(R.id.p1diamondsButton);
+        p1SpadesB=(Button)findViewById(R.id.p1spadesButton);
+        p1HeartsB=(Button)findViewById(R.id.p1heartsButton);
+        
+        p2ClubsB =(Button)findViewById(R.id.p2clubsButton);
+        p2DiamondsB=(Button)findViewById(R.id.p2diamondsButton);
+        p2SpadesB=(Button)findViewById(R.id.p2spadesButton);
+        p2HeartsB=(Button)findViewById(R.id.p2heartsButton);
+        
+        p3ClubsB =(Button)findViewById(R.id.p3clubsButton);
+        p3DiamondsB=(Button)findViewById(R.id.p3diamondsButton);
+        p3SpadesB=(Button)findViewById(R.id.p3spadesButton);
+        p3HeartsB=(Button)findViewById(R.id.p3heartsButton);
+        
 	    p2Main.setBackgroundColor(Color.RED);
 	    p3Main.setBackgroundColor(Color.BLUE);
 	    p4Main.setBackgroundColor(Color.YELLOW);
-
-    	
-    	
-        p1ClubsB =(Button)findViewById(R.id.p1clubsButton);
-        p1DiamondsB=(Button)findViewById(R.id.p1clubsButton);
-        p1SpadesB=(Button)findViewById(R.id.p1clubsButton);
-        p1HeartsB=(Button)findViewById(R.id.p1clubsButton);
+	    
+       /// p4ClubsB =(Button)findViewById(R.id.p4clubsButton);
+       // p4DiamondsB=(Button)findViewById(R.id.p4diamondsButton);
+       // p4SpadesB=(Button)findViewById(R.id.p4spadesButton);
+       // p4HeartsB=(Button)findViewById(R.id.p4heartsButton);
         
         tableCard1 = (EditText)findViewById(R.id.card1);
         tableCard2 = (EditText)findViewById(R.id.card2);
         tableCard3 = (EditText)findViewById(R.id.card3);
         tableCard4 = (EditText)findViewById(R.id.card4);
-        selectedCardTextBox=(TextView)findViewById(R.id.selectedCardTextBox);
+
         
         p1TR= (LinearLayout) findViewById(R.id.player1);
         p2TR= (TableRow) findViewById(R.id.player2);
         p3TR= (TableRow) findViewById(R.id.player3);
         p4TR= (TableRow) findViewById(R.id.player4);
 
-        //this could be a method to create a new hand.
-		makeDeck();
+        clubsPlayed = (TextView) findViewById(R.id.clubsPlayed);
+        diamondsPlayed = (TextView) findViewById(R.id.diamondsPlayed);
+        spadesPlayed = (TextView) findViewById(R.id.spadesPlayed);
+        heartsPlayed = (TextView) findViewById(R.id.heartsPlayed);
+        
+        getCardResources();
+
+	}
+	 
+    public void start(){ 	
+    	print("start()", 344);
+    	//should not need to make deck, just shuffle the old one.
 		shuffle();
         deal();
         p1.sortHand();
@@ -196,28 +405,23 @@ public class HeartsActivity extends Activity {
         p4.sortHand();
 
         trade();  //ha ha more like set who to trade too.
-        //TODO let play select cards and trade.
         voidCheck();
         checkForTwoMethod();
         displayCards(p1);
-
-	}
-	 
-    public void start(){ 	
-    	//p1.set;
-    	print("cp", 89);
-
 	
 	}
     /**
      * creates 52 cards 13 of each suit.
      */
-    public void makeDeck() {    	
+    public void makeDeck() { 
+    	print("make Deck", 400);
+    	if(deck[0]!=null){
+    		deck=new card[53];
+    	}
 		for(int suit=0;suit<4;suit++){			
 			for(int value=1;value<14;value++){
-				int x=0; //to be determined
-				int y=0; //to be determined
-				card cd = new card(x, y, value, suit, null, Thegame);
+
+				card cd = new card( value, suit, null);
 				deck[suit*13+value]=cd;
 			}
 
@@ -229,7 +433,7 @@ public class HeartsActivity extends Activity {
 	 * Probably a very uneven shuffle.
 	 */
 	public void shuffle(){
-
+		print("shuffle", 417);
 		int x=0;
 		int z=50;//times to loop the deck and 'randomly' switch cards.
 		int r = 51;
@@ -269,7 +473,7 @@ public class HeartsActivity extends Activity {
 			
 			deck=deck2;
 			
-			print("suffle"+x, 249);
+			//print("suffle"+x, 249);
 		}
 	}
 /**
@@ -277,7 +481,8 @@ public class HeartsActivity extends Activity {
 	 * NEEDS SHUFFLE.
 	 * */
 	public void deal() {
-		print("dealing", 283);
+		print("dealing", 465);
+		//TODO if resume code 
 		ArrayList<card> hand1 = new ArrayList<card>();
 		ArrayList<card> hand2 = new ArrayList<card>();
 		ArrayList<card> hand3 = new ArrayList<card>();
@@ -295,19 +500,27 @@ public class HeartsActivity extends Activity {
 			hand4.add(deck[d4]);
 		}
 		
-		if(p1==null){//first Start
-			p1 = new Player(hand1, 0, 1, "YOU"); 
-			p2 = new Player(hand2, 0, 2, "Bot 2");
-			p3 = new Player(hand3, 0, 3, "Bot 3");
-			p4 = new Player(hand4, 0, 4, "Bot 4");
+		if(p1==null||restart){//first Start  or restart called
+			print("New hands dealt.", 483);
+			int b = Color.rgb(0, 50 , 200);
+			p1 = new Player(hand1, 0, 1, name, Color.WHITE); 
+			p2 = new Player(hand2, 0, 2, "Chuck  (P2)", Color.RED);
+			p3 = new Player(hand3, 0, 3, "Skippy  (P3)", b);
+			p4 = new Player(hand4, 0, 4, "Jeff  (P4)", Color.YELLOW);
 			//p2.setColor(Color.RED);
 		}
-		else{//else new round and New cards are dealt
+		else if(count==0){//else new round and New cards are dealt
+			print("new round being delt", 492);
 			p1.sethand(hand1);
 			p2.sethand(hand2);
 			p3.sethand(hand3);
 			p4.sethand(hand4);
-
+		}
+		else{
+			print("IMPORTANT STUFF", 494);
+			//we are loading an old game.....
+			//TODO more code for setting it up right?
+			
 		}
 			
 		
@@ -316,8 +529,6 @@ public class HeartsActivity extends Activity {
 	
 		
 	}
-	
-	
 	
 	
 	/**
@@ -330,8 +541,8 @@ public class HeartsActivity extends Activity {
 		if(p1.checkForTwo()){
 			print("p1 plays 2 of clubs", 305);
 			curPlayer=p1;
-			tableCard1.setText(selectedCardSuit+"-"+selectedCard);
-			selectedCardTextBox.setText("You played the 2");
+			//tableCard1.setText(selectedCardSuit+"-"+selectedCard);  //TODO remove this line
+			bottomText.setText("You played the 2");
 			//playing=true;
 			//New code to set up each round play state then not modify till next round.
 			p1.setState(1);
@@ -373,7 +584,10 @@ public class HeartsActivity extends Activity {
 			p4.setState(1);
 			playTwoOfClubs();
 		}
-		print("current player="+curPlayer.getRealName(), 349);
+		else{
+			print("The game has already started.", 465);
+		}
+	print(" 2 check done--curPlayer="+curPlayer.getRealName(), 438);
 	}
 
 
@@ -381,6 +595,7 @@ public class HeartsActivity extends Activity {
 		print("setting Player state on "+p.getSeat(), 354);
 		switch(p.getSeat()){
 		case 1:
+			
 			p1.setState(1);
 			p2.setState(2);
 			p3.setState(3);
@@ -477,22 +692,27 @@ public class HeartsActivity extends Activity {
 					break;
 				}
 			}
+			String rs=cardToString(cardToPlay).replaceFirst(" of ", eol);
 			switch(p1.getState()){
 				case 1:{
 					clearTableCards();
-					tableCard1.setText(selectedCardSuit+"-"+selectedCard);
+					tableCard1.setText(rs);
+			        tableCard1.setBackgroundColor(p1.colorInt);
 					break;
 				}
 				case 2:{
-					tableCard2.setText(selectedCardSuit+"-"+selectedCard);
+					tableCard2.setText(rs);
+			        tableCard2.setBackgroundColor(p1.colorInt);
 					break;
 				}
 				case 3:{
-					tableCard3.setText(selectedCardSuit+"-"+selectedCard);
+					tableCard3.setText(rs);
+			        tableCard3.setBackgroundColor(p1.colorInt);
 					break;
 				}
 				case 4:{
-					tableCard4.setText(selectedCardSuit+"-"+selectedCard);
+					tableCard4.setText(rs);
+			        tableCard4.setBackgroundColor(p1.colorInt);
 					break;
 				}		
 			}
@@ -503,13 +723,13 @@ public class HeartsActivity extends Activity {
 			else{
 				curPlayer=nextPlayer(curPlayer);
 			}
-			
+			bottomText.setText("You played the "+cardToString(cardToPlay));
+
 			selectedCardPlace = 0;
 			selectedCardSuit = -1;
 			selectedCard = 0;
 			displayCards(p1);
 			cardToPlay=null;
-			selectedCardTextBox.setText(selectedCardSuit+" "+ selectedCard);
 		}
 		else{
 			Toast.makeText(HeartsActivity.this, "Not your turn",  Toast.LENGTH_SHORT).show();
@@ -518,7 +738,7 @@ public class HeartsActivity extends Activity {
 		
 
 	}
-	
+ 	
 	
 	public void displayCards(Player p){ 
 		ArrayList<card> c = p.getClubs();
@@ -573,11 +793,35 @@ public class HeartsActivity extends Activity {
 	}
 
 	public void clearTableCards(){
-	    tableCard1.setText("");
-	    tableCard2.setText("");
-	    tableCard3.setText("");
-	    tableCard4.setText("");
+	    tableCard1.setText("1");
+	    tableCard2.setText("2");
+	    tableCard3.setText("3");
+	    tableCard4.setText("4");
+	    tableCard1.setBackgroundColor(Color.LTGRAY);
+	    tableCard2.setBackgroundColor(Color.LTGRAY);
+	    tableCard3.setBackgroundColor(Color.LTGRAY);
+	    tableCard4.setBackgroundColor(Color.LTGRAY);
+
+	    
 	}
+	public void clearALL(){
+		clearTableCards();
+		p1 = null;
+		p2 = null;
+		p3 = null;
+		p4 = null;
+		playing = false;
+		heartsBroken=false;
+	    round=0;
+	    count=0;
+		tableCard1.setBackgroundColor(curPlayer.colorInt);
+		p1TR.setBackgroundColor(Color.BLACK);
+		p2TR.setBackgroundColor(Color.BLACK);
+		p3TR.setBackgroundColor(Color.BLACK);
+		p4TR.setBackgroundColor(Color.BLACK);
+		
+	}
+	
 	public void onMenuPressed(View v){
 		super.onBackPressed();
 	}
@@ -606,20 +850,19 @@ public class HeartsActivity extends Activity {
 	
 	
 	public void GO(){
-		print("GO()",  581);
-		bottomText2.setText(curPlayer.getRealName()+" just Played");
+		print("GO()",  619);
 		roundView.setText("Round= "+round);
 		card r=(curPlayer.go(round, pile, curPlayer));
-		String rs=r.getSuit()+"-"+ r.getValue();
+		String rs=cardToString(r).replaceFirst(" of ", eol);
+		print (rs, 832);
 		pile.add(r);
-		if(curPlayer.getSeat()==4&&pile.size()==3){
-			if(playing){
-				print("redundant call to set playing=true", 589);
-			}
+		if(curPlayer.getSeat()==4&&pile.size()!=4){
 			playing=true;
-			Toast.makeText(HeartsActivity.this, "Please play card",  Toast.LENGTH_SHORT).show();
+			//Toast.makeText(HeartsActivity.this, "Please play card",  Toast.LENGTH_SHORT).show();//  Should not be necessary.
 		}
-		setCardText(curPlayer.getState(), rs);//ADVANCES THE CUR PLAYER
+		bottomText2.setText(curPlayer.getRealName()+" played the "+ cardToString(r));
+		setCardText(curPlayer, rs);//ADVANCES THE CUR PLAYER
+
 	}
 	
 	/**
@@ -627,26 +870,33 @@ public class HeartsActivity extends Activity {
 	 * @param p seat of person who is playing a card
 	 * @param rs the string to be set to the layout.
 	 */
-	public void setCardText(int p, String rs){
+	public void setCardText(Player P, String rs){
+		int p=P.getState();  //could just call curPlayer but this makes sense in my head
 		switch(p){//is is player state 1-4
 		case 1:
 			clearTableCards();
-			curPlayer=nextPlayer(curPlayer);	//this is the error line
 			
+			tableCard1.setBackgroundColor(curPlayer.colorInt);
 			tableCard1.setText(rs);
+			curPlayer=nextPlayer(curPlayer);	//this is the error line
+
 			break;
 			
 		case 2:
-			curPlayer=nextPlayer(curPlayer);	//this is the error line
+			tableCard2.setBackgroundColor(curPlayer.colorInt);
 			tableCard2.setText(rs);
+			curPlayer=nextPlayer(curPlayer);	//this is the error line
+
 			break;
 		case 3:
-			curPlayer=nextPlayer(curPlayer);	//this is the error line
+			tableCard3.setBackgroundColor(curPlayer.colorInt);
 			tableCard3.setText(rs);
+			curPlayer=nextPlayer(curPlayer);	//this is the error line
 			break;
 		case 4:
 			tableCard4.setText(rs);
-			if(pile.size()==4){
+			tableCard4.setBackgroundColor(curPlayer.colorInt);
+			if(pile.size()>=4){
 				print("picking up hand", 652);
 				pickUpHand();
 			}
@@ -682,30 +932,65 @@ public class HeartsActivity extends Activity {
 			curPlayer.getClubs().remove(0); //Does not have Ace thus remove place one.
 		}
 		print("game started by"+curPlayer.getRealName(), 653);
-		String rs=r.getSuit()+"-"+ r.getValue();
+		String rs=cardToString(r).replaceFirst(" of ", eol);
 		pile.add(r);
 		bottomText2.setText(curPlayer.getRealName()+" played the 2 of Clubs");
-		setCardText(curPlayer.getState(), rs);
-		//playState++; no longer used
+		setCardText(curPlayer, null);//This advances the curPlayer.
+		//test CODE TODO
+		//canvas.drawBitmap(bitmap, x - (bitmap.getWidth() /2), y - (bitmap.getHeight() /2), null); 
+		
+		tableCard1.setBackgroundResource(cardArrayRes[0]);
+		tableCard1.setMaxHeight(123);
+		tableCard1.setMaxWidth(75);
+		tableCard1.setHeight(123);
+		tableCard1.setWidth(75);
+		Rect rect;
+		rect= new Rect(10, 10, 120, 80);
+		Drawable d=tableCard1.getBackground();
+		String dInt= ""+d.getBounds().top+ d.getBounds().right+ d.getBounds().left+ d.getBounds().bottom;
+		print (dInt, 943);
+		//Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
+		// Scale it to 50 x 50
+		// Set your new, scaled drawable "d"
+		d.setBounds(rect);
+		dInt= ""+d.getBounds().top+ d.getBounds().right+ d.getBounds().left+ d.getBounds().bottom;
+		print (dInt, 949);
+		tableCard1.setBackgroundDrawable(d);
 		if(curPlayer.getSeat()==1){
 			playing=true;
-			if(playing){
-				print("redundant call to set playing=true", 663);
-			}
-			selectedCardTextBox.setText("Your Turn");
+			bottomText.setText("Your Turn");
 		}
+		
+		
+		
+		
+		print("0101010", 959);
 	}
+	
+	public void getCardResources(){
+		cardArrayRes[0] = R.drawable.club2front;
+		cardArrayRes[2] = R.drawable.club2front;
+		cardArrayRes[3] = R.drawable.club3front;
+		cardArrayRes[4] = R.drawable.club2front;
+		cardArrayRes[5] = R.drawable.club2front;
+        //arr[1] = R.drawable.icon;
+	}
+	
+	
+	
 	public void pickUpHand(){
 		p1TR.setBackgroundColor(Color.BLACK);
 		p2TR.setBackgroundColor(Color.BLACK);
 		p3TR.setBackgroundColor(Color.BLACK);
 		p4TR.setBackgroundColor(Color.BLACK);
+		
 		roundHands.add(pile);
 		int high = 0;
 		int highSeat  = 0;
 		int points = 0;
 		int firstSuit=pile.get(0).getSuit();
 		for(int i=0;i<pile.size();i++){		// maybe start at the back of the pile...yet it does not really matter
+			pile.get(i).setPlayed(true);	//just added Not used yet but could be used to check what cards have been played on crash.
 			int curSuit=pile.get(i).getSuit();
 			int curCard =pile.get(i).getValue();
 			if(high<curCard){
@@ -737,44 +1022,42 @@ public class HeartsActivity extends Activity {
 		}
 		switch(highSeat){
 		case 1:
-			curPlayer=p1;
+			this.curPlayer=this.p1;
 			curPlayer.addToScore(points);
 	        p1tvScore.setText("P1 has "+curPlayer.getScore()+" points");
-
-			//Toast.makeText(HeartsActivity.this, "p1 won, points="+points,  Toast.LENGTH_SHORT).show();
 			playing=true;
 			bottomText2.setText("You won, points="+points);
+			bottomText.setText("Pick a Start Card");
 
-			selectedCardTextBox.setText("Pick a Start Card");
 			break;
 		case 2:
-			curPlayer=p2;
+			this.curPlayer=this.p2;
 			curPlayer.addToScore(points);
 	        p2tvScore.setText("P2 has "+curPlayer.getScore()+" points");
-
 			bottomText2.setText("p2 won, points="+points);
-			//Toast.makeText(HeartsActivity.this, "p2 won, points="+points,  Toast.LENGTH_SHORT).show();
+			
 			break;
 		case 3:
-			curPlayer=p3;
+			this.curPlayer=this.p3;
 			curPlayer.addToScore(points);
 	        p3tvScore.setText("P3 has "+curPlayer.getScore()+" points");
-
 			bottomText2.setText("p3 won, points="+points);
-			//Toast.makeText(HeartsActivity.this, "p3 won, points="+points,  Toast.LENGTH_SHORT).show();
+			
 			break;
 		case 4: 
-			curPlayer=p4;
+			this.curPlayer=this.p4;
 			curPlayer.addToScore(points);
 	        p4tvScore.setText("P4 has "+curPlayer.getScore()+" points");
-			bottomText2.setText("p4 won, points="+points);
-			//Toast.makeText(HeartsActivity.this, "p4 won, points="+points,  Toast.LENGTH_SHORT).show();
+			bottomText2.setText("p4 won, taking="+points+" points");
+
 			break;
 		}	
 		print("pickUpHand() for "+curPlayer.getRealName(), 770);
 		curPlayer.addDeckItem(pile);
-
-
+		tableCard1.setBackgroundColor(curPlayer.getColor());
+	    tableCard2.setBackgroundColor(curPlayer.getColor());
+	    tableCard3.setBackgroundColor(curPlayer.getColor());
+	    tableCard4.setBackgroundColor(curPlayer.getColor());
 		pile.clear();
 		setPlayState(curPlayer);  //for next round.
 
@@ -782,24 +1065,30 @@ public class HeartsActivity extends Activity {
 		count++;	//cards left counter
 		if(count==13){//Done playing need new cards.
 			Toast.makeText(HeartsActivity.this, "New round!",  Toast.LENGTH_SHORT).show();
-
 			count=0;
 			round++;  	//ROUND INCREMENTER!!!
-			//TODO Point check see if anyone has 100 yet 
-			shuffle();
-	        deal();
-	        p1.addToTotalScore(p1.getScore());
-	        p1.sortHand();
-	        p2.sortHand();
-	        p3.sortHand();
-	        p4.sortHand();
-	        trade();  //ha ha more like set who to trade too.
-	        voidCheck();
-	        checkForTwoMethod();
-	        displayCards(p1);
+			if(endGameCheck()){
+				curPlayer = winnerCheck();
+				bottomText.setText(curPlayer.getRealName()+" won the game!");
+				bottomText2.setText("Press menu, then restart to play again");
 
+			}
+			else{
+				print("New round", 982);
+				shuffle();
+		        deal();
+		        p1.sortHand();
+		        p2.sortHand();
+		        p3.sortHand();
+		        p4.sortHand();
+		        trade();  //ha ha more like set who to trade too.
+		        voidCheck();
+		        checkForTwoMethod();
+		        displayCards(p1);
+			}
 			
 		}
+		
 		//clears on start of next round....usually
 		//Toast.makeText(HeartsActivity.this, "Press Clear to clear Board",  Toast.LENGTH_SHORT).show();
 		
@@ -820,6 +1109,88 @@ public class HeartsActivity extends Activity {
 		*/
 
 		
+	}
+	/**
+	 * Finds lowest scoring player and sets winner to true.
+	 * Does less than or equal to...should be just less than or tie.
+	 */
+	public Player winnerCheck(){//this prob needs some rework
+		int scorep1 = p1.getScore();
+		int scorep2 = p2.getScore();
+		int scorep3 = p3.getScore();
+		int scorep4 = p4.getScore();
+
+
+		if(scorep1<=scorep2){
+			if(scorep1<=scorep3){
+				if(scorep1<=scorep4){
+					print("YOU WON", 995);
+					p1.winner=true;
+					return p1;
+				}
+				else{
+					print("P4 WON", 995);
+					p4.winner=true;
+					return p4;
+				}
+			}
+			else if(scorep3<=scorep4){
+				print("P3 WON", 995);
+				p3.winner=true;
+				return p3;
+			}
+
+		}
+		else if(scorep2<=scorep3){
+			if(scorep2<=scorep4){
+				print("P2 WON", 995);
+				p2.winner=true;
+				return p2;
+			}
+			else{
+				print("P4 WON", 995);
+				p4.winner=true;
+				return p4;
+				
+			}
+		}
+		else if(scorep3<=scorep4){
+				print("P3 WON", 995);
+				p3.winner=true;
+				return p3;
+			}
+			else{
+				print("P4 WON", 995);
+				p4.winner=true;
+				return p4;
+				
+			}
+		print("returning null on winner", 1040);
+		return null;
+		}
+		
+	public boolean endGameCheck(){
+		if(p1.getScore()>=100){
+			print("Player 1 LOOSES", 912);
+			return true;
+		}
+		if(p2.getScore()>=100){
+			print("Player 2 LOOSES", 912);
+			return true;
+
+		}
+		if(p3.getScore()>=100){
+			print("Player 3 LOOSES", 912);
+			return true;
+
+		}
+		if(p4.getScore()>=100){
+			print("Player 4 LOOSES", 912);
+			return true;
+
+		}
+		return false;  //Nobody has too many points
+		//TODO End game mode, find winner, show scores, 
 	}
 	
 
@@ -844,7 +1215,8 @@ public class HeartsActivity extends Activity {
 			case 4:
 				p4TR.setBackgroundColor(Color.BLACK);
 			int C=-132936;
-			p1TR.setBackgroundColor(C);
+			
+			p1TR.setBackgroundColor(669900);
 				playing=true;
 				return p1;
 		}
@@ -855,11 +1227,11 @@ public class HeartsActivity extends Activity {
 		switch (i){
 		case 0:
 			return(p.voidClubs);
-		case 2:
+		case 1:
 			return (p.voidDiamonds);
-		case 3:
+		case 2:
 			return (p.voidSpades);
-		case 4:
+		case 3:
 			return(p.voidHearts);
 		}
 		return false;
@@ -902,6 +1274,7 @@ public class HeartsActivity extends Activity {
 			else{
 				print("Trying to play wrong suit", 849);
 				Toast.makeText(HeartsActivity.this, "Not a Valid Choice",  Toast.LENGTH_SHORT).show();
+				return;
 
 			}
 		}
@@ -930,11 +1303,10 @@ public class HeartsActivity extends Activity {
 			}
 		}
 		cardToPlay=cArray.get(selectedCardPlace);
-		selectedCardTextBox.setText("suit="+selectedCardSuit+"  "+selectedCard);
+		bottomText.setText(cardToString(cardToPlay));
 	}
 	
 	public void onp1DiamondsButtonPressed(View v){
-		
 		//DO NOT PUT STUFF ABOVE THIS  this check should happen first.
 		ArrayList<card> cArray=p1.getDiamonds();
 		if(cArray.size()==0){
@@ -970,6 +1342,7 @@ public class HeartsActivity extends Activity {
 			else{
 				print("Trying to play wrong suit", 915);
 				Toast.makeText(HeartsActivity.this, "Not a Valid Choice",  Toast.LENGTH_SHORT).show();
+				return;
 
 			}
 		}
@@ -998,7 +1371,7 @@ public class HeartsActivity extends Activity {
 			}
 		}
 		cardToPlay=cArray.get(selectedCardPlace);
-		selectedCardTextBox.setText("suit="+selectedCardSuit+"  "+selectedCard);
+		bottomText.setText(cardToString(cardToPlay));
 	}
 	public void onp1SpadesButtonPressed(View v){
 
@@ -1037,6 +1410,8 @@ public class HeartsActivity extends Activity {
 			else{
 				print("Trying to play wrong suit", 980);
 				Toast.makeText(HeartsActivity.this, "Not a Valid Choice",  Toast.LENGTH_SHORT).show();
+				return;
+
 
 			}
 		}
@@ -1047,7 +1422,7 @@ public class HeartsActivity extends Activity {
 				selectedCardSuit=2;
 			}
 			else{
-				if(selectedCardSuit==0){
+				if(selectedCardSuit==2){
 					selectedCardPlace++;
 					if(selectedCardPlace>=cArray.size()){
 						selectedCardPlace=0;
@@ -1065,7 +1440,7 @@ public class HeartsActivity extends Activity {
 			}
 		}
 		cardToPlay=cArray.get(selectedCardPlace);
-		selectedCardTextBox.setText("suit="+selectedCardSuit+"  "+selectedCard);
+		bottomText.setText(cardToString(cardToPlay));
 	}
 	public void onp1HeartsButtonPressed(View v){
 
@@ -1106,6 +1481,7 @@ public class HeartsActivity extends Activity {
 			else{
 				print("Trying to play wrong suit", 1045);
 				Toast.makeText(HeartsActivity.this, "Not a Valid Choice",  Toast.LENGTH_SHORT).show();
+				return;
 
 			}
 
@@ -1142,9 +1518,71 @@ public class HeartsActivity extends Activity {
 		}
 		
 		cardToPlay=cArray.get(selectedCardPlace);
-		selectedCardTextBox.setText("suit="+selectedCardSuit+"  "+selectedCard);
+		bottomText.setText(cardToString(cardToPlay));
 	}
-	public void cardToString(){
+	public String cardToString(card c){
+		int value = c.getValue();
+		String sValue = "";
+		
+		int suit = c.getSuit();
+		String sSuit="";
+		switch(suit){
+		case 0:
+			sSuit="Clubs";
+			break;
+		case 1:
+			sSuit="Diamonds";
+			break;
+		case 2:
+			sSuit="Spades";
+			break;
+		case 3: 
+			sSuit="Hearts";
+			break;
+		}
+		
+		switch (value){
+			case 1:
+				sValue="Ace";
+				break;
+			case 2: 
+				sValue="Two";
+				break;
+			case 3:
+				sValue="Three";
+				break;
+			case 4:
+				sValue="Four";
+				break;
+			case 5:
+				sValue="Five";
+				break;
+			case 6:
+				sValue="Six";
+				break;
+			case 7:
+				sValue="Seven";
+				break;
+			case 8:
+				sValue="Eight";
+				break;
+			case 9:
+				sValue="Nine";
+				break;
+			case 10:
+				sValue="Ten";
+				break;
+			case 11:
+				sValue="Jack";
+				break;
+			case 12:
+				sValue="Queen";
+				break;
+			case 13:
+				sValue="King";
+				break;
+			}
+		return sValue+" of "+sSuit;
 		
 	}
 
@@ -1215,62 +1653,8 @@ public class HeartsActivity extends Activity {
         super.onCreate(savedInstanceState);
 		//Intent menuIntent  =new Intent(this, game.shad.tempus.hearts.mainMenu.class);
 		//startActivity(menuIntent);
-        //p1 =new Player();
-        
-        setContentView(R.layout.table);
-        firstStart();
-        /*
-        if(!playing){
-        	setContentView(R.layout.main);
-        }
-        /
 
-        
-    }
-    protected void firstStart() {
-		
-		Thegame=new playState();
-		makeDeck();
-		//shuffle
-        deal();
-        print("start player is "+curPlayer.getName(), 71);
 
-        Arrays.sort(p1.gethand());
-        Arrays.sort(p2.gethand());
-        Arrays.sort(p3.gethand());
-        Arrays.sort(p4.gethand());
-        
-
-        playing=true;
-        p1.gethand();
-        
-        //p1.getDeck().sortHand();
-        start();
-
-	
-	}
-	
-    
-    private void start(){ 	
-    	//p1.setsky
-    	print("cp", 89);
-        p1Clubs =(TextView)findViewById(R.id.p1clubsButton);
-        p1Diamonds=(TextView)findViewById(R.id.p1clubsButton);
-        p1Spades=(TextView)findViewById(R.id.p1clubsButton);
-        p1Hearts=(TextView)findViewById(R.id.p1clubsButton);
-        p1Clubs.setText(p1.getDeck().clubsString.toString());
-        
-        
-        
-        //p1Diamonds
-        //p1Spades=
-        //p1Hearts
-		//if(round<3){
-		//	trade();	//ignoring for now.
-		//}
-	
-	}
-    
     public void onActivityResult(int requestCode, int resultCode, Intent data){
     	Log.d(TAG, "return request");
     	print("return", 107);
@@ -1281,221 +1665,10 @@ public class HeartsActivity extends Activity {
     	}
     }
     
-    private void laycard(card card) {
-		//topGrid=(LinearLayout) findViewById(R.id.table);
-		
-		// TODO Auto-generated method stub
-		
-	}
-    public void onNextButtonPressed(View v){
-    	playState++;
-    	Intent nextIntent  =new Intent(this, game.shad.tempus.hearts.playState.class);
-    	nextIntent.putExtra("ps", playState);
-    	nextIntent.putExtra("re", count);
-    	startActivityForResult(nextIntent, count);
-    	//Thegame.nextState(playState);
-        // startActivity(nextIntent);
-    	
-    	count++;
-    }
-    
-    
-	//could be removed if it can be taken care of int the card class
-    public void drawcard(Canvas g, card card, int x, int y) {
-    	   int cx;    // x-coord of upper left corner of the card inside cardsImage
-    	   int cy;    // y-coord of upper left corner of the card inside cardsImage
-    	   if (card == null) {
-    	      cy = 4*123;   // coords for a face-down card.
-    	      cx = 2*79;
-    	   }
-    	   else {
-    	      cx = (card.getValue())*79;
-    	      switch (card.getSuit()) {
-    	      case card.CLUBS:    
-    	         cy = 0; 
-    	         break;
-    	      case card.DIAMONDS: 
-    	         cy = 123; 
-    	         break;
-    	      case card.HEARTS:   
-    	         cy = 2*123; 
-    	         break;
-    	      default:  // spades   
-    	         cy = 3*123; 
-    	         break;
-    	      }
-    	   }
-    	   //Bitmap  bitmap = Bitmap.createBitmap( topGrid.getWidth(), topGrid.getHeight(), Bitmap.Config.ARGB_8888);
-    	   //Canvas canvas = new Canvas(bitmap);
-    	   //view.draw(canvas); 
-    	   //bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos); 
-    	   //g.drawImage(Images,x,y,x+79,y+123,cx,cy,cx+79,cy+123,this);
-    	}
-    /**
-     * Find the player who has the 2 of Clubs
-     * Return them and set states for other players
-     * @return
-     
-	public void onPopPressed(View v){
-		print("pop...", 144);
-	}
-	
-	public void onPassPressed(View v){
-		print("passing...", 148);
-	}
-	protected Player findTwo() {
-		if(p1.checkForTwo()){
-			p1.state.setState(1);
-			p2.state.setState(2);
-			p3.state.setState(3);
-			p4.state.setState(4);
-			return p1;
-		}
-		else if(p2.checkForTwo()){
-			p1.state.setState(4);
-			p2.state.setState(1);
-			p3.state.setState(2);
-			p4.state.setState(3);
-			return p2;
-		}
-		else if(p3.checkForTwo()){
-			p1.state.setState(3);
-			p2.state.setState(4);
-			p3.state.setState(1);
-			p4.state.setState(2);
-			return p3;
-		}
-		else if(p4.checkForTwo()){
-			p1.state.setState(2);
-			p2.state.setState(3);
-			p3.state.setState(4);
-			p4.state.setState(1);
-			return p4;
-		}
-		
-		return null;
-		
-		
-	}
+   
 
-
-
-	private void trade() {
-		
-		switch (round){
-		case 1:
-			p1.setPass(2);
-			p2.setPass(3);
-			p3.setPass(4);
-			p4.setPass(1);
-			break;
-		case 2:
-			p1.setPass(4);
-			p2.setPass(1);
-			p3.setPass(2);
-			p4.setPass(3);
-			break;
-		case 3:
-			p1.setPass(3);
-			p2.setPass(4);
-			p3.setPass(1);
-			p4.setPass(2);
-			break;
-		case 4:
-			p1.setPass(0);
-			p2.setPass(0);
-			p3.setPass(0);
-			p4.setPass(0);
-			break;
-		}
-		
-		
-	}
-
-
-/**
- * Create the and deals them out and then finds the two
- * NEEDS SHUFFLE.
- 
-	private void deal() {
-    	card[] hand1 = new card[14];
-    	card[] hand2 = new card[14];
-    	card[] hand3 = new card[14];
-    	card[] hand4 = new card[14];
- 
-		for(int i=0;i<13;i++){//could be buggy
-			int d1=i;
-			int d2=13+i;
-			int d3=26+i;
-			int d4=39+i;
-			hand1[i]=deck[d1];
-			hand2[i]=deck[d2];
-			hand3[i]=deck[d3];
-			hand4[i]=deck[d4];
-		}
-		
-		p1 = new Player(hand1, 0, 1, name); 
-		p2 = new Player(hand2, 0, 2, "Bot 2");
-		p3 = new Player(hand3, 0, 3, "Bot 3");
-		p4 = new Player(hand4, 0, 4, "Bot 4");
-		
-		
-	
-		if(p1.checkForTwo()){
-			curPlayer=p1;
-		}
-		else if(p2.checkForTwo()){
-			curPlayer=p2;
-		}
-		else if(p3.checkForTwo()){
-			curPlayer=p3;
-		}
-		else if(p4.checkForTwo()){
-			curPlayer=p4;
-		}
-		}
-		
-
-
-	private void makeDeck() {
-    	
-		for(int suit=0;suit<4;suit++){			
-			for(int value=0;value<13;value++){
-				int x=0; //to be determined
-				int y=0; //to be determined
-				card cd = new card(x, y, value, suit);
-				deck[suit*13+value]=cd;
-			}
-
-		}
-		
-	}
-
-
-
-	public void onStartPressed(View v){
-		EditText et = (EditText) findViewById(R.id.name);
-		name=et.getText().toString();
-		print(name, 287);
-		RadioGroup rg = (RadioGroup) findViewById(R.id.difficulty);
-		RadioButton easy = (RadioButton) findViewById(R.id.easy);
-		RadioButton medium = (RadioButton) findViewById(R.id.medium);
-		RadioButton hard = (RadioButton) findViewById(R.id.hard);
-		if(easy.isChecked()){
-			difficulty=1;
-		}
-		else if(medium.isChecked()){
-			difficulty=2;
-		}
-		else if(hard.isChecked()){
-			difficulty=3;
-		}	
-		System.out.println("the game difficulty is set to "+difficulty);
-		firstStart();
-	}
 
 	
-		
 
 */
     

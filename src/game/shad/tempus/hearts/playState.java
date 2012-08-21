@@ -7,7 +7,7 @@ import android.os.Parcelable;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class playState  extends  HeartsActivity {
+public class playState  extends  Game {
 		int curState;
 		int result;
 		

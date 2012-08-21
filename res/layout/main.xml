@@ -3,8 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-
-
+
     <LinearLayout
         android:id="@+id/Startlayout"
         android:layout_width="match_parent"
@@ -34,10 +33,11 @@
             </EditText>
 
         </LinearLayout>
-
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:gravity="fill_horizontal" >
 
             <TextView
                 android:id="@+id/textView2"
@@ -46,7 +46,7 @@
                 android:text="@string/Diff"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
         </LinearLayout>
-
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -69,7 +69,7 @@
                     android:id="@+id/medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:enabled="false"
+                    android:enabled="true"
                     android:onClick="todo"
                     android:text="@string/medium" />
 
@@ -77,49 +77,99 @@
                     android:id="@+id/hard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:enabled="false"
+                    android:enabled="true"
                     android:onClick="todo"
                     android:text="@string/hard" />
 
             </RadioGroup>
-
+
             <LinearLayout
                 android:id="@+id/trackVoids"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="right" >
-
-                <CheckBox
-                    android:id="@+id/trackVoidsBox"
+
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:checked="true"
-                    android:layout_height="wrap_content"
-                    android:text="@string/helperVoids" />
+                    android:layout_height="match_parent"
+                    android:orientation="vertical" >
+
+                    <RadioGroup
+                        android:id="@+id/shuffle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" >
+
+                        <RadioButton
+                            android:id="@+id/dropShuffle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:enabled="true"
+                            android:text="@string/dropShuffle" />
+
+                        <RadioButton
+                            android:id="@+id/randomSwap"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:enabled="true"
+                            android:text="@string/randomSwap" />
+                    </RadioGroup>
+
+                </LinearLayout>
 
             </LinearLayout>
 
         </LinearLayout>
-
-        <Button
-            android:id="@+id/resume"
-            android:onClick="onResumePressed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/resume" />
-
-        <Button
-            android:id="@+id/start"
-            android:layout_width="118dp"
-            android:layout_height="wrap_content"
-            android:onClick="onStartPressed"
-            android:text="@string/start" />
-
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical" >
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <CheckBox
+                    android:id="@+id/playerHelper"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/playerHelper" />
+
+                <CheckBox
+                    android:id="@+id/trackVoidsBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/helperVoids" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <Button
+                    android:id="@+id/start"
+                    android:layout_width="118dp"
+                    android:layout_height="wrap_content"
+                    android:onClick="onStartPressed"
+                    android:text="@string/start" />
+
+                <Button
+                    android:id="@+id/resume"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:onClick="onResumePressed"
+                    android:text="@string/resume" />
+
+            </LinearLayout>
+
         </LinearLayout>
+
+
     </LinearLayout>
 
     <LinearLayout

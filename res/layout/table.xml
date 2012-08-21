@@ -6,297 +6,105 @@
     android:orientation="vertical" >
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/tableHolderLayout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center" >
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="320dp"
-        android:layout_height="wrap_content"
-        android:gravity="center|fill|fill_horizontal|left|right" >
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="left"
-            android:orientation="vertical" >
-
-            <Button
-                android:id="@+id/menu"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="onMenuPressed"
-                android:text="@string/menu" />
-
-            <Button
-                android:id="@+id/p4Main"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/player4"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="0.29" >
-        </LinearLayout>
-
-        <TableRow
-            android:id="@+id/player3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center|center_horizontal" >
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                    <Button
-                        android:id="@+id/p3clubsButton"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/clubsc" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                    <Button
-                        android:id="@+id/p3diamondsButton"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/diamondsd" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                    <Button
-                        android:id="@+id/p3spadesButton"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/spadess" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
-
-                    <Button
-                        android:id="@+id/p3heartsButton"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/heartsh" />
-
-                </LinearLayout>
-            </LinearLayout>
-        </TableRow>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="0.10" >
-
-            <Button
-                android:id="@+id/p3Main"
-                android:layout_width="55dp"
-                android:layout_height="34dp"
-                android:text="@string/player3"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:gravity="right"
-            android:orientation="vertical" >
-
-            <Button
-                android:id="@+id/exit"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="onExitPressed"
-                android:text="@string/exit" />
-
-            <Button
-                android:id="@+id/p2Main"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/player2"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal|center_vertical" >
-
-        <TableRow
-            android:id="@+id/player4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+        android:orientation="vertical" >
 
-            <SurfaceView
-                android:id="@+id/tableView"
-                android:layout_width="100dp"
-                android:layout_height="125dp" />
-
-        </TableRow>
-
         <LinearLayout
-            android:layout_width="98dp"
-            android:layout_height="101dp" >
-
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center|fill|fill_horizontal|left|right" >
+
             <LinearLayout
-                android:layout_width="42dp"
-                android:layout_height="match_parent"
-                android:orientation="vertical" >
-
-                <EditText
-                    android:id="@+id/card4"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/card4" />
-
-                <EditText
-                    android:id="@+id/card1"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/card1" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="42dp"
-                android:layout_height="match_parent"
-                android:orientation="vertical" >
-
-                <EditText
-                    android:id="@+id/card3"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/card3" />
-
-                <EditText
-                    android:id="@+id/card2"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/card2" />
-
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical|right" >
-
-            <TableRow
-                android:id="@+id/player2"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
+                android:layout_height="match_parent"
+                android:gravity="left"
+                android:orientation="vertical" >
 
-                <LinearLayout
+                <Button
+                    android:id="@+id/menu"
+                    style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical" >
+                    android:onClick="onMenuPressed"
+                    android:text="@string/menu" />
+            </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" >
-
-                        <Button
-                            android:id="@+id/p2clubsButton"
-                            style="?android:attr/buttonStyleSmall"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/clubsc" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" >
-
-                        <Button
-                            android:id="@+id/p2diamondsButton"
-                            style="?android:attr/buttonStyleSmall"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/diamondsd" />
-                    </LinearLayout>
-                </LinearLayout>
-
+            <LinearLayout
+                android:id="@+id/topLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0.29" >
+
                 <LinearLayout
+                    android:id="@+id/tableLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical" >
+                    android:gravity="center_horizontal|center_vertical"
+                    android:orientation="horizontal" >
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" >
+                    <EditText
+                        android:id="@+id/card1"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:text="@string/card1" />
 
-                        <Button
-                            android:id="@+id/p2spadesButton"
-                            style="?android:attr/buttonStyleSmall"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/spadess" />
-                    </LinearLayout>
+                    <EditText
+                        android:id="@+id/card2"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:text="@string/card2" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" >
-
-                        <Button
-                            android:id="@+id/p2heartsButton"
-                            style="?android:attr/buttonStyleSmall"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/heartsh" />
+                    <EditText
+                        android:id="@+id/card3"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:text="@string/unknown" />
 
-                    </LinearLayout>
+                    <EditText
+                        android:id="@+id/card4"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:text="@string/card4" />
                 </LinearLayout>
-            </TableRow>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:gravity="right"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/exit"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="onExitPressed"
+                    android:text="@string/exit" />
+            </LinearLayout>
         </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -330,7 +138,7 @@
                 android:text="@string/p4Score"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
         </LinearLayout>
-
+
         <LinearLayout
             android:id="@+id/player1"
             android:layout_width="wrap_content"
@@ -345,14 +153,14 @@
                 android:gravity="center|center_horizontal" >
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical" >
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" >
 
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" >
+
                         <Button
                             android:id="@+id/p1clubsButton"
                             style="?android:attr/buttonStyleSmall"
@@ -360,20 +168,19 @@
                             android:layout_height="wrap_content"
                             android:onClick="onp1ClubsButtonPressed"
                             android:text="@string/clubsc" />
-
+
                         <TextView
                             android:id="@+id/p1Clubs"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/unknown"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
-
                     </LinearLayout>
-
+
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" >
-
+
                         <Button
                             android:id="@+id/p1diamondsButton"
                             style="?android:attr/buttonStyleSmall"
@@ -382,21 +189,21 @@
                             android:layout_weight="1"
                             android:onClick="onp1DiamondsButtonPressed"
                             android:text="@string/diamondsd" />
-
+
                         <TextView
                             android:id="@+id/p1Diamonds"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:text="@string/unknown"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
-
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
-
+
             <LinearLayout
                 android:id="@+id/LinearLayout1"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent" >
 
                 <LinearLayout
@@ -407,7 +214,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" >
-
+
                         <Button
                             android:id="@+id/p1spadesButton"
                             style="?android:attr/buttonStyleSmall"
@@ -415,20 +222,19 @@
                             android:layout_height="wrap_content"
                             android:onClick="onp1SpadesButtonPressed"
                             android:text="@string/spadess" />
-
+
                         <TextView
                             android:id="@+id/p1Spades"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/unknown"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
-
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" >
-
+
                         <Button
                             android:id="@+id/p1heartsButton"
                             style="?android:attr/buttonStyleSmall"
@@ -436,52 +242,51 @@
                             android:layout_height="wrap_content"
                             android:onClick="onp1HeartsButtonPressed"
                             android:text="@string/heartsh" />
-
+
                         <TextView
                             android:id="@+id/p1Hearts"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/unknown"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
-
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="vertical" >
-
+
             <TextView
                 android:id="@+id/roundView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/random"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
             <TextView
                 android:id="@+id/clubsPlayed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/unknown"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
             <TextView
                 android:id="@+id/diamondsPlayed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/unknown"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
             <TextView
                 android:id="@+id/spadesPlayed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/unknown"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
             <TextView
                 android:id="@+id/heartsPlayed"
                 android:layout_width="wrap_content"
@@ -489,27 +294,34 @@
                 android:text="@string/unknown"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
+            <TextView
+                android:id="@+id/totalPlayed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/unknown"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
         </LinearLayout>
     </LinearLayout>
-
+
     <LinearLayout
-        android:layout_width="320dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-
+
         <Button
-            android:id="@+id/back"
+            android:id="@+id/debug"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onBackButtonPressed"
+            android:onClick="onDebugButtonPressed"
             android:text="@string/Previous" />
-
+
         <Button
-            android:id="@+id/hint"
+            android:id="@+id/clear"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onHintPressed"
+            android:onClick="onClearPressed"
             android:text="@string/clear" />
 
         <Button
@@ -530,6 +342,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/bottomLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical" >
@@ -541,7 +354,7 @@
             android:clickable="false"
             android:ems="10"
             android:singleLine="true" />
-
+
         <EditText
             android:id="@+id/bottomTV2"
             android:layout_width="match_parent"

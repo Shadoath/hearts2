@@ -17,7 +17,7 @@ implements SurfaceHolder.Callback {
 
     private static final String TAG = heartsPanel.class.getSimpleName();
 	
-	public card[] deck=new card[52];
+	public Card[] deck=new Card[52];
 	//public Player p1;
 	//public Player p2;
 	//public Player p3;
@@ -34,8 +34,8 @@ implements SurfaceHolder.Callback {
     public int round=0;
     public int count=0;
     public int players=4;
-    private card heartOne;
-    private card heartTwo;
+    private Card heartOne;
+    private Card heartTwo;
 
     public int testX = 0;
     public int testY = 0;

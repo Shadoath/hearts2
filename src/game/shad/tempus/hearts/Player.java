@@ -9,11 +9,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 @SuppressLint("ParserError")
-public class Player extends HeartsActivity{
-	ArrayList<card> hand;
-	public ArrayList<ArrayList<card>> takenHands = new ArrayList<ArrayList<card>>();
+public class Player extends Game{
+	ArrayList<Card> hand;
+	public ArrayList<ArrayList<Card>> takenHands = new ArrayList<ArrayList<Card>>();
+	public Deck deck =new Deck();
 	public int seat=0; //position
 	public String realName = "";
 	public int colorInt = 0;
@@ -22,74 +24,37 @@ public class Player extends HeartsActivity{
 	public int score = 0;
 	public int totalScore=0;
 	public int passTo = 0;
-	ArrayList<card> clubs = new ArrayList<card>();     //0
+	Deck clubs = new Deck();     //0
 	int highClub = 0;
 	int lowClub = 0;
-	ArrayList<card> diamonds = new ArrayList<card>();  //1
+	Deck diamonds = new Deck();  //1
 	int highDiamonds = 0;
 	int lowDiamonds = 0;
-	ArrayList<card> spades = new ArrayList<card>();	   //2
+	Deck spades = new Deck();	   //2
 	int highSpades = 0;
 	int lowSpades = 0;
-	ArrayList<card> hearts = new ArrayList<card>();    //
+	Deck hearts = new Deck();    //
 	int highHearts = 0;
 	int lowHearts = 0;
-	public boolean winner = false;
-	public boolean voidClubs;
-	public boolean voidDiamonds;
-	public boolean voidHearts;
-	public boolean voidSpades;
-	public String clubsString="";
-	public String diamondsString="";
-	public String heartsString="";
-	public String spadesString="";
-	public Button clubsButton;
-	public Button diamondsButton;
-	public Button spadesButton;
-	public Button heartsButton;
-	
+	boolean winner = false;
+	boolean voidClubs;
+	boolean voidDiamonds;
+	boolean voidHearts;
+	boolean voidSpades;
 	
 	public LayoutInflater factory;
 
 	public View textEntryView;
 
-	public Player(ArrayList<card> hand1, int score, int seat, String name, int color){
-		this.hand = hand1;
+	public Player(Deck deck, int score, int seat, String name, int color){
+
+		this.deck = deck;
 		this.score = score;
 		this.seat = seat;
 		this.realName = name;
 		this.colorInt = color;
-		//this.deck = new Deck();
-		/*
-		switch(seat){
-		case 1:
-			clubsButton = (Button)  findViewById(R.id.p1clubsButton);
-			diamondsButton = (Button)  findViewById(R.id.p1diamondsButton);
-			spadesButton = (Button)  findViewById(R.id.p1spadesButton);
-			heartsButton = (Button)  findViewById(R.id.p1heartsButton);
-			break;
-		case 2:
-			clubsButton = (Button)  findViewById(R.id.p2clubsButton);
-			diamondsButton = (Button)  findViewById(R.id.p2diamondsButton);
-			spadesButton = (Button)  findViewById(R.id.p2spadesButton);
-			heartsButton = (Button)  findViewById(R.id.p2heartsButton);
-			break;
-		case 3:
-			clubsButton = (Button)  findViewById(R.id.p3clubsButton);
-			diamondsButton = (Button)  findViewById(R.id.p3diamondsButton);
-			spadesButton = (Button)  findViewById(R.id.p3spadesButton);
-			heartsButton = (Button)  findViewById(R.id.p3heartsButton);
-			break;
-		case 4:
-			clubsButton = (Button)  findViewById(R.id.p4clubsButton);
-			diamondsButton = (Button)  findViewById(R.id.p4diamondsButton);
-			spadesButton = (Button)  findViewById(R.id.p4spadesButton);
-			heartsButton = (Button)  findViewById(R.id.p4heartsButton);
-			break;
-		
-		}
-		*/
-		
+		sortHand();
+				
 
 	}
 	/**Checks if void in said suit.....Should be redone.
@@ -97,7 +62,8 @@ public class Player extends HeartsActivity{
 	 * @param i the suit value.
 	 * @return
 	 */
-	public boolean checkVoid(int i){
+	
+public boolean checkVoid(int i){
 		switch(i){
 		case 0:
 			if(voidClubs)
@@ -120,9 +86,21 @@ public class Player extends HeartsActivity{
 	}
 	
 
-	
-	public card go(int round, ArrayList<card> pile , Player p){
-		card nextCard;
+	public boolean canPlaySuit(int i){
+		switch (i){
+		case 0:
+			return(voidClubs);
+		case 1:
+			return (voidDiamonds);
+		case 2:
+			return (voidSpades);
+		case 3:
+			return(voidHearts);
+		}
+		return false;
+	}
+	public Card go(int round, ArrayList<Card> pile , Player p){
+		Card nextCard;
 		int nextCardSuit;
 		curPlayer=p;
 		print("player.go ="+curPlayer.getRealName(), 91);
@@ -132,6 +110,7 @@ public class Player extends HeartsActivity{
 		}
 		int suit=pile.get(0).getSuit();
 		if(checkVoid(suit)){
+			
 			print("void--PlayHigh("+suit+")", 93);
 			if(suit<3){
 				//playing next suit
@@ -141,19 +120,21 @@ public class Player extends HeartsActivity{
 				//No real problems with sending the wrong suit the call for play high and play low are recursive
 				suit=0;
 			}
-			
 			return playHigh(suit);
 			//TODO do all code for void crap
-
 		}
 		print("state ="+state, 34);
 		switch (state){  //REPLACED ps with STATE, removed call for it in constructor
 		case 1:{
 			switch (round){
 			case 0:
+				return playHigh(0);
 			case 1: 
+				return playHigh(0);
 			case 2:
+				
 			case 3:
+				
 			case 4:
 			case 5:
 			case 6:
@@ -165,6 +146,7 @@ public class Player extends HeartsActivity{
 			case 10:
 			case 11:
 			case 12:
+			case 13:
 				print("round 8-12 --PlayLow("+suit+")", 117);
 				return playLow(suit);
 			}
@@ -186,7 +168,9 @@ public class Player extends HeartsActivity{
 			case 9:
 			case 10:
 			case 11:
-			case 12:
+			case 12:			
+			case 13:
+
 				print("round 8-12 --PlayLow("+suit+")", 140);
 				return playLow(suit);
 			}
@@ -207,18 +191,20 @@ public class Player extends HeartsActivity{
 			case 10:
 			case 11:
 			case 12:
+			case 13:
 				print("round 0-7 --PlayLow("+suit+")", 161);
 				return playLow(suit);
 			}
 		case 4:
 			if(checkForPoints(pile)){
 				print("Play low--POINTS!!", 177);
-				playLow(suit);
+				return playLow(suit);
 			}
-			else
+			else{
 				print("Play high--no points", 177);
-				playHigh(suit);
-
+				return playHigh(suit);
+			}
+			/*
 			switch (round){
 			case 0:
 			case 1: 
@@ -228,25 +214,22 @@ public class Player extends HeartsActivity{
 			case 5:
 			case 6:
 			case 7:
-				print("round 0-7 --PlayHigh("+suit+")", 175);
+				print("round 0-7 --PlayLow("+suit+")", 175);
 				return playLow(suit);
 			case 8:
 			case 9:
 			case 10:
 			case 11:
 			case 12:
+			case 13:
 				print("round 8-12 --PlayHigh("+suit+")", 183);
 				return playHigh(suit);
+
 			}
-			
-		
-		
+			*/
 		}
 		print("Out of all Loops !!SHOULD NOT HAPPEN!!--PlayHigh("+suit+")", 193);
-
-		return playHigh(suit);
-
-		
+		return playHigh(suit);		
 	}
 
 	/**
@@ -254,36 +237,37 @@ public class Player extends HeartsActivity{
 	 * @param suit
 	 * @return the lowest card of a given suit.
 	 */
-	public card playLow(int suit){
-		card nextCard = null;
+	public Card playLow(int suit){
+		int outOfCards=0; //TODO
+		Card nextCard = null;
 		switch(suit){
 		case 0:
-			if(clubs.size()==0){
+			if(clubs.getSize()==0){
 				return playLow(++suit);
 			}
-			nextCard=clubs.get(0);
-			clubs.remove(0);
+			nextCard=clubs.getCard(0);
+			clubs.removeCardAtIndex(0);
 			return nextCard;
 		case 1:
-			if(diamonds.size()==0){
+			if(diamonds.getSize()==0){
 				return playLow(++suit);
 			}
-			nextCard=diamonds.get(0);
-			diamonds.remove(0);
+			nextCard=diamonds.getCard(0);
+			diamonds.removeCardAtIndex(0);
 			return nextCard;
 		case 2:
-			if(spades.size()==0){
+			if(spades.getSize()==0){
 				return playLow(++suit);
 			}
-			nextCard=spades.get(0);
-			spades.remove(0);
+			nextCard=spades.getCard(0);
+			spades.removeCardAtIndex(0);
 			return nextCard;
 		case 3: 
-			if(hearts.size()==0){
+			if(hearts.getSize()==0){
 				return playLow(0);
 			}
-			nextCard=hearts.get(0);
-			hearts.remove(0);
+			nextCard=hearts.getCard(0);
+			hearts.removeCardAtIndex(0);
 			return nextCard;
 		case 4:
 			print("something Broken", 238);		
@@ -292,39 +276,47 @@ public class Player extends HeartsActivity{
 		
 		return nextCard;
 	}
-	public card playHigh(int suit){
-		card nextCard;
+	public Card playHigh(int suit){
+		Card nextCard = null;
 		switch(suit){
 		case 0:
-			if(clubs.size()==0){  //if suit is empty just recall this method with a higher suit.
+			if(clubs.getSize()==0){  //if suit is empty just recall this method with a higher suit.
 				return playHigh(++suit);
 			}
-			nextCard=clubs.get(clubs.size()-1);
-			clubs.remove(clubs.size()-1);
-			return nextCard;
+			else{
+				nextCard = clubs.getCard(clubs.getSize()-1);
+				clubs.removeCardAtIndex(clubs.getSize()-1);
+				print(nextCard.cardToString(), 321);
+				return nextCard;
+			}	
 		case 1:
-			if(diamonds.size()==0){
+			if(diamonds.getSize()==0){
 				return playHigh(++suit);
 			}
-			nextCard=diamonds.get(diamonds.size()-1);
-			diamonds.remove(diamonds.size()-1);
-			return nextCard;
+			else{
+				nextCard=diamonds.getCard(diamonds.getSize()-1);
+				diamonds.removeCardAtIndex(diamonds.getSize()-1);
+				print(nextCard.cardToString(), 331);
+				return nextCard;
+			}
 		case 2:
-			if(spades.size()==0){
+			if(spades.getSize()==0){
 				return playHigh(++suit);
 			}
-			nextCard=spades.get(spades.size()-1);
-			spades.remove(spades.size()-1);
+			nextCard=spades.getCard(spades.getSize()-1);
+			spades.removeCardAtIndex(spades.getSize()-1);
+			print(nextCard.cardToString(), 340);
 			return nextCard;
 		case 3: 
-			if(hearts.size()==0){
+			if(hearts.getSize()==0){
 				return playHigh(0);
 			}
-			nextCard=hearts.get(hearts.size()-1);
-			hearts.remove(hearts.size()-1);
+			nextCard=hearts.getCard(hearts.getSize()-1);
+			hearts.removeCardAtIndex(hearts.getSize()-1);
+			print(nextCard.cardToString(), 348);
 			return nextCard;
-		}		
-		return null;
+		}
+		return nextCard;
 	}
 	
 
@@ -359,12 +351,12 @@ public class Player extends HeartsActivity{
 		state = c;
 	}
 	
-	public void addDeckItem(ArrayList<card> h){
+	public void addDeckItem(ArrayList<Card> h){
 		takenHands.add(h);		//deck.
 	}
 	
-	public ArrayList<ArrayList<card>> getDeck(){
-		return takenHands;
+	public Deck getDeck(){
+		return deck;
 	}
 	
 	public void addToScore(int score){
@@ -377,11 +369,12 @@ public class Player extends HeartsActivity{
 		return score;
 	}
 	
-	public ArrayList<card> gethand() {
-		return hand;
+	public Deck gethand() {
+		return deck;
 	}
-	public void sethand(ArrayList<card> c) {
-		hand=c;
+	public void sethand(Deck deck1) {
+		this.deck.clearALL();
+		this.deck.addAllCards(deck1);
 	}
 	public int getPass() {
 		return passTo;
@@ -390,17 +383,17 @@ public class Player extends HeartsActivity{
 		this.passTo=passTo;
 	}
     
-	public void setClubs(ArrayList<card> c){
-		this.clubs=c;
+	public void setClubs(Deck c){
+		this.clubs.addAllCards(c);
 	}
-	public void setDiamonds(ArrayList<card> d){
-		this.diamonds=d;
+	public void setDiamonds(Deck d){
+		this.diamonds.addAllCards(d);
 	}
-	public void setSpades(ArrayList<card> s){
-		this.spades=s;
+	public void setSpades(Deck s){
+		this.spades.addAllCards(s);
 	}
-	public void setHearts(ArrayList<card> h){
-		this.hearts=h;
+	public void setHearts(Deck h){
+		this.hearts.addAllCards(h);
 	}
 	
 	public void setClubsVoid(boolean c){
@@ -421,22 +414,22 @@ public class Player extends HeartsActivity{
 	public void setHeartsVoid(boolean h){
 		voidHearts=h;
 	}
-	public ArrayList<card> getClubs(){
+	public Deck getClubs(){
 		return clubs;
 	}
-	public ArrayList<card> getDiamonds(){
+	public Deck getDiamonds(){
 		return diamonds;
 	}
-	public ArrayList<card> getSpades(){
+	public Deck getSpades(){
 		return spades;
 	}
-	public ArrayList<card> getHearts(){
+	public Deck getHearts(){
 		return hearts;
 	}
 	public boolean checkForTwo(){
 		int i;
 		for (i=0;i<13;i++){
-			if(hand.get(i).getValue()==(2)&&hand.get(i).getSuit()==(0)){	
+			if(deck.getCard(i).getValue()==(2)&&deck.getCard(i).getSuit()==(0)){	
 				return true;				
 			}
 		}
@@ -444,21 +437,28 @@ public class Player extends HeartsActivity{
 	}
 	
 	public void checkForVoids(){ 	
-		if(clubs.size()==0){
+		int empty =0;
+		if(clubs.getSize()==0){
+			empty++;
 			setClubsVoid(true);
 		}
-		if(spades.size()==0){
+		if(spades.getSize()==0){
+			empty++;
 			setSpadesVoid(true);
 		}
-		if(diamonds.size()==0){
+		if(diamonds.getSize()==0){
+			empty++;
 			setDiamondsVoid(true);
 		}
-		if(hearts.size()==0){
+		if(hearts.getSize()==0){
+			empty++;
 			setHeartsVoid(true);
 		}
-		
+		if(empty==4){
+			print("The ship is SINKING!!, we are out of cards", 487);
+		}
 		//could this game be used to teach people hearts?
-		
+		/*
 		if(voidHelper){
 			clubsButton.setText("c="+clubs.size());
 			clubsButton.setBackgroundColor(Color.MAGENTA);
@@ -469,20 +469,32 @@ public class Player extends HeartsActivity{
 			heartsButton.setText("h="+hearts.size());
 			heartsButton.setBackgroundColor(Color.MAGENTA);
 		}
-
+		 */
 
 	}
+	/**
+	 * Takes the deck and assigns all cards to the player
+	 * then sorts them into suits
+	 * and updates the DeckHolder.
+	 * or it should....
+	 */
 	public void sortHand() {
-		ArrayList<card> thand=hand;
+		print("sorting hand for "+this.realName, 480);
+		Deck thand = new Deck();
+		thand.addAllCards(deck);
 		int z=0;
-		while(hand.size()>z){
-			hand.get(z).setOwner(this);//had some issues this fixed them.
+		while(thand.getSize()>z){//Too many for loops
+			thand.getCard(z).setOwner(this);//had some issues this fixed them.
 			z++;
+		}
+		if(z!=13){
+			//if this is called the bots are probably cheating!
+			Toast.makeText(this, "Hand did not equal 13 for" +this.name, Toast.LENGTH_SHORT).show();
 		}
 		int hc = 0;  //high club
         int hd = 0;  //high diamond
         int hs = 0;  //high spade
-        int hh = 0;  //high heart
+        int hh = 0;  //high heart/
 		int clubsCounter = 0;
 		int diamondsCounter = 0;
 		int spadesCounter = 0;
@@ -491,23 +503,23 @@ public class Player extends HeartsActivity{
 		int dc2 = 0;
 		int sc2 = 0;
 		int hc2 = 0;
-        ArrayList<card> c = new ArrayList<card>();  
-        ArrayList<card> d = new ArrayList<card>();
-        ArrayList<card> s = new ArrayList<card>();
-        ArrayList<card> h = new ArrayList<card>();
-        for(int i=0;i<thand.size();i++){
-        	int ncard=thand.get(i).getValue();
-        	switch(thand.get(i).getSuit()){
+        Deck c = new Deck();  
+        Deck d = new Deck();
+        Deck s = new Deck();
+        Deck h = new Deck();
+        for(int i=0;i<thand.getSize();i++){
+        	int ncard=thand.getCard(i).getValue();
+        	switch(thand.getCard(i).getSuit()){
 	        	case 0:	
 	        		cc2=clubsCounter;
 	        		if(hc>ncard){	        			
-	        			while(clubsCounter>0&&ncard<c.get(clubsCounter-1).getValue()){
+	        			while(clubsCounter>0&&ncard<c.getCard(clubsCounter-1).getValue()){
 	        				clubsCounter--;
 	        			}     					
 
 	        		}
-	        		c.add(clubsCounter, thand.get(i));	 
-	        		hc=c.get(c.size()-1).getValue(); 
+	        		c.addCardAtIndex(clubsCounter, thand.getCard(i));	 
+	        		hc=c.getCard(c.getSize()-1).getValue(); 
 	        		clubsCounter=cc2;
 	        		clubsCounter++;
 
@@ -516,13 +528,13 @@ public class Player extends HeartsActivity{
 
 		    		dc2=diamondsCounter;
 	        		if(hd>ncard){	   
-	        			while(diamondsCounter>0&&ncard<d.get(diamondsCounter-1).getValue()){
+	        			while(diamondsCounter>0&&ncard<d.getCard(diamondsCounter-1).getValue()){
 	        				diamondsCounter--;
 	        			}     					
 
 	        		}        			  
-	        		d.add(diamondsCounter, thand.get(i));	
-	        		hd=d.get(d.size()-1).getValue();
+	        		d.addCardAtIndex(diamondsCounter, thand.getCard(i));	
+	        		hd=d.getCard(d.getSize()-1).getValue();
 	        		diamondsCounter=dc2;
 	        		diamondsCounter++;
 
@@ -531,13 +543,13 @@ public class Player extends HeartsActivity{
 
 	        		sc2=spadesCounter;
 	        		if(hs>ncard){	        			
-	        			while(spadesCounter>0&&ncard<s.get(spadesCounter-1).getValue()){
+	        			while(spadesCounter>0&&ncard<s.getCard(spadesCounter-1).getValue()){
 	        				spadesCounter--;
 	        			}     					
 
 	        		}			  
-	        		s.add(spadesCounter, thand.get(i));	
-	        		hs=s.get(s.size()-1).getValue();
+	        		s.addCardAtIndex(spadesCounter, thand.getCard(i));	
+	        		hs=s.getCard(s.getSize()-1).getValue();
 	        		spadesCounter=sc2;
 	        		spadesCounter++;
 
@@ -546,47 +558,41 @@ public class Player extends HeartsActivity{
 
 		    		hc2=heartsCounter;
 	        		if(hh>ncard){	   
-	        			while(heartsCounter>0&&ncard<h.get(heartsCounter-1).getValue()){
+	        			while(heartsCounter>0&&ncard<h.getCard(heartsCounter-1).getValue()){
 	        				heartsCounter--;
 	        			}     					
 
 	        		} 			  
-	        		h.add(heartsCounter, thand.get(i));	
-	        		hh=h.get(h.size()-1).getValue();
+	        		h.addCardAtIndex(heartsCounter, thand.getCard(i));	
+	        		hh=h.getCard(h.getSize()-1).getValue();
 	        		heartsCounter=hc2;
 	        		heartsCounter++;
-
 		    		break;
-
         	}
-	    	//print(i+" ", 358); for debug
-	    	
-
         }
-        	
         setClubs(c);
         setDiamonds(d);
         setSpades(s);
         setHearts(h);
-        if(seat==6){
-        	
-
-        	p1Clubs = (TextView) textEntryView.findViewById(R.id.p1Clubs);
-        	p1Diamonds = (TextView) textEntryView.findViewById(R.id.p1Diamonds);
-        	p1Spades = (TextView) textEntryView.findViewById(R.id.p1Spades);
-        	p1Hearts = (TextView) textEntryView.findViewById(R.id.p1Hearts);
-        	p1Clubs = (TextView) findViewById(R.id.p1Clubs);
-        	p1Diamonds = (TextView) findViewById(R.id.p1Diamonds);
-        	p1Spades = (TextView) findViewById(R.id.p1Spades);
-        	p1Hearts = (TextView) findViewById(R.id.p1Hearts);
-	    	//p1Clubs.setText(arraytoString(c2));
-	    	//p1Diamonds.setText(arraytoString(d2));
-	    	//p1Spades.setText(arraytoString(s2));
-	    	//p1Hearts.setText(arraytoString(h2));
-        }
-}
-
-	public boolean checkForPoints(ArrayList<card> c) {
+        updateDeck();
+	}
+	
+	public void updateDeck(){
+        Deck newDeck = new  Deck();
+        newDeck.addAllCards(this.clubs);
+        newDeck.addAllCards(this.diamonds);
+        newDeck.addAllCards(this.spades);
+        newDeck.addAllCards(this.hearts);
+        updateDeckCards(newDeck);
+	}
+	
+	public void updateDeckCards(Deck cards){
+		deck.clearALL();
+		for(int i = 0; i<cards.getSize();i++){
+			this.deck.addCard(cards.getCard(i));
+		}
+	}
+	public boolean checkForPoints(ArrayList<Card> c) {
 		int points=0;
 		for(int i=0; i<c.size();i++){
 			int curCard = c.get(i).getValue();
@@ -614,47 +620,5 @@ public class Player extends HeartsActivity{
 		}
 		return false;
 	}
-	/*
 
-	
-/*
-	public int[] getHighLowSuit(){
-		int high=0;
-		int low =0;
-		int suit=0;
-		int[] HLS=new int[3];
-		
-		if(hand.length>1){
-			suit = hand[0].getSuit();
-			for(int i=0;i<hand.length;i++){
-				int curSuit=hand[i].getSuit();
-				int curCard =hand[i].getValue();
-				if(high<curCard){
-					if(suit==curSuit){
-						high=curCard;
-					}
-					if(suit!=curSuit){
-						//Not a valid high
-					}
-				}
-				if (low>curCard){
-					aif(suit==curSuit){
-						low=curCard;
-					}
-					if(suit!=curSuit){
-						//Not a valid low
-					}
-
-				}
-			}
-			HLS[0]=high;
-			HLS[1]=low;
-			HLS[2]=suit;
-			
-			return HLS;		
-		}
-		else
-		return null;
-	}
-*/
 }

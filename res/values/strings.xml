@@ -62,4 +62,7 @@
         <string name="startuphelp">Follow the colors, and if you get lost just hit \'Next\'.</string>
         <string name="resume">Resume</string>
         <string name="helperVoids">Track Voids</string>
+        <string name="dropShuffle">Drop Shuffle</string>
+        <string name="randomSwap">Random Swap</string>
+        <string name="playerHelper">Player helper</string>
 </resources>

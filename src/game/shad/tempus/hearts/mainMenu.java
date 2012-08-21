@@ -21,7 +21,7 @@ public class mainMenu extends Activity{
     }
 
 	public void onStartPressed(View v){
-		Intent gameIntent  =new Intent(this, game.shad.tempus.hearts.HeartsActivity.class);
+		Intent gameIntent  =new Intent(this, game.shad.tempus.hearts.Game.class);
 		et = (EditText) findViewById(R.id.playerName);
 		String  s = et.getText().toString();
 		System.out.println(s);
@@ -40,7 +40,20 @@ public class mainMenu extends Activity{
 		else if(hard.isChecked()){
 	    	gameIntent.putExtra("diff", 3);
 		}	
+
+		RadioButton shuffleDrop = (RadioButton) findViewById(R.id.dropShuffle);
+		RadioButton shuffleSwap = (RadioButton) findViewById(R.id.randomSwap);
 		
+		if(shuffleDrop.isChecked()){
+	    	gameIntent.putExtra("shuffle", 1);
+		}
+		else if(shuffleSwap.isChecked()){
+	    	gameIntent.putExtra("shuffle", 2);
+		}
+		CheckBox playerHelper = (CheckBox) findViewById(R.id.playerHelper);
+		boolean ph = playerHelper.isChecked();
+		gameIntent.putExtra("playerHelper", ph);
+
 		CheckBox voidHelper = (CheckBox) findViewById(R.id.trackVoidsBox);
 		boolean vh = voidHelper.isChecked();
 		gameIntent.putExtra("voidHelper", vh);
@@ -48,7 +61,7 @@ public class mainMenu extends Activity{
     	// finish();
 	}
 	public void onResumePressed(View v){
-		Intent gameIntent  =new Intent(this, game.shad.tempus.hearts.HeartsActivity.class);
+		Intent gameIntent  =new Intent(this, game.shad.tempus.hearts.Game.class);
 		et = (EditText) findViewById(R.id.playerName);
 		String  s = et.getText().toString();
 		System.out.println(s);
@@ -66,7 +79,7 @@ public class mainMenu extends Activity{
 		else if(hard.isChecked()){
 	    	gameIntent.putExtra("diff", 3);
 		}	
-
+		
 		
 		CheckBox voidHelper = (CheckBox) findViewById(R.id.trackVoidsBox);
 		boolean vh = voidHelper.isChecked();
@@ -84,5 +97,6 @@ public class mainMenu extends Activity{
 		Toast.makeText(mainMenu.this, "Still in progress...",  Toast.LENGTH_SHORT).show();
 
 	}
+	
 
 }

@@ -6,29 +6,29 @@ import java.util.Arrays;
 
 import android.graphics.Canvas;
 
-public class Hand extends HeartsActivity{
+public class Hand extends Game{
 	Player handWinner=null;
 	
-	private ArrayList<card> hand;
+	private ArrayList<Card> hand;
 	
 	public Hand(){
-		hand = new ArrayList<card>();
+		hand = new ArrayList<Card>();
 		
 	}
-	public void newhand(ArrayList<card> nCard){
+	public void newhand(ArrayList<Card> nCard){
 		hand=nCard;
 	}
 
 
-	public void addCard(card card){
+	public void addCard(Card card){
 		this.hand.add(card);
 	}
 	
-	public void removeCard(card card){
+	public void removeCard(Card card){
 		this.hand.remove(card);
 	}
 	
-	public int getIndex(card card){
+	public int getIndex(Card card){
 		return this.hand.indexOf(card);
 	}
 	
@@ -39,22 +39,22 @@ public class Hand extends HeartsActivity{
 		return  hand;
 	}
 	
-	public card getCard(int index){
+	public Card getCard(int index){
 		return hand.get(index);
 	}
 	
-	public card getFirst(){
+	public Card getFirst(){
 		return hand.get(0);
 	}
-	public card getSecond(){
+	public Card getSecond(){
 		return hand.get(1);
 	}
 	
-	public card getThird(){
+	public Card getThird(){
 		return hand.get(2);
 	}
 	
-	public card getFourth(){  //Dumb code never called
+	public Card getFourth(){  //Dumb code never called
 		return hand.get(3);
 	}
 	/*

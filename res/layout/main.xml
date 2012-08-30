@@ -3,7 +3,8 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-
+
+
     <LinearLayout
         android:id="@+id/Startlayout"
         android:layout_width="match_parent"
@@ -13,14 +14,16 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
-
+
+
             <TextView
                 android:id="@+id/textView1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/name"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
-
+
+
             <EditText
                 android:id="@+id/playerName"
                 android:layout_width="wrap_content"
@@ -33,7 +36,8 @@
             </EditText>
 
         </LinearLayout>
-
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,12 +50,26 @@
                 android:text="@string/Diff"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
         </LinearLayout>
-
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal" >
-
+
+
             <RadioGroup
                 android:id="@+id/difficulty"
                 android:layout_width="wrap_content"
@@ -82,7 +100,10 @@
                     android:text="@string/hard" />
 
             </RadioGroup>
-
+
+
+
+
             <LinearLayout
                 android:id="@+id/trackVoids"
                 android:layout_width="match_parent"
@@ -113,7 +134,10 @@
                             android:layout_height="wrap_content"
                             android:enabled="true"
                             android:text="@string/randomSwap" />
-                        
+                        
+
+
+
                	   		<RadioButton
                	   		    android:id="@+id/mixShuffle"
                	   		    android:layout_width="wrap_content"
@@ -128,7 +152,8 @@
             </LinearLayout>
 
         </LinearLayout>
-
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -179,11 +204,14 @@
 
 
     </LinearLayout>
-
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
-
+
+
+
         <TextView
             android:id="@+id/textView3"
             android:layout_width="match_parent"

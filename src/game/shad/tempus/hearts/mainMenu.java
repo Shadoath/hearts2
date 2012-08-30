@@ -43,17 +43,20 @@ public class mainMenu extends Activity{
 
 		RadioButton shuffleDrop = (RadioButton) findViewById(R.id.dropShuffle);
 		RadioButton shuffleSwap = (RadioButton) findViewById(R.id.randomSwap);
-		
+		RadioButton mixShuffle = (RadioButton) findViewById(R.id.mixShuffle);
+
 		if(shuffleDrop.isChecked()){
 	    	gameIntent.putExtra("shuffle", 1);
 		}
 		else if(shuffleSwap.isChecked()){
 	    	gameIntent.putExtra("shuffle", 2);
 		}
+		else if(mixShuffle.isChecked()){
+	    	gameIntent.putExtra("shuffle", 3);
+		}
 		CheckBox playerHelper = (CheckBox) findViewById(R.id.playerHelper);
 		boolean ph = playerHelper.isChecked();
 		gameIntent.putExtra("playerHelper", ph);
-
 		CheckBox voidHelper = (CheckBox) findViewById(R.id.trackVoidsBox);
 		boolean vh = voidHelper.isChecked();
 		gameIntent.putExtra("voidHelper", vh);

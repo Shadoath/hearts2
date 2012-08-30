@@ -4,22 +4,29 @@
     android:layout_height="fill_parent"
     android:gravity="right"
     android:orientation="vertical" >
-
+
     <LinearLayout
         android:id="@+id/tableHolderLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
-
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center|fill|fill_horizontal|left|right" >
+            android:gravity="center|center_horizontal|center_vertical|fill|fill_horizontal|left|right" >
+
+            <LinearLayout
+                android:id="@+id/tableLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|center_vertical"
+                android:orientation="horizontal" >
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:gravity="left"
                 android:orientation="vertical" >
 
                 <Button
@@ -29,65 +36,6 @@
                     android:layout_height="wrap_content"
                     android:onClick="onMenuPressed"
                     android:text="@string/menu" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/topLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="0.29" >
-
-                <LinearLayout
-                    android:id="@+id/tableLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal|center_vertical"
-                    android:orientation="horizontal" >
-
-                    <EditText
-                        android:id="@+id/card1"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:ems="10"
-                        android:text="@string/card1" />
-
-                    <EditText
-                        android:id="@+id/card2"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:ems="10"
-                        android:text="@string/card2" />
-
-                    <EditText
-                        android:id="@+id/card3"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:ems="10"
-                        android:text="@string/unknown" />
-
-                    <EditText
-                        android:id="@+id/card4"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:ems="10"
-                        android:text="@string/card4" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="right"
-                android:gravity="right"
-                android:orientation="vertical" >
 
                 <Button
                     android:id="@+id/exit"
@@ -96,7 +44,9 @@
                     android:layout_height="wrap_content"
                     android:onClick="onExitPressed"
                     android:text="@string/exit" />
+
             </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>
@@ -200,9 +150,9 @@
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
-
+
             <LinearLayout
-                android:id="@+id/LinearLayout1"
+                android:id="@+id/LinearLayout12"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent" >
 
@@ -303,26 +253,11 @@
 
         </LinearLayout>
     </LinearLayout>
-
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <Button
-            android:id="@+id/debug"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onDebugButtonPressed"
-            android:text="@string/Previous" />
-
-        <Button
-            android:id="@+id/clear"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onClearPressed"
-            android:text="@string/clear" />
+        android:layout_height="wrap_content"
+        android:gravity="center" >
 
         <Button
             android:id="@+id/playCard"
@@ -339,6 +274,7 @@
             android:layout_height="wrap_content"
             android:onClick="onNextButtonPressed"
             android:text="@string/next" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -346,6 +282,45 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center" >
+
+            <Button
+                android:id="@+id/button1"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onSwipeLeftPressed"
+                android:text="@string/swipeLeft" />
+
+            <Button
+                android:id="@+id/debug"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onDebugButtonPressed"
+                android:text="@string/Previous" />
+
+            <Button
+                android:id="@+id/clear"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClearPressed"
+                android:text="@string/clear" />
+
+            <Button
+                android:id="@+id/button2"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onSwipeRightPressed"
+                android:text="@string/swipeRight" />
+
+        </LinearLayout>
 
         <EditText
             android:id="@+id/bottomTV"

@@ -15,6 +15,9 @@ public class Deck {
 		this.deck.add(card);
 	}
 	
+	public ArrayList<Card> getDeck(){
+		return this.deck;
+	}
 	public void addAllCards(Deck cards){
 		for(int i = 0; i<cards.getSize();i++){
 			this.deck.add(cards.getCard(i));
@@ -57,6 +60,10 @@ public class Deck {
 	public int getSize(){
 		return this.deck.size();
 	}
+	
+
+	
+	
 	
 	//returns a card at an index
 	public Card getCard(int index){

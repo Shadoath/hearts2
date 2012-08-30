@@ -1,5 +1,8 @@
 package game.shad.tempus.hearts;
 
+import java.util.ArrayList;
+
+import android.graphics.Rect;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.Toast;
@@ -8,24 +11,27 @@ public class Gestures implements GestureDetector.OnGestureListener,
 GestureDetector.OnDoubleTapListener
 {
 
-    private Game view;
+    private Game game;
     private static final int SWIPE_MIN_DISTANCE = 100;
     private static final int SWIPE_MAX_OFF_PATH = 250;
     private static final int SWIPE_THRESHOLD_VELOCITY = 200;
     
-    private DeckHolder dh = null;
+    private DeckHolder deckView = null;
+    private TableHolder tableView = null;
 
-    public Gestures(Game view)
+    public Gestures(Game game)
     {
-       this.view = view;
-       this.dh = view.getDH();
+       this.game = game;
+       this.deckView = game.getDeckHolder();
+       this.tableView = game.getTableHolder();
+
     }
 
     @Override
     public boolean onDoubleTap(MotionEvent e)
     {
         //To select a card and send to pile
-        Toast.makeText(view.getApplicationContext(), "Double Tap", Toast.LENGTH_SHORT).show();
+        Toast.makeText(game.getApplicationContext(), "Double Tap", Toast.LENGTH_SHORT).show();
         return false;
     }
 
@@ -33,6 +39,7 @@ GestureDetector.OnDoubleTapListener
     public boolean onDoubleTapEvent(MotionEvent e)
     {
         // TODO Auto-generated method stub
+    	
         return false;
     }
     
@@ -40,13 +47,24 @@ GestureDetector.OnDoubleTapListener
     public boolean onSingleTapConfirmed(MotionEvent e)
     {
         //Add for buttons or info??
-        this.dh = view.getDH();
-        Card c = dh.getCard(0);
-        if(c.col((int)e.getX(), (int)e.getY())){
-            Toast.makeText(view.getApplicationContext(), "Single Click", Toast.LENGTH_SHORT).show();
-            
-        }else{
-            Toast.makeText(view.getApplicationContext(), "Single Click Fail", Toast.LENGTH_SHORT).show();
+    	int x = (int) e.getX();
+    	int y = (int) e.getY();
+        Rect bondsDV=deckView.getBounds();
+        Rect bondsTV=tableView.getBounds();
+
+        if(bondsDV.contains(x, y)){
+            Toast.makeText(game.getApplicationContext(), "DeckView", Toast.LENGTH_SHORT).show();
+            ArrayList<Card> deckCards = new ArrayList<Card>();
+            deckCards.addAll((deckView.getDeck().getDeck()));
+            for(Card c :deckCards){
+            	if(c.getBounds().contains(x, y)){
+            		c.setTouched(true);
+            	}
+            	
+            }
+        }
+        else if(bondsTV.contains(x, y)){
+            Toast.makeText(game.getApplicationContext(), "TableView", Toast.LENGTH_SHORT).show();
         }
         return false;
     }
@@ -68,16 +86,16 @@ GestureDetector.OnDoubleTapListener
                 return false;
             // right to left swipe
                 if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    Toast.makeText(view.getApplicationContext(), "Left Swipe", Toast.LENGTH_SHORT).show();
-                    this.dh.swipeLeft();
+                    Toast.makeText(game.getApplicationContext(), "Left Swipe", Toast.LENGTH_SHORT).show();
+                    this.deckView.swipeLeft();
                 } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    Toast.makeText(view.getApplicationContext(), "Right Swipe", Toast.LENGTH_SHORT).show();
-                    this.dh.swipeRight();
+                    Toast.makeText(game.getApplicationContext(), "Right Swipe", Toast.LENGTH_SHORT).show();
+                    this.deckView.swipeRight();
                 }
                 else if(e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                    Toast.makeText(view.getApplicationContext(), "Swipe up", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(game.getApplicationContext(), "Swipe up", Toast.LENGTH_SHORT).show();
                 } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                    Toast.makeText(view.getApplicationContext(), "Swipe down", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(game.getApplicationContext(), "Swipe down", Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception e) {
             // nothing

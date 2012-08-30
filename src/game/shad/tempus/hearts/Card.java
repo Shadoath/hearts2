@@ -50,7 +50,10 @@ public class Card {
 	        
 	        switch (s){
 	            case 0:
-	                switch(v){	   
+	                switch(v){	 
+	                	case 0:
+	                		im = R.drawable.blueback;
+	                		break;
 		                case 1:
 	                        im = R.drawable.clubs_ace;
 	                        break;
@@ -292,6 +295,11 @@ public class Card {
     public Bitmap getBitmap(){
 		return bitmap;
 	}
+    public Rect getBounds(){
+    	return new Rect(x1, y1, x2, y2);
+    }
+    
+    
 	public int getRid(){
 		return Rid;
 	}
@@ -442,7 +450,10 @@ public class Card {
         //canvas.drawBitmap(bitmap, x - (bitmap.getWidth() /2), y - (bitmap.getHeight() /2), null);
         //Rect r = new Rect(x, y, x + bitmap.getWidth()/2, y + bitmap.getHeight()/2);
         Rect r = new Rect(x1, y1, x2,  y2);
+        if(touched){
+        	//do code to make it special.
 
+        }
     	canvas.drawBitmap(bitmap, null, r, null);
     }
     

@@ -3,9 +3,12 @@ package game.shad.tempus.hearts;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.gesture.Gesture;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -20,6 +23,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -52,6 +56,8 @@ public class Game extends Activity{
 	public Player curPlayer;
 	public Card cardToPlay;
 	public Intent gameIntent;
+	public Canvas canvas;
+	public Paint paint;
 	//public card[] pile = new card[4];
 	public int pileI=0;
 
@@ -82,7 +88,8 @@ public class Game extends Activity{
     int screenHeight;
 	private int shuffleType;
 	int playerHelperInt=0;
-    
+   
+	
     public EditText tCount;
     public TextView output1;
     //Player 1
@@ -108,13 +115,7 @@ public class Game extends Activity{
     public TextView p2tvScore;
     public TextView p3tvScore;
     public TextView p4tvScore;
-    
-    
-    public EditText tableCard1;
-    public EditText tableCard2;
-    public EditText tableCard3;
-    public EditText tableCard4;
-    
+        
     public LinearLayout p1TR;
 
     public TextView bottomText;
@@ -124,8 +125,9 @@ public class Game extends Activity{
     LinearLayout bottomLayout;
     LinearLayout tableHolderLayout;
     LinearLayout tableLayout;
-    LinearLayout topLayout;
+    //LinearLayout topLayout;
     DeckHolder cardViewDH;
+    TableHolder tableViewDH;
 
     //Button used as a global place holder in function fixSides()
 	Button fixSidesButton;
@@ -138,7 +140,8 @@ public class Game extends Activity{
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
+        //hide keyboard :
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         gameIntent = getIntent();        
         Bundle b = gameIntent.getExtras();
         this.name=(String) b.get("name").toString().trim();
@@ -146,7 +149,7 @@ public class Game extends Activity{
         this.playerHelper = (Boolean) b.get("playerHelper");
         print("player helper is "+playerHelper, 145);
         print(this.name, 148);
-        if (this.name.equalsIgnoreCase("Your name")){
+        if (this.name.equalsIgnoreCase("Your name")||this.name.equals("")){
         	this.name = "You";
         }
         this.difficulty =  (Integer) b.get("diff");
@@ -323,12 +326,6 @@ public class Game extends Activity{
         p1SpadesB=(Button)findViewById(R.id.p1spadesButton);
         p1HeartsB=(Button)findViewById(R.id.p1heartsButton);
         
-
-        
-        tableCard1 = (EditText)findViewById(R.id.card1);
-        tableCard2 = (EditText)findViewById(R.id.card2);
-        tableCard3 = (EditText)findViewById(R.id.card3);
-        tableCard4 = (EditText)findViewById(R.id.card4);
                 
         p1TR= (LinearLayout) findViewById(R.id.player1);
 
@@ -341,7 +338,7 @@ public class Game extends Activity{
         tableHolderLayout = (LinearLayout) findViewById(R.id.tableHolderLayout);
         tableLayout = (LinearLayout) findViewById(R.id.tableLayout);
 
-        topLayout = (LinearLayout) findViewById(R.id.topLayout); 
+        //topLayout = (LinearLayout) findViewById(R.id.topLayout); 
 
         Display display = getWindowManager().getDefaultDisplay(); 
         screenWidth = display.getWidth();
@@ -356,67 +353,62 @@ public class Game extends Activity{
     	//should not need to make deck, just shuffle the old one.
         if(restart){
         	//TODO reset all points
-			print("restarting-onStart", 171);
+			print("restarting-onStart", 348);
         	makeDeck();
 			shuffle();
 	        deal();
 	        //This needs to be done later trade();  //ha ha more like set who to trade too.
 	        //TODO let play select cards and trade.
 	        voidCheck();
-	        Deck d = p1.getDeck();
-	        cardViewDH = new DeckHolder(this.getApplicationContext(), screenWidth, screenHeight/8);
-	        cardViewDH.addDeck(d);
-	        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(screenWidth, screenHeight/8);
-	        LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(screenWidth/2, screenHeight/8);
-	        cardViewDH.setLayoutParams(layoutParams);
-	        tableLayout.setLayoutParams(layoutParams2);
-			//tableCard1.setWidth(screenWidth/6);
-			//tableCard2.setWidth(screenWidth/6);
-			//tableCard3.setWidth(screenWidth/6);
-			//tableCard4.setWidth(screenWidth/6);
 
-	        //TODO Soon. cardViewDH.set
-	        tableHolderLayout.addView(cardViewDH);
-	        tableLayout.setLayoutParams(layoutParams);
+	        
+	        createViews();
 	        checkForTwoMethod();//This more or less starts the game.
 	        displayCards(p1);
         }
     
         else{
-        	print("Normal Start", 369);
+        	print("Normal Start", 386);
         	//New round keep playing
 			makeDeck();
         	shuffle();	
 	        deal();
 	        //TODO trade()
 	        voidCheck();
-
-	        Deck d = p1.getDeck();
-	        cardViewDH = new DeckHolder(this.getApplicationContext(), screenWidth, screenHeight/7);
-	        cardViewDH.addDeck(d);
-	        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(screenWidth, screenHeight/7);
-	        cardViewDH.setLayoutParams(layoutParams);
-	        //TODO Soon. cardViewDH.set
-	        tableHolderLayout.addView(cardViewDH);
-
-	        checkForTwoMethod();//Starts the first round.
+	        createViews();
+	        
+	        checkForTwoMethod();//This more or less starts the game.
 	        displayCards(p1);
         }
       //DECKHOLDER
         
 	}
     
+    public void createViews(){
+    	this.cardViewDH = new DeckHolder(this.getApplicationContext(), screenWidth, screenHeight/8);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(screenWidth, screenHeight/8);
+
+        this.tableViewDH = new TableHolder(this.getApplicationContext(), (int) (screenWidth*.7), screenHeight/8);
+        LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams((int) (screenWidth*.7), screenHeight/8);
+
+        cardViewDH.setLayoutParams(layoutParams);
+        tableViewDH.setLayoutParams(layoutParams2);
+     
+        cardViewDH.addDeck(p1.getDeck());
+        tableHolderLayout.addView(cardViewDH);
+        tableLayout.addView(tableViewDH);
+    }
+    
+    
     /**
      * creates 52 cards 13 of each suit.
      */
     public void makeDeck() { 
     	print("make Deck", 404);
-    	deck=new Deck();
+    	deck.clearALL();
 		for(int suit=0;suit<4;suit++){			
 			for(int value=1;value<14;value++){
-
 				Card cd = new Card( value, suit, this.getApplicationContext());
-				
 				deck.addCard(cd);
 			}
 
@@ -485,7 +477,7 @@ public class Game extends Activity{
 				deck.clearALL();
 				deck.addAllCards(deck2);
 			}
-			else{	//this shuffle may not work after changing everything to Deck...
+			else if(shuffleType==2){	//this shuffle may not work after changing everything to Deck...
 				print("shuffle type 2", 475);
 				int x=0;
 				int z=50;//times to loop the deck and 'randomly' switch cards.
@@ -531,9 +523,86 @@ public class Game extends Activity{
 					
 				}
 			}
+			else{
+				//TODO finish.
+				print("shuffle type 3", 475);
+				int x = 0;
+				int z = 50;
+				int total =0;
+				ArrayList<Deck> decks= new ArrayList<Deck>();
+				Deck deck2 = new Deck();
+				deck2.addAllCards(this.deck);
+				while(x<z){
+					decks.addAll(splitDeck(deck2));
+					print("the deck is "+decks.size(), 552);
+					deck2.clearALL();
+					deck2.addAllCards(mixOutIn(decks));
+					decks.clear();
+					x++;
+				}	
+				
+				
+				
+				
+				
+			}
 		}
 
+	/**
+	 * Takes a Deck and returns an array of decks, 11 of them 5 per array and 2 in the last one.
+	 * @param a The Deck to be split
+	 * @return	ArrayList<Deck>(size = 11)
+	 */
+	private ArrayList<Deck> splitDeck(Deck a) {
+		ArrayList<Deck> decks = new ArrayList<Deck>();
+		for(int i =0; i<10;i++){
+			Deck deck2 = new Deck();
 
+			int t=0;
+			while(t<5){
+				deck2.addCard(a.getCard(t));
+				t++;
+			}
+			t--;
+			while(t>=0){
+				a.removeCardAtIndex(t);
+				t--;
+			}
+			decks.add(deck2);
+		}
+		decks.add(a);
+		return decks;
+	}
+
+	/**
+	 * Mix an ArrayList<Deck> into 
+	 * @param a
+	 * @return
+	 */
+	
+
+	private Deck mixOutIn(ArrayList<Deck> a){
+		int size = a.size();
+		boolean extra=false;
+		if(size%2==1){
+			size--;
+			extra=true;
+		}
+		Deck d= new Deck();
+		for(int i =0;i<size/2;i++){
+			d.addAllCards(mixDecks(a.get(i), a.get(size-i-1)));
+		}
+		d.addAllCards(a.get(size/2));
+		
+		return d;
+	}
+	
+	public Deck mixDecks(Deck a, Deck b){
+		for(int i=0; i<a.getSize();i++){
+			b.addCardAtIndex(i+i, a.getCard(i));
+		}
+		return b;
+	}
 	
 	public ArrayList<Card> addLowHigh(ArrayList<Card> fromDeck){
 		ArrayList<Card> toDeck= new ArrayList<Card>();
@@ -557,7 +626,7 @@ public class Game extends Activity{
 	 * NEEDS SHUFFLE.
 	 * */
 	public void deal() {
-		print("dealing", 465);
+		print("dealing", 560);
 		Deck hand1 = new Deck();
 		Deck hand2 = new Deck();
 		Deck hand3 = new Deck();
@@ -782,6 +851,7 @@ public class Game extends Activity{
 			playing=false;
 			switch(cardToPlay.getSuit()){
 				case 0:{
+					
 					p1.getClubs().removeCardAtIndex(selectedCardPlace);
 					break;
 				}
@@ -799,26 +869,13 @@ public class Game extends Activity{
 				}
 				//TODO reset the deckHolder view
 			}
-			String rs=cardToPlay.name.replaceFirst(" of ", eol);
-			switch(p1.getState()){
-				case 1:{
-					clearTableCards();
-			        tableCard1.setBackgroundResource(cardToPlay.getRid());
-					break;
-				}
-				case 2:{
-			        tableCard2.setBackgroundResource(cardToPlay.getRid());
-					break;
-				}
-				case 3:{
-			        tableCard3.setBackgroundResource(cardToPlay.getRid());
-					break;
-				}
-				case 4:{
-			        tableCard4.setBackgroundResource(cardToPlay.getRid());
-					break;
-				}		
+				
+			//String rs=cardToPlay.name.replaceFirst(" of ", eol);
+			if(pile.size()==0){
+				clearTableCards();
 			}
+			tableViewDH.addCard(cardToPlay);
+
 			if(pile.size()==4){
 				//Toast.makeText(HeartsActivity.this, "Last card",  Toast.LENGTH_SHORT).show();
 				pickUpHand();			
@@ -840,6 +897,9 @@ public class Game extends Activity{
 		}
 		p1.updateDeck();
 		cardViewDH.updateDeck(p1.getDeck());
+		cardViewDH.invalidate();
+		tableViewDH.invalidate();
+		tableViewDH.refreshDrawableState();
 		cardViewDH.refreshDrawableState();
 		
 
@@ -899,6 +959,10 @@ public class Game extends Activity{
 	}
 
 	public void clearTableCards(){
+		//
+		tableViewDH.removeAll();
+		tableViewDH.addBlankCards();
+		/*
 	    tableCard1.setText("1");
 	    tableCard2.setText("2");
 	    tableCard3.setText("3");
@@ -907,7 +971,7 @@ public class Game extends Activity{
 	    tableCard2.setBackgroundColor(Color.LTGRAY);
 	    tableCard3.setBackgroundColor(Color.LTGRAY);
 	    tableCard4.setBackgroundColor(Color.LTGRAY);
-
+	*/
 	    
 	}
 	public void clearALL(){
@@ -920,7 +984,6 @@ public class Game extends Activity{
 		heartsBroken=false;
 	    round=1;
 	    count=0;
-		tableCard1.setBackgroundColor(curPlayer.colorInt);
 		
 	}
 	
@@ -938,6 +1001,9 @@ public class Game extends Activity{
 		Toast.makeText(Game.this, "Printed Hands",  Toast.LENGTH_SHORT).show();
 		p1.updateDeck();
 		cardViewDH.updateDeck(p1.getDeck());
+		cardViewDH.invalidate();
+		tableViewDH.invalidate();
+		tableViewDH.refreshDrawableState();
 		cardViewDH.refreshDrawableState();
 		
 
@@ -962,6 +1028,18 @@ public class Game extends Activity{
 	}
 	
 	
+	public void onSwipeLeftPressed(View v){
+		this.cardViewDH.swipeLeft();
+		Toast.makeText(Game.this, "position is "+cardViewDH.getPosition(),  Toast.LENGTH_SHORT).show();
+
+	}
+	
+	public void onSwipeRightPressed(View v){
+		this.cardViewDH.swipeRight();
+		Toast.makeText(Game.this, "position is "+cardViewDH.getPosition(),  Toast.LENGTH_SHORT).show();
+		
+
+	}
 	
 	public void GO(){
 		print("GO()",  619);
@@ -980,6 +1058,8 @@ public class Game extends Activity{
 		bottomText2.setText(curPlayer.getRealName()+" played the "+ r.name);
 		curPlayer.updateDeck();
 		setCardText(curPlayer, rs, r);//ADVANCES THE CUR PLAYER
+		cardViewDH.invalidate();
+		tableViewDH.invalidate();
 
 	}
 	
@@ -989,28 +1069,32 @@ public class Game extends Activity{
 	 * @param rs the string to be set to the layout.
 	 */
 	public void setCardText(Player P, String rs, Card r){
+		
 		int p=P.getState();  //could just call curPlayer but this makes sense in my head
 		switch(p){//is is player state 1-4
 		case 1:
 			clearTableCards();
-			
-			tableCard1.setBackgroundResource(r.getRid());
+			tableViewDH.addCard(r);
 			curPlayer=nextPlayer(curPlayer);	//this is the error line
-
 			break;
 			
 		case 2:
-			
-			tableCard2.setBackgroundResource(r.getRid());
+			tableViewDH.addCard(r);
+
+			//tableCard2.setBackgroundResource(r.getRid());
 			curPlayer=nextPlayer(curPlayer);	//this is the error line
 
 			break;
 		case 3:
-			tableCard3.setBackgroundResource(r.getRid());
+			tableViewDH.addCard(r);
+
+			//tableCard3.setBackgroundResource(r.getRid());
 			curPlayer=nextPlayer(curPlayer);	//this is the error line
 			break;
 		case 4:
-			tableCard4.setBackgroundResource(r.getRid());
+			tableViewDH.addCard(r);
+
+			//tableCard4.setBackgroundResource(r.getRid());
 			if(pile.size()>=4){
 				print("picking up hand", 652);
 				pickUpHand();
@@ -1026,10 +1110,11 @@ public class Game extends Activity{
 			break;
 		case 5:
 			//playState=-1; commented out
-			print("OUT OF BOUNDS!!! playstate=4", 637);
+			print("OUT OF BOUNDS!!! playstate=5", 637);
 			Toast.makeText(Game.this, "playState=0",  Toast.LENGTH_SHORT).show();
 			break;
 		}
+		tableViewDH.refreshDrawableState();
 		bottomText2.append(eol + "Current player is "+curPlayer.getRealName());
 	}
 	
@@ -1053,9 +1138,9 @@ public class Game extends Activity{
 		setCardText(curPlayer, null, r);//This advances the curPlayer.
 		//test CODE TODO
 		//canvas.drawBitmap(bitmap, x - (bitmap.getWidth() /2), y - (bitmap.getHeight() /2), null); 
-		
-		Rect rect;
-		rect= new Rect(10, 10, 120, 80);
+		//
+		//Rect rect;
+		//rect= new Rect(10, 10, 120, 80);
 		if(curPlayer.getSeat()==1){
 			playing=true;
 			bottomText.setText("Your Turn");
@@ -1591,8 +1676,14 @@ public class Game extends Activity{
 		print(wholeHand, 1467);
 		print("total="+hand.getSize(), 1580);
 	}
-	public DeckHolder getDH() {
+	public DeckHolder getDeckHolder() {
 		// TODO Auto-generated method stub
 		return cardViewDH;
 	}
+	public TableHolder getTableHolder() {
+		// TODO Auto-generated method stub
+		return tableViewDH;
+	}
 }
+
+

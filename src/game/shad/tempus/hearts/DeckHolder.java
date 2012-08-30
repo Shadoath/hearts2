@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -34,20 +35,42 @@ public class DeckHolder extends View
         return this.deck.getCard(i);
     }
     
-    public void addDeck(Deck deck){
+    public int getPosition() {
+		return position;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
+	}
+	public Rect getBounds(){
+		return new Rect(0, this.screenHeight, this.screenWidth, this.screenHeight*2);
+	}
+
+	public void addDeck(Deck deck){
         this.deck = deck;
     }
     
     public void swipeLeft(){
-    	if(position<=deck.getSize()+3)
-    		position+=3;
-    	this.refreshDrawableState();
+    	if(getPosition()<deck.getSize()-3)
+    		setPosition(getPosition() + 3);
+    	else
+    		setPosition(0);
+    	invalidate();
     }
     public void swipeRight(){
-    	if(position>=3)
-    		position-=3;
-    	this.refreshDrawableState();
+    	if(getPosition()>=3)
+    		setPosition(getPosition() - 3);
+    	else{
+    		setPosition(deck.getSize()-4);
+    	}
+    	invalidate();
 
+    }
+    public void addCard(Card c){
+    	this.deck.addCard(c);
+    }
+    public void removeAll(){
+    	this.deck.clearALL();
     }
     
     @Override
@@ -55,31 +78,40 @@ public class DeckHolder extends View
         super.onDraw(canvas);
         full=false;
         int displayed=0;
-        int cardWidth=screenWidth/7;
-        for (int i=position;i<deck.getSize();i++, displayed++){
-        	if(i>=7+position){
+        //TODO resize cards 
+       	int cardWidth=screenWidth/7;
+       	int i=getPosition();
+       	int loop=0;
+       	while(!full){
+        	if(displayed>7){
         		//j+=60;
         		//i2=8;
         		full=true;
         	}
-        	if(i==deck.getSize()&&deck.getSize()>displayed){
-        		System.out.println("onDraw DH");
-        	}
         	if(!full){
+        		if(i>=deck.getSize()&&deck.getSize()>7){
+        			loop=i;
+        			i=0;
+        		}
         		Card c=deck.getCard(i);
         		c.resizeBitmap(cardWidth, screenHeight);
-        		c.setCoords(cardWidth*(i-position), 0, cardWidth+cardWidth*(i-position), screenHeight);
+        		c.setCoords(cardWidth*((i+loop)-getPosition()), 0, cardWidth+cardWidth*((i+loop)-getPosition()), screenHeight);
         		c.draw(canvas);
+           		i++;
+           		displayed++;
         	}
         }
+       	
     }
     
     
     public void updateDeck(Deck deck){
         this.deck = deck;
-        this.refreshDrawableState();
+        refreshDrawableState();
     }
-    
+    public Deck getDeck(){
+        return this.deck;
+    }
     public void updateCurrentCard(Card Card){
         this.Card = Card;
     }  

@@ -4,7 +4,6 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-
     <LinearLayout
         android:id="@+id/Startlayout"
         android:layout_width="match_parent"
@@ -14,145 +13,134 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
-
-
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/name"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-
+
             <EditText
                 android:id="@+id/playerName"
-                android:layout_width="wrap_content"
+                android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:onClick="textSelected"
-                android:ems="10" >
+                android:ems="10"
+                android:hint="@string/yourName"
+                android:inputType="textPersonName"
+                android:onClick="textSelected" >
 
                 <requestFocus />
             </EditText>
-
         </LinearLayout>
-
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="fill_horizontal" >
 
-            <TextView
-                android:id="@+id/textView2"
+            <LinearLayout
                 android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Diff"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/Diff"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:gravity="right"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/TextView01"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/shuffle"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </LinearLayout>
         </LinearLayout>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical|fill_horizontal"
             android:orientation="horizontal" >
 
-
-            <RadioGroup
-                android:id="@+id/difficulty"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-
-                <RadioButton
-                    android:id="@+id/easy"
-                    android:tag="e"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="@string/easy" />
-
-                <RadioButton
-                    android:id="@+id/medium"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:enabled="true"
-                    android:onClick="todo"
-                    android:text="@string/medium" />
-
-                <RadioButton
-                    android:id="@+id/hard"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:enabled="true"
-                    android:onClick="todo"
-                    android:text="@string/hard" />
-
-            </RadioGroup>
-
-
-
-
             <LinearLayout
-                android:id="@+id/trackVoids"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="right" >
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical" >
 
-                <LinearLayout
+                <RadioGroup
+                    android:id="@+id/difficulty"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical" >
+                    android:layout_height="wrap_content" >
 
-                    <RadioGroup
-                        android:id="@+id/shuffle"
+                    <RadioButton
+                        android:id="@+id/easy"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" >
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:tag="e"
+                        android:text="@string/easy" />
 
-                        <RadioButton
-                            android:id="@+id/dropShuffle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:enabled="true"
-                            android:text="@string/dropShuffle" />
+                    <RadioButton
+                        android:id="@+id/medium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:enabled="true"
+                        android:onClick="todo"
+                        android:text="@string/medium" />
 
-                        <RadioButton
-                            android:id="@+id/randomSwap"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:enabled="true"
-                            android:text="@string/randomSwap" />
-                        
+                    <RadioButton
+                        android:id="@+id/hard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:enabled="true"
+                        android:onClick="todo"
+                        android:text="@string/hard" />
+                </RadioGroup>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:gravity="right"
+                android:orientation="vertical" >
 
+                <RadioGroup
+                    android:id="@+id/shuffle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
 
-               	   		<RadioButton
-               	   		    android:id="@+id/mixShuffle"
-               	   		    android:layout_width="wrap_content"
-               	   		    android:layout_height="wrap_content"
-               	   		    android:enabled="true"
-               	   		    android:text="@string/pileMix" />
+                    <RadioButton
+                        android:id="@+id/dropShuffle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:enabled="true"
+                        android:text="@string/dropShuffle" />
 
-                    </RadioGroup>
+                    <RadioButton
+                        android:id="@+id/randomSwap"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:enabled="true"
+                        android:text="@string/randomSwap" />
 
-                </LinearLayout>
-
+                    <RadioButton
+                        android:id="@+id/mixShuffle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:enabled="false"
+                        android:text="@string/pileMix" />
+                </RadioGroup>
             </LinearLayout>
 
         </LinearLayout>
-
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -160,23 +148,24 @@
             android:orientation="vertical" >
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
 
                 <CheckBox
-                    android:id="@+id/playerHelper"
+                    android:id="@+id/cardCounterCheckBox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="@string/playerHelper" />
-
+                    android:text="@string/CountCards" />
+
                 <CheckBox
-                    android:id="@+id/trackVoidsBox"
+                    android:id="@+id/PortaitMode"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="@string/helperVoids" />
+                    android:enabled="false"
+                    android:text="@string/portraitMode" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -197,27 +186,19 @@
                     android:enabled="false"
                     android:onClick="onResumePressed"
                     android:text="@string/resume" />
-
             </LinearLayout>
-
         </LinearLayout>
-
-
     </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
-
-
 
         <TextView
             android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="137dp"
             android:text="@string/startuphelp" />
-
     </LinearLayout>
 
 </LinearLayout>

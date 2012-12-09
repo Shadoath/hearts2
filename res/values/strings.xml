@@ -2,13 +2,14 @@
 <resources>
 
     <string name="hello">Droids have heart</string>
+    <string name="yourName">Your Name</string>
     <string name="app_name">Hearts</string>
     <string name="showpile">Show Pile</string>
     <string name="showvoids">Show Voids</string>
     <string name="showhand">Show Hand</string>
     <string name="pass">Pass</string>
     <string name="info">Info</string>
-    <string name="playcard">Play Card</string>
+    <string name="playcard">Play Card/Next</string>
     <string name="pop">Pop</string>
     <string name="name">Name</string>
     <string name="Diff">Difficulty</string>
@@ -17,6 +18,7 @@
     <string name="hard">Hard</string>
     <string name="start">Start</string>
     <string name="One">1</string>
+  
         <string-array name="Seat">
         <item>1</item>
         <item>2</item>
@@ -36,16 +38,17 @@
         <string name="unknown">**</string>
         
         <string name="random">Random</string>
+        <string name="round">Round=1</string>
         
         <string name="next">Next</string>
         
-        <string name="hint">Hint</string>
+        <string name="hint">hint</string>
         
         <string name="Previous">DeBug</string>
         
         <string name="exit">Exit</string>
         
-        <string name="menu">Menu</string>
+        <string name="menu">Deck</string>
         
         <string name="card1">Card1</string>
         
@@ -53,19 +56,37 @@
         <string name="card3">Card3</string>
         <string name="card4">Card4</string>
         <string name="playState">playState++</string>
-        <string name="clear">clear</string>
-        <string name="p1Score">p1 has 0 points</string>
-        <string name="p2Score">p2 has 0 points</string>
-        <string name="p3Score">p3 has 0 points</string>
-        <string name="p4Score">p4 has 0 points</string>
+        <string name="clear">Table</string>
+        <string name="p1Score">P1:0 points</string>
+        <string name="p2Score">P2:0 points</string>
+        <string name="p3Score">P3:0 points</string>
+        <string name="p4Score">P4:0 points</string>
         <string name="you">You</string>
-        <string name="startuphelp">Follow the colors, and if you get lost just hit \'Next\'.</string>
+        <string name="howToPlay">The goal of hearts is to have the least points at the end, the game is over when someone breaks 50 points. \n
+            Each hand is played in thirteen rounds or \'tricks\' of four cards.  The first round is always started with the Two of Clubs.  \n
+            The leading card\'s suit of the trick must be played unless you are void. \n
+            The highest card of the starting suit (Two to Ace), determines the winner of the trick and then they chooses the next starting card.\n
+            Each heart is one point, the Queen of Spades is +13, and the Jack of Diamonds is -10. \n
+            Hearts can not be played to start a trick till \'Broken.\  To break heart the Queen of Spades or a heart from a void round must be played.
+            The game is played in four hands per session.  The first three hands players trade three cards before the round begins.\n
+            On the fourth round there is no trading, then a new session begins.\n
+            On the rare chance a single player takes all the points in a round (Jack of Diamonds excluded). They then \'Shoot the moon\'\n
+            This takes the 26 points from their score and instead gives it to everyone else.
+            </string>
+        <string name="startuphelp">Touch the card you want to play, then press Next to manualy advance the game till your turn. \n OR go to menu then turn on AutoRun, then the game will advance automatically till your turn and wait for you to play. \nArrow buttons to move through your Cards \nIf you get lost just hit \'Next\'.</string>
         <string name="resume">Resume</string>
-        <string name="helperVoids">Track Voids</string>
+        <string name="CountCards">Count Cards</string>
+        <string name="portraitMode">Portrait Mode</string>
         <string name="dropShuffle">Drop Shuffle</string>
         <string name="randomSwap">Random Swap</string>
         <string name="playerHelper">Player helper</string>
         <string name="pileMix">Mix Shuffle</string>
         <string name="swipeLeft">&lt;--</string>
-        <string name="swipeRight">--&gt;</string>
+        <string name="swipeRight">---&gt;</string>
+        <string name="SkyTim">Skylar and Tim</string>
+        <string name="shuffle">Shuffle Method</string>
+        <string name="load">Load</string>
+        <string name="save">Save</string>
+        <string name="prev">Previous</string>
+        <string name="delete">Delete</string>
 </resources>

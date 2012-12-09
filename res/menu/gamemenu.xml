@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/autoRun"
+          android:title="Full Auto Run" 
+          android:checked="false" 
+          android:checkable="true"/>
+    <item android:id="@+id/debug"
+          android:title="Debug" />
+    <item android:id="@+id/normalRun" 
+        android:checked="false" 
+        android:title="Normal Run"
+        android:checkable="true">
+    </item>
+    
+	<item android:id="@+id/restart"
+          android:title="Restart" />
+    <item android:id="@+id/thinkTime"
+          android:title="AI thinking time" />
+    <item android:id="@+id/help" 
+        android:title="Hearts Basics"></item>
+</menu>

@@ -152,13 +152,13 @@ public class Player {
 			case 13:
 				if(trickHasPoints){
 					Log.d(TAG, "Play low/CardBelow--POINTS in pile!!");
-					return getDeckCardBelow(trick.getHighCard());
+					return getDeckCardBelow(trick.getHighCard(), false);
 				}
 				if(trickNegativePoints)
 					playHighSimple(startSuit, 0);
 				else {
 					
-					return getDeckCardBelow(trick.getHighCard());
+					return getDeckCardBelow(trick.getHighCard(), false);
 				}
 				}
 		case 4:
@@ -168,7 +168,7 @@ public class Player {
 			Log.d(TAG, "Seat 4!");
 			if(trickHasPoints){
 				Log.d(TAG, "Play below highest in pile --POINTS in pile!!");
-				return getDeckCardBelow(trick.getHighCard());
+				return getDeckCardBelow(trick.getHighCard(), true);
 			}
 			else if(startSuit==2 && hasQueen){
 				if(checkForCardsHigher(trick.TrickToDeck(), 12)){//TODO build method into Trick class
@@ -284,7 +284,7 @@ public class Player {
 			else{
 				Log.d(TAG, "Playing Club");
 				nextCard = clubs.getCard(clubs.getSize()-1);
-				Log.d(TAG, nextCard.cardToString());
+				Log.d(TAG, nextCard.toString());
 				return nextCard;
 			}	
 		case 1:
@@ -295,7 +295,7 @@ public class Player {
 			else{
 				Log.d(TAG, "Playing Diamond");
 				nextCard=diamonds.getCard(diamonds.getSize()-1);
-				Log.d(TAG, nextCard.cardToString());
+				Log.d(TAG, nextCard.toString());
 				return nextCard;
 			}
 		case 2:
@@ -311,7 +311,7 @@ public class Player {
 					return nextCard;
 				}
 				spades.removeCardAtIndex(spades.getSize()-1);
-				Log.d(TAG, nextCard.cardToString());
+				Log.d(TAG, nextCard.toString());
 				return nextCard;
 			}
 		case 3: 
@@ -321,7 +321,7 @@ public class Player {
 			}else if(game.heartsBroken||playingVoid||game.trading){
 				Log.d(TAG, "Playing heart");
 				nextCard=hearts.getCard(hearts.getSize()-1);
-				Log.d(TAG, nextCard.cardToString());
+				Log.d(TAG, nextCard.toString());
 				this.playingVoid=false;
 				return nextCard;
 			}
@@ -464,8 +464,8 @@ public class Player {
 	 * Use to keep low cards longer.
 	 * @param c
 	 */
-	private Card getDeckCardBelow(Card c){
-		Log.d(TAG, "Checking for a card below "+c.cardToString());
+	private Card getDeckCardBelow(Card c, boolean lastPlayer){
+		Log.d(TAG, "Checking for a card below "+c.toString());
 		int top = c.getValue();
 		Card bestPick = new Card(0, -1, game);
 		switch (c.getSuit()){
@@ -507,10 +507,15 @@ public class Player {
 			break;
 			
 		}
-		if(bestPick.getSuit()==-1){
-			Log.d(TAG, "No card found, play high and save lower cards for later");
-			return playHigh(c.getSuit(), 0);
-		}
+		if(bestPick.getSuit()==-1)
+			if(lastPlayer){
+				Log.d(TAG, "No card found, Last Card in trick sooo, play high and save lower cards for later");
+				return playHigh(c.getSuit(), 0);
+			}
+			else{
+				Log.d(TAG, "No card found, Playing next best");
+				return playLow(c.getSuit(), 0);
+			}
 		return bestPick;
 		
 	}
@@ -901,7 +906,7 @@ public class Player {
 		}
 		c.setTouched(false);
 		this.deck.removeCard(c);
-		Log.d(TAG, "card to trade ===="+c.cardToString());
+		Log.d(TAG, "card to trade ===="+c.toString());
 		return c;
 				
 	}
@@ -1039,7 +1044,7 @@ public class Player {
 			}
 			Log.d(TAG, "Playing heart");
 			nextCard=hearts.getCard(hearts.getSize()-1);
-			Log.d(TAG, nextCard.cardToString());
+			Log.d(TAG, nextCard.toString());
 			return nextCard;
 			
 		case 4:

@@ -38,7 +38,7 @@ public class Card {
 	    this.bitmap = getImage(value, suit);
 		this.value = value;
 		this.suit = suit;
-		this.name = cardToString();
+		this.name = toString();
 		
 	}
 	 
@@ -295,7 +295,8 @@ public class Card {
 		this.suit = suit;
 	}
 
-	public String cardToString(){
+	@Override
+	public String toString(){
 		String sValue = "";
 		String sSuit="";
 		switch(suit){

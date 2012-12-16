@@ -66,14 +66,14 @@ public class Deck {
 	
 	public void addCards(ArrayList<Card> cards){
 		for(Card c : cards){
-			Log.d(TAG, "card added="+c.cardToString());
+			Log.d(TAG, "card added="+c.toString());
 			this.deck.add(c);
 		}
 	}
 	
 	public void removeCards(ArrayList<Card> cards){
 		for(Card c : cards){
-			Log.d(TAG, "card removed="+c.cardToString());
+			Log.d(TAG, "card removed="+c.toString());
 			c.setTouched(false);
 			this.deck.remove(c);
 		}

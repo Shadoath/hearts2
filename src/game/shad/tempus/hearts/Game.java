@@ -24,6 +24,7 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
@@ -679,7 +680,7 @@ public class Game extends Activity {
 		nextCard.setOwner(curPlayer);
 		tableTrick.addCard(nextCard);
 
-		Log.d(TAG, "Playing card="+nextCard.cardToString());
+		Log.d(TAG, "Playing card="+nextCard.name);
 		tableHolder.addCard(nextCard);		
 		playCardBottomText(nextCard);
 		curPlayer.removeCardFromDeck(nextCard);
@@ -756,7 +757,7 @@ public class Game extends Activity {
 				points++;
 			}
 			Log.d(TAG, "pick up hand cards checked="+i);
-			roundString += currentCard.cardToString()+", ";
+			roundString += currentCard.name+", ";
 
 		}
 		roundCardString+=roundString+"\n";
@@ -1305,7 +1306,7 @@ public class Game extends Activity {
 		Log.d(TAG, "displayTable cards");
 		String sDeck= "";
 		for(int i=0; i<deck.getSize();i++){
-			sDeck += (1+i)+". "+deck.getCard(i).getOwner().getRealName()+" : "+deck.getCard(i).cardToString()+"\n";
+			sDeck += (1+i)+". "+deck.getCard(i).getOwner().getRealName()+" : "+deck.getCard(i).name+"\n";
 		}
 		return sDeck;
 		//TODO update gameView in thread.
@@ -1612,7 +1613,7 @@ public class Game extends Activity {
 		    			if(cardToPlay==null){//Nothing picked yet
 		    				cardToPlay=c;
 		    				cardToPlay.setTouched(true);
-		    				myToast.setText("You picked the "+c.cardToString());
+		    				myToast.setText("You picked the "+c.name);
 		    				myToast.show();
 		    				break;
 		    			}
@@ -1620,7 +1621,7 @@ public class Game extends Activity {
 		    				cardToPlay.setTouched(false);
 		    				cardToPlay=c;
 		    				cardToPlay.setTouched(true);
-		    				myToast.setText("You picked the "+c.cardToString());
+		    				myToast.setText("You picked the "+c.name);
 		    				myToast.show();
 
 		    				break;
@@ -1677,7 +1678,7 @@ public class Game extends Activity {
 			if(cardToPlay==null){//Nothing picked yet
 				cardToPlay=c;
 				cardToPlay.setTouched(true);
-				myToast.setText("You picked the "+c.cardToString());
+				myToast.setText("You picked the "+c.name);
 				myToast.show();
 				
 			}
@@ -1685,11 +1686,12 @@ public class Game extends Activity {
 				cardToPlay.setTouched(false);
 				cardToPlay=c;
 				cardToPlay.setTouched(true);
-				myToast.setText("You picked the "+c.cardToString());
+				myToast.setText("You picked the "+c.name);
 				myToast.show();
 
 				
 			}
+			
 		}
 		updateDH();
 
@@ -1708,17 +1710,17 @@ public class Game extends Activity {
 			case 1:
 				bottomText2.setText("Cards picked to trade left:"+eol);
 				for(Card c : cards)
-					bottomText2.append(c.cardToString()+eol);
+					bottomText2.append(c.name+eol);
 				break;
 			case 2:
 				bottomText2.setText("Cards picked to trade right:"+eol);
 				for(Card c : cards)
-					bottomText2.append(c.cardToString()+eol);
+					bottomText2.append(c.name+eol);
 				break;
 			case 3:
 				bottomText2.setText("Cards picked to trade across:"+eol);
 				for(Card c : cards)
-					bottomText2.append(c.cardToString()+eol);
+					bottomText2.append(c.name+eol);
 				break;
 			default:
 				Log.d(TAG, "Traiding on round 4. BAD PLAN!");
@@ -1728,7 +1730,7 @@ public class Game extends Activity {
 		else{		
 			bottomText2.setText("Cards given to you:"+eol);
 			for(Card c : cards)
-				bottomText2.append(c.cardToString()+eol);
+				bottomText2.append(c.name+eol);
 			bottomText2.append(eol);
 		}
 		
@@ -1773,7 +1775,7 @@ public class Game extends Activity {
 				return true;
 			}
 			else{
-				Log.d(TAG, "Trying to play "+c.cardToString());
+				Log.d(TAG, "Trying to play "+c.name);
 				myToast.setText("Not a Valid Choice");
 				myToast.show();
 				return false;

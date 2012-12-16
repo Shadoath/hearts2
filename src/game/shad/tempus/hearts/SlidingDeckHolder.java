@@ -26,7 +26,9 @@ public class SlidingDeckHolder extends LinearLayout
 
 	
     private Deck deck;
-    private ArrayList<View> cardView;
+    private ArrayList<View> cardViewSelected;
+    private ArrayList<View> tradingViews;
+    private View viewSelected;
     private ImageView cardImageView;
     private Card Card;
     private Card firstCardTouched;
@@ -35,10 +37,7 @@ public class SlidingDeckHolder extends LinearLayout
     private int screenHeight;
     private int position=0;
     private int cardWidth=0;
-    private boolean full=false;
-	public boolean initialized = false; //made true on surfaceCreated()
-	private boolean doneTouching = false;
-	private SurfaceHolder surfaceHolder;
+
 	private SlidingDeckHolder self;
 	private Context mContext;
 	private Game game;
@@ -57,29 +56,14 @@ public class SlidingDeckHolder extends LinearLayout
        	params = new LinearLayout.LayoutParams(cardWidth, screenHeight);
         this.deck = new Deck();
         
-        cardView= new ArrayList<View>();
+        cardViewSelected= new ArrayList<View>();
+        tradingViews= new ArrayList<View>();
         //addBlankCards();
         //this.addCardViews(cardView);
 
 
     }
-    @Override
-    protected void onDraw(Canvas canvas) {
-    	super.onDraw(canvas);
-    	
-    	int childcount = this.getChildCount();
-    	for (int i=0; i < childcount; i++){
-    	      CardView v = (CardView) this.getChildAt(i);
-    	      if(v.getCard().isTouched()){
-    	    	  v.setAlpha(180);
-    	      }
-    	      else{
-    	    	  v.setAlpha(0);
-    	      }
-    	}
-    };
-
-    
+        
     public void addBlankCards(){
     	this.deck.clearALL();
     	int i = 0;
@@ -88,8 +72,8 @@ public class SlidingDeckHolder extends LinearLayout
 			cView.setMaxHeight(screenHeight);
 			cView.setMaxWidth(screenWidth);
 			cView.setVisibility(View.VISIBLE);
-			cView.setPadding(0, 0, 0, 0);
 			cView.setLayoutParams(params);
+			cView.setPadding(0, 5, 0, 5);
 			cView.setImageBitmap(game.BlueBack);
 	        addView(cView);
 	        i++;
@@ -123,7 +107,7 @@ public class SlidingDeckHolder extends LinearLayout
 	 */
 	public void addDeck(Deck deck){
     	removeAllViews();
-		cardView= new ArrayList<View>();
+		cardViewSelected= new ArrayList<View>();
 		for(Card c: deck.getDeck()){
 			CardView cView= new CardView(mContext, c, params);
 
@@ -135,10 +119,55 @@ public class SlidingDeckHolder extends LinearLayout
 					String t = v.getTag().toString();
 					Log.d(TAG, "tag="+t);
 					for(Card c: self.deck.getDeck()){
-						Log.d(TAG, "card Tag="+c.cardToString());
-						if(c.cardToString().equals(t)){
+						Log.d(TAG, "card Tag="+c.toString());
+						if(c.toString().equals(t)){
 							game.slidingDeckViewTouched(c);
-							break;
+							boolean done = false;
+							if(game.trading){//Pick up to three cards
+								if(tradingViews.size()>0){
+									int cardInt = 0;
+					    			for(View view : tradingViews){
+										if(view.equals(v)){
+											tradingViews.get(cardInt).setBackgroundColor(Color.BLACK);
+											tradingViews.remove(cardInt);
+											done=true;	//Already picked that one. Now it is unselected.
+											break;
+										}
+					    				cardInt++;
+
+									}
+					    			if(done){
+					    				Log.d(TAG, "deselected a card ");
+										return;
+					    			}
+								}
+								v.setBackgroundColor(Color.GREEN);
+								int size = tradingViews.size();
+								if(size<3){//Nothing picked yet
+									tradingViews.add(v);
+									
+								}
+								else {
+									tradingViews.get(0).setBackgroundColor(Color.BLACK);
+									tradingViews.remove(0);
+									tradingViews.add(v);
+								}
+
+								return;
+							}
+							if(game.checkPlayability(c)){
+								if(viewSelected==null){
+									v.setBackgroundColor(Color.GREEN);
+									viewSelected=v;
+								}
+								else{
+									viewSelected.setBackgroundColor(Color.BLACK);
+									v.setBackgroundColor(Color.GREEN);
+									viewSelected=v;
+									
+								}
+							}
+							
 						}
 					}
 				}
@@ -172,7 +201,7 @@ public class SlidingDeckHolder extends LinearLayout
     	this.deck.addCard(c);
     }
     public void removeAll(){
-		this.cardView= new ArrayList<View>();
+		this.cardViewSelected= new ArrayList<View>();
     }
             
     

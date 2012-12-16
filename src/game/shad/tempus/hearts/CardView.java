@@ -15,7 +15,7 @@ public class CardView extends ImageView{
 		setImageBitmap(card.getBitmap());
 		setLayoutParams(layoutParams);
 		setPadding(0, 0, 0, 0);
-		setTag(card.cardToString());
+		setTag(card.toString());
 		// TODO Auto-generated constructor stub
 	}
 	

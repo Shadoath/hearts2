@@ -1844,6 +1844,7 @@ public class Game extends Activity {
 		SpadesQueen = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade_queen);
 		SpadesKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade_king);
 		SpadesAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade_ace);
+		
 
 		HeartsTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts2);
 		HeartsThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts3);

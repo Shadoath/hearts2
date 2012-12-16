@@ -54,7 +54,9 @@ public class SlidingDeckHolder extends LinearLayout
         this.screenHeight = sH;
        	cardWidth=screenWidth/7;
        	params = new LinearLayout.LayoutParams(cardWidth, screenHeight);
-        this.deck = new Deck();
+       	params.setMargins(1, 1, 1, 1);
+       	
+       	this.deck = new Deck();
         
         cardViewSelected= new ArrayList<View>();
         tradingViews= new ArrayList<View>();
@@ -69,13 +71,13 @@ public class SlidingDeckHolder extends LinearLayout
     	int i = 0;
     	while(i  < 12){
     		ImageView cView= new ImageView(mContext);
-			cView.setMaxHeight(screenHeight);
-			cView.setMaxWidth(screenWidth);
+			cView.setMaxHeight(screenHeight-10);
+			cView.setMaxWidth(cardWidth-10);
+			cView.setPadding(10,10,10,10);
 			cView.setVisibility(View.VISIBLE);
 			cView.setLayoutParams(params);
-			cView.setPadding(0, 5, 0, 5);
 			cView.setImageBitmap(game.BlueBack);
-	        addView(cView);
+			addView(cView);
 	        i++;
     	}
     }
@@ -141,6 +143,7 @@ public class SlidingDeckHolder extends LinearLayout
 										return;
 					    			}
 								}
+								v.setSelected(true);
 								v.setBackgroundColor(Color.GREEN);
 								int size = tradingViews.size();
 								if(size<3){//Nothing picked yet
@@ -149,6 +152,7 @@ public class SlidingDeckHolder extends LinearLayout
 								}
 								else {
 									tradingViews.get(0).setBackgroundColor(Color.BLACK);
+									tradingViews.get(0).setSelected(false);
 									tradingViews.remove(0);
 									tradingViews.add(v);
 								}
@@ -157,12 +161,16 @@ public class SlidingDeckHolder extends LinearLayout
 							}
 							if(game.checkPlayability(c)){
 								if(viewSelected==null){
+									v.setSelected(true);
 									v.setBackgroundColor(Color.GREEN);
 									viewSelected=v;
 								}
 								else{
+									viewSelected.setSelected(false);
+									
 									viewSelected.setBackgroundColor(Color.BLACK);
 									v.setBackgroundColor(Color.GREEN);
+									v.setSelected(true);
 									viewSelected=v;
 									
 								}

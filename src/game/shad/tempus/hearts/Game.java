@@ -1,438 +1,257 @@
 package game.shad.tempus.hearts;
 
+import game.shad.tempus.hearts.GameThread.AutoRunState;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.gesture.Gesture;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
+import android.graphics.RectF;
 import android.os.Bundle;
-import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.OnGestureListener;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.SurfaceView;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.TableRow;
+import android.widget.ScrollView;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.LinearLayout.LayoutParams;
 
 
-public class Game extends Activity{
-	
+public class Game extends Activity {
+	public static final String TAG = "Hearts--Game";
+	public static final int pointsTillEndGame = 50;
+    
+	private Context context;
+    private File path;
+
 	//current issues
-	//the pickup pile method needs to correctly pick who wins.  using when it was played needs aditional playstate check to confirm seat.
-	//playing someone elses cards....needs testing
-	// when doing the Play2clubs can play Ace instead due to getting the first item in array
 	//BOTS ARE CHEATING AND NOT PLAYING CARDS WHEN THEY SHOULD!!
-	//Points are not being kept...p1+p2 do odd things
-	//
+	//TODO Scrolling cards by creating a start value for where to start drawing a card.
+	private MainActivity main;
 	public String eol = System.getProperty("line.separator");
 	public String name;
-	public Deck deck=new Deck();
-	public int[] cardArrayRes= new int[52];
-	public Card[] deckCards=new Card[4];
-    public ArrayList<Card> pile=new ArrayList<Card>();
-    public ArrayList<ArrayList<Card>> roundHands= new ArrayList<ArrayList<Card>>(); 
-	public Player p1;
+	
+	private Deck cardDeck=new Deck();
+	private Trick tableTrick=new Trick();
+	private Deck blankCards=new Deck();
+	
+    public Player p1;
 	public Player p2;
 	public Player p3;
 	public Player p4;
 	public Player curPlayer;
+	
 	public Card cardToPlay;
-	public Intent gameIntent;
-	public Canvas canvas;
-	public Paint paint;
-	//public card[] pile = new card[4];
-	public int pileI=0;
+	public Canvas canvas = new Canvas();
+	private ArrayList<TrickStats> roundHands= new ArrayList<TrickStats>(); 
+	public String roundCardString = "";
 
+	
+    //Booleans for setting game states
+    public boolean playing 			= false;  //initialized to false but set true during check for 2
+    public boolean heartsBroken 	= false;
+    public boolean restart 			= false;
+    public boolean cardCounterB		= false;
+    public boolean newRound			= false;
+    public boolean trading 			= false; 
+	public boolean justPickedUpPile = false;
+	public boolean jackFound 		= false;	//TODO use this 
+	public boolean queenFound 		= false;	//TODO use this 
+
+	private boolean initialized 	= false; //made true on surfaceCreated()
+	private boolean jackFoundP1 	= false;
+	private boolean jackFoundP2 	= false;
+	private boolean jackFoundP3 	= false;
+	private boolean jackFoundP4 	= false;
+	
+	public int playerHelperInt=0;
+    public int round=1;
 	public int selectedCard=0;
 	public int selectedCardSuit=-1;
-	public int selectedCardPlace=0;
-	int clubsPlayedInt=0;
-	int diamondsPlayedInt=0;
-	int spadesPlayedInt=0;
-	int heartsPlayedInt=0;
+    public int roundScore = 0;
+
 	
+	private int clubsPlayedInt=0;
+	private int diamondsPlayedInt=0;
+	private int spadesPlayedInt=0;
+	private int heartsPlayedInt=0;
+    private int roundScoreP1 = 0;
+    private int roundScoreP2 = 0;
+    private int roundScoreP3 = 0;
+    private int roundScoreP4 = 0;
+    private int session=1;
+    private int gameHands=1;
+    private int difficulty=1;
+    private int shuffleType;
+	private int screenWidth;
+    private int screenHeight;
+	//////////////////////gameview stuff
+
 	
-    public EditText et1;
-    //Booleans for setting game states
-    public boolean playing = false;  //initialized to false but set true during check for 2
-    public boolean heartsBroken;
-    public boolean restart = false;
-    public boolean voidHelper;
-    public boolean playerHelper;
-    public boolean newRound=false;
+	private Canvas deckHolderCanvas = null;
+	private Canvas tableHolderCanvas = null;
+	private Canvas p1HolderCanvas = null;
+	private Canvas p2HolderCanvas = null;
+	private Canvas p3HolderCanvas = null;
+	private Canvas p4HolderCanvas = null;
+
+    private LinearLayout bottomLayout;
+    private HorizontalScrollView deckHolderLayout;
+    private LinearLayout tableHolderLayout;
+    private LinearLayout topLayout;
+    private LinearLayout middleLayout;
+    private LinearLayout tableRightView;
     
-    public int round=1;
-    public int count=0;
-    public int players=4;
-    public int difficulty=1;
-	int size;
-	int screenWidth;
-    int screenHeight;
-	private int shuffleType;
-	int playerHelperInt=0;
+    private Button playCard;
+    private Button leftButton;
+    private Button rightButton;
+    
+    public DeckHolder deckHolder;
+    public SlidingDeckHolder slidingDeckHolder;
+    private TableHolder tableHolder;
+    
+    private PlayerHolder p1Holder;
+    private PlayerHolder p2Holder;
+    private PlayerHolder p3Holder;
+    private PlayerHolder p4Holder;
+    
+    private LinearLayout.LayoutParams tableHolderlayoutParams;
+    private LinearLayout.LayoutParams deckHolderlayoutParams;
+    private LinearLayout.LayoutParams slidingDeckHolderlayoutParams;
+    private TextView clubsPlayed;
+    private TextView diamondsPlayed;
+    private TextView spadesPlayed;
+    private TextView heartsPlayed;
+    private TextView roundView;
+    private TextView bottomText;
+    private TextView bottomText2;
+    
+    private RectF rect = new RectF(); // public rect to be passed to drawable objects for drawing bitmaps
+    private Paint paint = new Paint(); // public paint to be passed to drawable objects
+	private Toast myToast;
    
+		
 	
-    public EditText tCount;
-    public TextView output1;
-    //Player 1
-    
-    public TextView p1Clubs;
-    public TextView p1Diamonds;
-    public TextView p1Spades;
-    public TextView p1Hearts;
-    
-    public TextView clubsPlayed;
-    public TextView diamondsPlayed;
-    public TextView spadesPlayed;
-    public TextView heartsPlayed;
-    public TextView roundView;
-	TextView totalPlayed;
-    
-    public Button p1ClubsB;
-    public Button p1DiamondsB;
-    public Button p1SpadesB;
-    public Button p1HeartsB;
-    
-    public TextView p1tvScore;
-    public TextView p2tvScore;
-    public TextView p3tvScore;
-    public TextView p4tvScore;
-        
-    public LinearLayout p1TR;
-
-    public TextView bottomText;
-    public TextView bottomText2;
-    
-    private GestureDetector gestures;
-    LinearLayout bottomLayout;
-    LinearLayout tableHolderLayout;
-    LinearLayout tableLayout;
-    //LinearLayout topLayout;
-    DeckHolder cardViewDH;
-    TableHolder tableViewDH;
-
-    //Button used as a global place holder in function fixSides()
-	Button fixSidesButton;
-
-	
-    /** Called when the activity is first created. */
-	@Override
-    public void onCreate(Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        //hide keyboard :
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        gameIntent = getIntent();        
-        Bundle b = gameIntent.getExtras();
+    public Game(Bundle gameBundle, Context context, MainActivity main) {
+        Bundle b = gameBundle;
+        this.context = context;
+        this.main = main;
         this.name=(String) b.get("name").toString().trim();
-        this.voidHelper = (Boolean) b.get("voidHelper");
-        this.playerHelper = (Boolean) b.get("playerHelper");
-        print("player helper is "+playerHelper, 145);
-        print(this.name, 148);
+        this.cardCounterB = (Boolean) b.get("cardCounter");
+        this.screenHeight = (int) b.getInt("height");
+        this.screenWidth = (int) b.getInt("width");
+        
+        Log.d(TAG, "Text in player name box is "+this.name);
         if (this.name.equalsIgnoreCase("Your name")||this.name.equals("")){
         	this.name = "You";
         }
         this.difficulty =  (Integer) b.get("diff");
         this.shuffleType =  (Integer) b.get("shuffle");
-        print("shuffle type= "+shuffleType, 152);
+        Log.d(TAG, "shuffle type= "+shuffleType);
 
-        print("difficulty= "+difficulty, 154);
+        Log.d(TAG, "difficulty= "+difficulty);
                
         this.restart = (Boolean) b.get("restart");
-        setContentView(R.layout.table);
+//        createBlankHand();
+        myToast  = Toast.makeText(context, "", Toast.LENGTH_SHORT);
+        setupSaveSettings();
+        findViewsById();
         
+
 	}
     
-    @Override
-    public void onStart(){
-    	print("onStart Called", 135);
-    	super.onStart();
-
-    	firstStart();
-    	
-    }
-
-	@Override
-	public void onResume(){
-		print("onResume called", 192);
-        //setContentView(R.layout.table);
-		//firstStart();  //always a good plan to call this
-        //this could be a method to create a new hand.
-		//deal();
-        //checkForTwoMethod();
-        //displayCards(p1);
-		super.onResume();
-        gestures = new GestureDetector(this, new Gestures(this));
+	private void setupSaveSettings(){
+    	switch(2){
+    	case 1:
+        	path = main.getCacheDir();
+    	case 2:
+        	path = main.getApplicationContext().getFilesDir();
+    	case 3:
+        	path = main.getExternalCacheDir();
         
-
-		/*
-		bottomText.setText("curPlayer is "+curPlayer.getRealName());
-		if(pile.size()>=1){
-			bottomText2.setText(""+pile.get(pile.size()-1).getOwner().getRealName()+" played last");
-			
-			}
-		else{
-			bottomText2.setText(curPlayer.getRealName()+" needs to start");
-		}
-		*/
-		
-		
-	}
-
-	@Override
-	public void onPause(){
-		print("on pause", 190);
-		super.onPause();
-		
-		/*
-		Bundle b;
-		Parcelable p;
-		p1.
-		b.putParcelableArray("players", )
-		ParseObject gameScore = new ParseObject("GameScore");
-		gameScore.put("score", 1337);
-		gameScore.put("playerName", "Sean Plott");
-		gameScore.put("cheatMode", false);
-		try {
-		    gameScore.save();
-		} catch (ParseException e) {
-		    // e.getMessage() will have information on the error.
-		}
-		Test for crash fix from start up.
-		*/
-		
-	}
-	
-	
-	public void onRestoreInstanceState(Bundle savedInstanceState){
-		print("onRestoreInstanceState", 212);
-		restart=false;
-		
-		
-		
-		super.onRestoreInstanceState(savedInstanceState);
-		
-	}
-	@Override
-    public void onRestart(){
-    	print("onRestart()", 214);
-    	restart=true;
-    	//TODO set ALL points back to 0.
-    	super.onRestart();
-    	
+    	}
+    	Log.d(TAG, "settings Saved");
     }
 	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.mainmenu, menu);
-	    return true;
-	}
-	
-	public boolean onTouchEvent(MotionEvent e){
-        return gestures.onTouchEvent(e);
-    }
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle item selection
-	    switch (item.getItemId()) {
-	        case R.id.hint:
-	            print("Hint asked for", 250);
-				Toast.makeText(Game.this, "Press Next",  Toast.LENGTH_SHORT).show();
-
-	            return true;
-	        case R.id.settings:
-	            print("Settings asked for", 253);
-	            MenuInflater inflater = getMenuInflater();
-	            Menu m = null;
-	            inflater.inflate(R.menu.preferences, m);
-	            return true;
-	        case R.id.restart:
-	        	print("restart pressed", 258);
-	        	restart = true;
-	        	
-	        	clearALL();
-	        	start();
-	            print("Restart game", 175);
-	            //TODO GAME variables reset.
-
-	            return true;
-	        case R.id.exit:
-	        	restart=true;
-	            print("Exit", 180);
-	            finish();
-	        default:
-	            return super.onOptionsItemSelected(item);
-	    }
-	}
-
-	/**
-	 * quick print method for debugging
-	 * @param i the String to be printed
-	 * @param j the line number where the print is being called from.
-	 */
-    public void print(String i, int j){
-	    System.out.println(i+"  "+j);
-	
-	}
-    
-    /**
-     * Basically declares all the views into  objects.
-     * Should only be called from OnCreate(); and OnRestart();
-     * 
-     */
-    public void firstStart() {
-    	print("firstStart()", 315);
-    	p1Clubs = (TextView) findViewById(R.id.p1Clubs);
-    	p1Diamonds = (TextView) findViewById(R.id.p1Diamonds);
-    	p1Spades = (TextView) findViewById(R.id.p1Spades);
-    	p1Hearts = (TextView) findViewById(R.id.p1Hearts);
-    	
-        p1tvScore = (TextView) findViewById(R.id.p1tvScore);
-        p2tvScore = (TextView) findViewById(R.id.p2tvScore);
-        p3tvScore = (TextView) findViewById(R.id.p3tvScore);
-        p4tvScore = (TextView) findViewById(R.id.p4tvScore);
-
-        
-    	roundView = (TextView) findViewById(R.id.roundView);
-    	bottomText = (TextView) findViewById(R.id.bottomTV);
-    	bottomText2 = (TextView) findViewById(R.id.bottomTV2);
-
-	
-    	
-        p1ClubsB =(Button)findViewById(R.id.p1clubsButton);
-        p1DiamondsB=(Button)findViewById(R.id.p1diamondsButton);
-        p1SpadesB=(Button)findViewById(R.id.p1spadesButton);
-        p1HeartsB=(Button)findViewById(R.id.p1heartsButton);
-        
-                
-        p1TR= (LinearLayout) findViewById(R.id.player1);
-
-        clubsPlayed = (TextView) findViewById(R.id.clubsPlayed);
-        diamondsPlayed = (TextView) findViewById(R.id.diamondsPlayed);
-        spadesPlayed = (TextView) findViewById(R.id.spadesPlayed);
-        heartsPlayed = (TextView) findViewById(R.id.heartsPlayed);
-        totalPlayed = (TextView) findViewById(R.id.totalPlayed);
-        bottomLayout = (LinearLayout) findViewById(R.id.bottomLayout);
-        tableHolderLayout = (LinearLayout) findViewById(R.id.tableHolderLayout);
-        tableLayout = (LinearLayout) findViewById(R.id.tableLayout);
-
-        //topLayout = (LinearLayout) findViewById(R.id.topLayout); 
-
-        Display display = getWindowManager().getDefaultDisplay(); 
-        screenWidth = display.getWidth();
-        screenHeight = display.getHeight();
-
-        getCardResources();
-        start();
-	}
-	 
-    public void start(){ 	
-    	print("start()", 344);
-    	//should not need to make deck, just shuffle the old one.
-        if(restart){
-        	//TODO reset all points
-			print("restarting-onStart", 348);
-        	makeDeck();
-			shuffle();
-	        deal();
-	        //This needs to be done later trade();  //ha ha more like set who to trade too.
-	        //TODO let play select cards and trade.
-	        voidCheck();
-
-	        
-	        createViews();
-	        checkForTwoMethod();//This more or less starts the game.
-	        displayCards(p1);
-        }
-    
-        else{
-        	print("Normal Start", 386);
-        	//New round keep playing
+	public void heartsMe(){ 
+		//TODO create a loading screen event.
+		Log.d(TAG, "start()");
+		if(restart){		//Not sure on this line.
 			makeDeck();
-        	shuffle();	
-	        deal();
-	        //TODO trade()
-	        voidCheck();
-	        createViews();
-	        
-	        checkForTwoMethod();//This more or less starts the game.
-	        displayCards(p1);
+			this.restart = false;
+		}
+    	shuffle();	
+        dealing();
+        voidCheckAllPlayers();	//Run this before doing and player logic 
+        queenCheckAllPlayers();	//Fist of two calls during a 13 trick game.
+        if(session!=4){//Trading
+        	playCard.setText("Trade Cards");
+        	playCard.setEnabled(false);
+        	trading=true;
+	        bottomText.setText("Choose three cards to trade");
+	        bottomText2.setText("Trading..."+eol);
         }
-      //DECKHOLDER
-        
+        else{	//NO trading  
+        	playCard.setText("Play Card");
+        	playCard.setEnabled(true);
+        	checkForTwoMethod();	//This more or less starts the game.
+        }
+       
+        update();
 	}
-    
-    public void createViews(){
-    	this.cardViewDH = new DeckHolder(this.getApplicationContext(), screenWidth, screenHeight/8);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(screenWidth, screenHeight/8);
+		
+	/**
+	 * creates 52 cards 13 of each suit.
+	 */
+	public void makeDeck() { 
+		Log.d(TAG, "make Deck");
+		this.cardDeck = new Deck();
 
-        this.tableViewDH = new TableHolder(this.getApplicationContext(), (int) (screenWidth*.7), screenHeight/8);
-        LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams((int) (screenWidth*.7), screenHeight/8);
-
-        cardViewDH.setLayoutParams(layoutParams);
-        tableViewDH.setLayoutParams(layoutParams2);
-     
-        cardViewDH.addDeck(p1.getDeck());
-        tableHolderLayout.addView(cardViewDH);
-        tableLayout.addView(tableViewDH);
-    }
-    
-    
-    /**
-     * creates 52 cards 13 of each suit.
-     */
-    public void makeDeck() { 
-    	print("make Deck", 404);
-    	deck.clearALL();
 		for(int suit=0;suit<4;suit++){			
-			for(int value=1;value<14;value++){
-				Card cd = new Card( value, suit, this.getApplicationContext());
-				deck.addCard(cd);
+			for(int value=2;value<15;value++){
+				Card cd = new Card(value, suit, this);
+				cardDeck.addCard(cd);
 			}
-
+	
 		}
 		
 	}
+	
 	/**
 	 * WOULD NOT BET LIFE ON THIS SHUFFLE!!!
 	 * Probably a very uneven shuffle.
 	 */
 	public void shuffle(){
-		print("shuffle", 424);
+		Log.d(TAG, "shuffle");
+		Log.d(TAG, "Deck size="+this.cardDeck.getSize());
+		
 			if(shuffleType==1){
-				print("shuffle type 1", 475);
-
+				Log.d(TAG, "shuffle type 1");
+	
 				//New shuffle going in 8/16
 				int x = 0;
 				int z = 50;
-				int total =0;
 				
 				Deck deck2 = new Deck();
 				Deck deck3 = new Deck();
 				Deck deck4 = new Deck();
-				deck2.addAllCards(this.deck);
+				deck2.addAllCards(cardDeck);
 				int j=0;
 				int a=(int)  (Math.random()*7)+1;
 				int dLength=0;;
@@ -442,7 +261,7 @@ public class Game extends Activity{
 					dLength=deck2.getSize();
 					while(dLength>0){
 						if(dLength<=a){
-							print("STOP, too Small. "+dLength, 443);
+							Log.d(TAG, "STOP, too Small. "+dLength);
 							deck3.addAllCards(deck2);
 							deck2.clearALL();
 							a=-1;	//must be negative or it will go into the while loop
@@ -462,23 +281,23 @@ public class Game extends Activity{
 						
 						a=(int) (Math.random()*7)+1;
 						dLength=deck2.getSize();
-						//print("deck2= "+dLength, 461);
-						//print("deck3= "+deck3.getSize(), 462);
-						//print("deck4= "+deck4.getSize(), 463);
+						//Log.d(TAG, "deck2= "+dLength, 461);
+						//Log.d(TAG, "deck3= "+deck3.getSize(), 462);
+						//Log.d(TAG, "deck4= "+deck4.getSize(), 463);
 					}
 					//deck2.clearALL();  should be empty
 					stop=false;
 					deck2.addAllCards(deck4);  //dont use = it makes them clones of each other
 					deck4.clearALL();
-					print("x="+x+"  z="+z, 467);
+					Log.d(TAG, "x="+x+"  z="+z);
 					
 				}
-				print("j is "+j, 470);
-				deck.clearALL();
-				deck.addAllCards(deck2);
+				Log.d(TAG, "j is "+j);
+				cardDeck.clearALL();
+				cardDeck.addAllCards(deck2);
 			}
 			else if(shuffleType==2){	//this shuffle may not work after changing everything to Deck...
-				print("shuffle type 2", 475);
+				Log.d(TAG, "shuffle type 2");
 				int x=0;
 				int z=50;//times to loop the deck and 'randomly' switch cards.
 				int r = 51;
@@ -491,14 +310,14 @@ public class Game extends Activity{
 					int a=(int) (Math.random()*r);
 					for(int i=52; i>0&&!stop; i--){
 						int loop=0;
-						while(deck.getCard(a)!=null&&!stop){
+						while(cardDeck.getCard(a)!=null&&!stop){
 							loop++;
 							a=(int) (Math.random()*r);
 							if(loop>15&&!stop){ //careful on this Set loop to 15 from 10.
 								r = 0;
-								for(int q=0; q<deck.getSize();q++){//Random math not finding cards, Empty rest and start again.
-									if(deck.getCard(q)!=null){
-										deck2.addCardAtIndex(q, deck.getCard(q));
+								for(int q=0; q<cardDeck.getSize();q++){//Random math not finding cards, Empty rest and start again.
+									if(cardDeck.getCard(q)!=null){
+										deck2.addCardAtIndex(q, cardDeck.getCard(q));
 										r++;
 										j++;
 									}
@@ -511,13 +330,13 @@ public class Game extends Activity{
 							}
 						}
 						if(!stop){
-							deck2.addCardAtIndex(a, deck.getCard(a));
-							deck.addCardAtIndex(a, null);			
+							deck2.addCardAtIndex(a, cardDeck.getCard(a));
+							cardDeck.addCardAtIndex(a, null);			
 							j++;
 						}
 					}
 					
-					deck=deck2;
+					cardDeck=deck2;
 					
 					
 					
@@ -525,29 +344,24 @@ public class Game extends Activity{
 			}
 			else{
 				//TODO finish.
-				print("shuffle type 3", 475);
+				Log.d(TAG, "shuffle type 3");
 				int x = 0;
 				int z = 50;
 				int total =0;
 				ArrayList<Deck> decks= new ArrayList<Deck>();
 				Deck deck2 = new Deck();
-				deck2.addAllCards(this.deck);
+				deck2.addAllCards(cardDeck);
 				while(x<z){
 					decks.addAll(splitDeck(deck2));
-					print("the deck is "+decks.size(), 552);
+					Log.d(TAG, "the deck is "+decks.size());
 					deck2.clearALL();
 					deck2.addAllCards(mixOutIn(decks));
 					decks.clear();
 					x++;
 				}	
-				
-				
-				
-				
-				
 			}
 		}
-
+	
 	/**
 	 * Takes a Deck and returns an array of decks, 11 of them 5 per array and 2 in the last one.
 	 * @param a The Deck to be split
@@ -557,7 +371,7 @@ public class Game extends Activity{
 		ArrayList<Deck> decks = new ArrayList<Deck>();
 		for(int i =0; i<10;i++){
 			Deck deck2 = new Deck();
-
+	
 			int t=0;
 			while(t<5){
 				deck2.addCard(a.getCard(t));
@@ -573,14 +387,13 @@ public class Game extends Activity{
 		decks.add(a);
 		return decks;
 	}
-
+	
+	
 	/**
 	 * Mix an ArrayList<Deck> into 
 	 * @param a
 	 * @return
 	 */
-	
-
 	private Deck mixOutIn(ArrayList<Deck> a){
 		int size = a.size();
 		boolean extra=false;
@@ -604,313 +417,857 @@ public class Game extends Activity{
 		return b;
 	}
 	
-	public ArrayList<Card> addLowHigh(ArrayList<Card> fromDeck){
-		ArrayList<Card> toDeck= new ArrayList<Card>();
-		for(int i=0;i<fromDeck.size();i++){
-			toDeck.add(fromDeck.get(i));
-		}
-		return toDeck;
-	}
-	
-	public ArrayList<Card> addHighLow(ArrayList<Card> fromDeck){
-		ArrayList<Card> toDeck= new ArrayList<Card>();
-		for(int i=fromDeck.size()-1;i>=0;i--){
-			toDeck.add(fromDeck.get(i));
-		}
-		return toDeck;
-	}
 	
 	
-/**
- 	* Create the and deals them out and then finds the two
-	 * NEEDS SHUFFLE.
-	 * */
-	public void deal() {
-		print("dealing", 560);
+	/**
+	* Create the and deals them out and then finds the two
+	* NEEDS SHUFFLE.
+	*/
+	public void dealing() {
+		Log.d(TAG, "dealing");
+		Log.d(TAG, "Deck size="+this.cardDeck.getSize());
 		Deck hand1 = new Deck();
 		Deck hand2 = new Deck();
 		Deck hand3 = new Deck();
 		Deck hand4 = new Deck();
-		for(int i=0;i<deck.getSize();i+=4){
+		for(int i=0;i<cardDeck.getSize();i+=4){
 			int d1=i;
 			int d2=i+1;
 			int d3=i+2;
 			int d4=i+3;
-			hand1.addCard(deck.getCard(d1));
-			hand2.addCard(deck.getCard(d2));
-			hand3.addCard(deck.getCard(d3));
-			hand4.addCard(deck.getCard(d4));
+			hand1.addCard(cardDeck.getCard(d1));
+			hand2.addCard(cardDeck.getCard(d2));
+			hand3.addCard(cardDeck.getCard(d3));
+			hand4.addCard(cardDeck.getCard(d4));
 			
 			
 		}
-		if(p1==null||restart){//first Start  or restart called
-			print("New hands dealt.", 483);
-			int b = Color.rgb(0, 50 , 200);
-			p1 = new Player(hand1, 0, 1, name, Color.WHITE); 
-			p2 = new Player(hand2, 0, 2, "Chuck  (P2)", Color.RED);
-			p3 = new Player(hand3, 0, 3, "Skippy  (P3)", b);
-			p4 = new Player(hand4, 0, 4, "Jeff  (P4)", Color.YELLOW);
-			//p2.setColor(Color.RED);
+		if(p1==null){//first Start 
+			Log.d(TAG, "Creating new players and giving each person a hand.");
+			int color1 = Color.parseColor("#FF7711");
+			int color2 = Color.rgb(0, 50 , 200);
+			p1 = new Player(main, this, hand1, 0, 1, name, Color.GREEN); 
+			p2 = new Player(main, this, hand2, 0, 2, "(P2)", color1);
+			p3 = new Player(main, this, hand3, 0, 3, "(P3)", color2);
+			p4 = new Player(main, this, hand4, 0, 4, "(P4)", Color.RED);
+			slidingDeckHolder.addDeck(hand1);
+			
+			createPlayerViews();
+			updatePlayerInfo();
 		}
 		else {//else new round and New cards are dealt
-			print("new round being delt", 563);
+			Log.d(TAG, "new round being delt");
 			p1.sethand(hand1);
 			p2.sethand(hand2);
 			p3.sethand(hand3);
 			p4.sethand(hand4);
+			slidingDeckHolder.addDeck(p1.getDeck());
+			logPlayerPoints();
 		}			
 		
-		//TODO if resume code 
-		/* New Deal to work the proper way.
-		ArrayList<card> hand1 = new ArrayList<card>();
-		ArrayList<card> hand2 = new ArrayList<card>();
-		ArrayList<card> hand3 = new ArrayList<card>();
-		ArrayList<card> hand4 = new ArrayList<card>();
- 
-		for(int i=0;i<13;i++){//could be buggy; also could be shot for shuffling like this.
-			int d1=i;
-			int d2=13+i;
-			int d3=26+i;
-			int d4=39+i;
-			hand1.add(deck[d1]);
-			hand2.add(deck[d2]);
-			hand3.add(deck[d3]);
-			hand4.add(deck[d4]);
+		
+	}
+	
+	/**
+	 * Called when player has picked all his cards.
+	 */
+	public void tradeCards(){
+		p2.getCardsToTrade();
+		p3.getCardsToTrade();
+		p4.getCardsToTrade();
+		switch (session){
+		case 1:	
+			//Trade Left p4->p3->p2->p1
+			p4.addCardsToDeck(p1.cardsToTrade);
+			
+			p3.addCardsToDeck(p4.cardsToTrade);
+			
+			p2.addCardsToDeck(p3.cardsToTrade);
+			
+			p1.addCardsToDeck(p2.cardsToTrade);
+			updateBottomTextWithTradingCards(false, p2.cardsToTrade);
+		break;
+		case 2:
+			//Trade right p1->p2->p3->p4
+			p2.addCardsToDeck(p1.cardsToTrade);
+			
+			p1.addCardsToDeck(p4.cardsToTrade);
+			updateBottomTextWithTradingCards(false, p4.cardsToTrade);
+			
+			p4.addCardsToDeck(p3.cardsToTrade);
+			
+			p3.addCardsToDeck(p2.cardsToTrade);
+		break;
+		case 3:
+			//across p2 to p4
+			p4.addCardsToDeck(p2.cardsToTrade);
+			
+			p2.addCardsToDeck(p4.cardsToTrade);
+			
+			//across p1 to p3
+			p1.addCardsToDeck(p3.cardsToTrade);
+			updateBottomTextWithTradingCards(false, p3.cardsToTrade);
+			
+			p3.addCardsToDeck(p1.cardsToTrade);
+		break;
+		case 4:
+			Log.d(TAG, "Error there should not be trading now!");
+		break;
 		}
-		if(p1==null||restart){//first Start  or restart called
-			print("New hands dealt.", 483);
-			int b = Color.rgb(0, 50 , 200);
-			p1 = new Player(hand1, 0, 1, name, Color.WHITE); 
-			p2 = new Player(hand2, 0, 2, "Chuck  (P2)", Color.RED);
-			p3 = new Player(hand3, 0, 3, "Skippy  (P3)", b);
-			p4 = new Player(hand4, 0, 4, "Jeff  (P4)", Color.YELLOW);
-			//p2.setColor(Color.RED);
+		if(!p1.tradingCardsRemoved){
+			p1.removeCardsFromDeck(p1.cardsToTrade);
+			p1.tradingCardsRemoved=false;
 		}
-		else if(count==0){//else new round and New cards are dealt
-			print("new round being delt", 492);
-			p1.sethand(hand1);
-			p2.sethand(hand2);
-			p3.sethand(hand3);
-			p4.sethand(hand4);
+		p1.cardsToTrade.clear();
+		p2.cardsToTrade.clear();
+		p3.cardsToTrade.clear();
+		p4.cardsToTrade.clear();
+
+		p1.sortHandFromDeck();
+		p2.sortHandFromDeck();
+		p3.sortHandFromDeck();
+		p4.sortHandFromDeck();
+        voidCheckAllPlayers();	//Run this before doing player logic 
+		this.trading=false;
+		slidingDeckHolder.addDeck(p1.getDeck());
+		playCard.setEnabled(true);
+		checkForTwoMethod();
+		update();
+
+	}
+	
+	/**
+	 * Called from HeartsMe();
+	 * Finds who has the 2 of clubs and forces them to play it
+	 * Sets the states for the next round
+	 * Then advances the curPlayer
+	 * Checks all players for queen of Spades
+	 */
+	public void checkForTwoMethod(){
+		Log.d(TAG, "checkForTwoMethod() called");
+		if(p1.checkForTwo()){
+			Log.d(TAG, "p1 played the 2 of clubs");
+			curPlayer=p1;
+			setState(1);
+			playTwoOfClubs();
+	
+		}
+		else if(p2.checkForTwo()){
+			Log.d(TAG, "p2 plays 2 of clubs");
+			curPlayer=p2;
+			setState(2);
+			playTwoOfClubs();
+			}
+		else if(p3.checkForTwo()){
+			Log.d(TAG, "p3 plays 2 of clubs");
+			curPlayer=p3;
+			setState(3);
+			playTwoOfClubs();
+		}
+		else if(p4.checkForTwo()){
+			Log.d(TAG, "p4 plays 2 of clubs");
+			curPlayer=p4;
+			setState(4);
+			playTwoOfClubs();
 		}
 		else{
-			print("IMPORTANT STUFF", 494);
-			//we are loading an old game.....
-			//TODO more code for setting it up right?
-			
-		}	
-	*/
+			Log.d(TAG, "The game has already started.");
+		}
+		Log.d(TAG, " 2 check done--curPlayer="+curPlayer.getRealName());
+        voidCheckAllPlayers();	//Run this before doing and player logic 
+        queenCheckAllPlayers();	//This should be the only place this needs to be run.
+		}
+	      
+	/**
+	 * Sets the first round of the game going
+	 * Plays two and then sets next CurPlayer
+	 */
+	public void playTwoOfClubs(){
+		tableTrick.clearALL();
+		clearTableCards();
+		this.justPickedUpPile=false;
+		Card nextCard = curPlayer.twoOfClubs;
+		nextCard.setOwner(curPlayer);
+		curPlayer.removeCardFromDeck(nextCard);
+		curPlayer.updateSuitsFast();
+		Log.d(TAG, "Game started by "+curPlayer.getRealName());
+		tableTrick.addCard(nextCard);
+		tableHolder.addCard(nextCard);
+		bottomText2.append("Round Started!"+eol+curPlayer.getRealName()+" had the "+ nextCard.name+eol);
+		nextPlayer();	
+		Log.d(TAG, "0101010--0101010--0101010--0101010--0101010");
+	}
+	
+	/**
+	 * Checks for voids in suits for all players.
+	 * This gets called at the end of each trick and at the start of the game.
+	 * Maybe work in a set void to true when the player plays the last card.
+	 */
+	public void voidCheckAllPlayers(){
+	    p1.checkForVoids();
+	    p2.checkForVoids();     
+	    p3.checkForVoids();
+	    p4.checkForVoids();
+	}
+
+	/**
+	 * Checks for the Queen in all players hands.
+	 * Sets  the boolean hasQueen=true/false for later round logic
+	 */
+	public void queenCheckAllPlayers(){
+	    p1.checkForQueen();
+	    p2.checkForQueen();     
+	    p3.checkForQueen();
+	    p4.checkForQueen();
+	}	
+	
+	
+	/**
+	 * When player hits the Play/next Button or when game thread is continuing the Game
+	 * Checks trading  // Only for round 1 but 
+	 * If on auto run cards will be picked for you.
+	 */
+	public void GO(){
+		Log.d(TAG,  "!!!GO!!!  round="+round);
+			if(trading){//
+				if(p1.cardsToTrade.size()!=3){
+					p1.getCardsToTrade();
+				}
+				tradeCards();
+				return;
+			}
+			if(curPlayer!=null){
+				if(justPickedUpPile){//
+					tableTrick.clearALL();
+					clearTableCards();
+					this.justPickedUpPile=false;
+				}
+				if(curPlayer!=p1||cardToPlay==null){// If null then it is a AUTO play.  This is also GO for BOTS.
+					Log.d(TAG, "normal GO()");
+					Card nextCard=(curPlayer.go(round, tableTrick));
+					Log.d(TAG, "###"+curPlayer.realName);
+					Log.d(TAG, "###"+curPlayer.realName+" choose the "+nextCard.name+". Pile size="+tableTrick.getSize() );
+					playCard(nextCard);
+				}
+				else {
+					Log.d(TAG, "USER SELECTED CARD PLAY ----CardToPlay GO()");
+					if(checkPlayability(cardToPlay)){
+						cardToPlay.setTouched(false);
+						Log.d(TAG, "###"+curPlayer.realName+" played a "+cardToPlay.name+". Pile size="+tableTrick.getSize() );
+						playCard(cardToPlay);
+						cardToPlay=null;
+					}
+					else{
+						Log.d(TAG, "Trying to cheat!!");
+						if(cardToPlay!=null){
+							cardToPlay.setTouched(false);
+							cardToPlay=null;
+						}
+					}
+				}
+			}
+			else
+				Log.d(TAG, "Game.GO failed, Curplayer was null");
+	}
+	
+	/**
+	 * Plays the selected card and advances the curPlayer
+	 * @param p seat of person who is playing a card
+	 * @param rs the string to be set to the layout.
+	 */
+	public void playCard(Card nextCard){
+		nextCard.setOwner(curPlayer);
+		tableTrick.addCard(nextCard);
+
+		Log.d(TAG, "Playing card="+nextCard.cardToString());
+		tableHolder.addCard(nextCard);		
+		playCardBottomText(nextCard);
+		curPlayer.removeCardFromDeck(nextCard);
+
+		curPlayer.updateSuitsFast();
+		if(curPlayer==p1){
+			slidingDeckHolder.addDeck(p1.getDeck());
+		}
+		if(tableTrick.getSize()>=4){
+			pickUpHand();//This sets the next player
+		}
+		else{
+			nextPlayer();	
+		}
+		update();
+	}
+	
+	/**
+	 * Gets the table cards, totals points and sends to round winner
+	 * Does a check on round 14 to re deal hands.
+	 */
+	public void pickUpHand(){
+		Log.d(TAG, "Picking up hand.");
 		
+		justPickedUpPile=true;
+		playing=false;	//Is set back to true later if trick is won.
+		boolean jackFound = false;
+		int high = 0;
+		int highSeat  = 0;
+		int points = 0;
+		String roundString = "Round="+round+"\n";
+		int firstSuit=tableTrick.getCard(0).getSuit();
+		for(int i=0;i<tableTrick.getSize();i++){		// maybe start at the back of the pile...yet it does not really matter
+			Card currentCard=tableTrick.getCard(i);
+			int curSuit=currentCard.getSuit();
+			int curCard =currentCard.getValue();
+			if(firstSuit==curSuit){  	
+				if(high<curCard){ //equals so that p1 can take the lead.  But should never be equal
+					high=curCard;
+					highSeat=currentCard.getOwner().getSeat();//Seats are 1-4 
+				}
+			}
+			if(curSuit==0){
+//				clubsPlayedString+=currentCard.cardToString()+"\n";
+				clubsPlayedInt++;
+			}
+			
+			else if(curSuit==1){ //Diamonds  check for jack.
+//				diamondsPlayedString+=currentCard.cardToString()+"\n";
+				diamondsPlayedInt++;
+				if(curCard==11){
+					jackFound = true;
+					this.jackFound = true;
+					points-=10;
+					Toast.makeText(context, "Jack - 10 points",  Toast.LENGTH_SHORT).show();
+
+				}
+			}
+			else if(curSuit==2){//Spades   check for queen
+//				spadesPlayedString+=currentCard.cardToString()+"\n";
+				spadesPlayedInt++;
+				if(curCard==12){
+					heartsBroken=true;
+					queenFound  =true;
+					points+=13;
+					Toast.makeText(context, "Queen + 13 points",  Toast.LENGTH_SHORT).show();
+
+				}
+			}
+			else if(curSuit==3){//heart--add points				
+//				heartsPlayedString+=currentCard.cardToString()+"\n";
+				heartsPlayedInt++;
+				heartsBroken=true;
+				points++;
+			}
+			Log.d(TAG, "pick up hand cards checked="+i);
+			roundString += currentCard.cardToString()+", ";
+
+		}
+		roundCardString+=roundString+"\n";
+		
+		if(cardCounterB){
+			clubsPlayed.setText("C="+clubsPlayedInt);
+			diamondsPlayed.setText("D="+diamondsPlayedInt);
+			spadesPlayed.setText("S="+spadesPlayedInt);
+			heartsPlayed.setText("H="+heartsPlayedInt);
+			int total=clubsPlayedInt+diamondsPlayedInt+spadesPlayedInt+heartsPlayedInt;
+		}
+		resetPlayerHolderCards();
+		switch(highSeat){
+		case 1:
+			curPlayer=p1;
+			p1Holder.addBlankCard(0);
+			p1.addToScore(points);
+			roundScoreP1+=points;
+			playing = true;
+			playCard.setText("Play Card");
+			bottomText2.append("You won!  Points= "+points+eol);
+			bottomText2.append("Choose a starting card."+eol);
+			if(jackFound)
+			    jackFoundP1 = true;
+			break;
+		case 2:
+			curPlayer=p2;
+			p2Holder.addBlankCard(0);
+			p2.addToScore(points);
+			roundScoreP2+=points;
+			playCard.setText("Next");
+			bottomText2.append(eol+"P2 won, points= "+points+eol);
+			if(jackFound)
+			    jackFoundP2 = true;
+			break;
+		case 3:
+			curPlayer=p3;
+			p3Holder.addBlankCard(0);
+			p3.addToScore(points);
+			roundScoreP3+=points;
+			playCard.setText("Next");
+			bottomText2.append(eol+"P3 won, points= "+points+eol);
+			if(jackFound)
+			    jackFoundP3 = true;
+			break;
+		case 4: 
+			curPlayer=p4;
+			p4Holder.addBlankCard(0);
+			p4.addToScore(points);
+			roundScoreP4+=points;
+			playCard.setText("Next");
+			bottomText2.append(eol+"P4 won, points= "+points+eol);
+			if(jackFound)
+			    jackFoundP4 = true;
+			break;
+		}	
+		Log.d(TAG, "pickUpHand() for "+curPlayer.getRealName());
+		roundScore+=points;
+		roundHands.add(new TrickStats(tableTrick.TrickToDeck(), round, curPlayer));  
+		if(cardToPlay!=null){
+			cardToPlay.setTouched(false);
+			cardToPlay=null;
+		}
+		if(endGameCheck()){
+			gameOver();
+			return;
+		}
+		round++;	
+		roundView.setText("Round="+round);
+		if(round==14){//Done playing need new cards.'
+			Log.d(TAG, "round is 14 checking moon for holes");
+			session++;	//Used to tell when to trade and who to
+			if(session > 5){
+				session = 1;
+			}
+			gameHands++;
+			round=1;  	//ROUND RESET!!!
+			
+			if(!shootingForTheMoon()){//false we missed need a new round/or we hit the moon but nobody lost.  True if game winnings shot.
+				Log.d(TAG, "New Round needed, games is not over yet.");
+				newRound();
+			}
+
+		}
+		else{
+			setState(highSeat);		//Used by AI for picking next card.
+			voidCheckAllPlayers();
+			
+		}
+		main.handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				if(justPickedUpPile){
+					clearTableCards();			
+					update();					
+					tableTrick.clearALL();
+					justPickedUpPile=false;
+				}
+			}
+		}, main.gt.getAutoRunTimeinMilli()/2);
+		//;
+
+				
+	}
+	
+	private void newRound(){
+		Log.d(TAG, "New round");
+		playCard.setEnabled(false);	//This should fix hitting next to fast and causing a GO() that will crash game.  Re-enabled in HeartsMe()
+		newRound=true;
+		resetRoundVars();
+		heartsMe();
+
+	}
+
+	
+	
+	private boolean shootingForTheMoon(){
+		boolean hit = false;
+		Log.d(TAG, "Shooting for the Moon");
+		Log.d(TAG, "p1.score="+p1.score);
+		Log.d(TAG, "p2.score="+p2.score);
+		Log.d(TAG, "p3.score="+p3.score);
+		Log.d(TAG, "p4.score="+p4.score);
+		Log.d(TAG, "BLAM!!!!!");
+		if(roundScoreP1==26||roundScoreP1==16&&jackFoundP1){
+			bottomText2.setText("You Shot the MOON!");
+			bottomText2.append("Plus 26 points to EVERYONE ELSE!");
+			p1.score-=26;
+			p2.score+=26;
+			p3.score+=26;
+			p4.score+=26;
+			hit = true;
+		}		
+		if(roundScoreP2==26||roundScoreP2==16&&jackFoundP2){
+			bottomText2.setText("(P2) Shot the MOON!");
+			bottomText2.append("Plus 26 points to EVERYONE ELSE!");
+			p1.score+=26;
+			p2.score-=26;
+			p3.score+=26;
+			p4.score+=26;
+			hit = true;
+		}		
+		if(roundScoreP3==26||roundScoreP3==16&&jackFoundP3){
+			bottomText2.setText("(P3) Shot the MOON!");
+			bottomText2.append("Plus 26 points to EVERYONE ELSE!");
+			p1.score+=26;
+			p2.score+=26;
+			p3.score-=26;
+			p4.score+=26;
+			hit = true;
+		}		
+		if(roundScoreP4==26||roundScoreP4==16&&jackFoundP4){
+			bottomText2.setText("(P4) Shot the MOON!");
+			bottomText2.append("Plus 26 points to EVERYONE ELSE!");
+			p1.score+=26;
+			p2.score+=26;
+			p3.score+=26;
+			p4.score-=26;
+			hit = true;
+		}
+		if (!hit){
+			Log.d(TAG, "Miss!");
+
+			
+			return false;
+		}
+		else
+			Log.d(TAG, "Direct Hit!");
+			if(endGameCheck()){
+				bottomText2.append("GAME ENDING SHOT!");
+				Log.d(TAG, "game ending shot");
+				gameOver();
+				return true;
+			}
+		return false;
 	}
 	
 	
 	/**
-	 * Call on round 0;
-	 * Finds who has the 2 of clubs and forces them to play it
-	 * Sets the states for the next round
-	 * Then advances the curPlayer
+	 * Check to see if anyone broke the point limit till end of game
+	 * @return	true if game is over.
 	 */
-	public void checkForTwoMethod(){
-		print("checkForTwoMethod() called", 638);
-		if(p1.checkForTwo()){
-			print("p1 plays 2 of clubs", 305);
-			curPlayer=p1;
-			//tableCard1.setText(selectedCardSuit+"-"+selectedCard);  //TODO remove this line
-			bottomText.setText("You played the 2");
-			//playing=true;
-			//New code to set up each round play state then not modify till next round.
-			p1.setState(1);
-			p2.setState(2);
-			p3.setState(3);
-			p4.setState(4);
-			playTwoOfClubs();
-			displayCards(p1);
-
+	public boolean endGameCheck(){
+		if(p1.getScore()>=pointsTillEndGame){
+			Log.d(TAG, "Player 1 LOOSES");
+			return true;
+		}
+		if(p2.getScore()>=pointsTillEndGame){
+			Log.d(TAG, "Player 2 LOOSES");
+			return true;
 
 		}
-		else if(p2.checkForTwo()){
-			print("p2 plays 2 of clubs", 320);
-			bottomText.setText("p2 plays 2 of clubs");
-			curPlayer=p2;
-			p1.setState(4);
-			p2.setState(1);
-			p3.setState(2);
-			p4.setState(3);
-			playTwoOfClubs();
-			}
-		else if(p3.checkForTwo()){
-			print("p3 plays 2 of clubs", 330);
-			bottomText.setText("p3 plays 2 of clubs");
-			curPlayer=p3;
-			p1.setState(3);
-			p2.setState(4);
-			p3.setState(1);
-			p4.setState(2);
-			playTwoOfClubs();
-		}
-		else if(p4.checkForTwo()){
-			print("p4 plays 2 of clubs", 340);
-			bottomText.setText("p4 plays 2 of clubs");
-			curPlayer=p4;
-			p1.setState(2);
-			p2.setState(3);
-			p3.setState(4);
-			p4.setState(1);
-			playTwoOfClubs();
-		}
-		else{
-			print("The game has already started.", 465);
-		}
-	print(" 2 check done--curPlayer="+curPlayer.getRealName(), 438);
-	}
-	
-	
-	public void  setPlayState(Player p) {
-		print("setting Player state on "+p.getSeat(), 354);
-		switch(p.getSeat()){
-		case 1:
-			
-			this.p1.setState(1);
-			this.p2.setState(2);
-			this.p3.setState(3);
-			this.p4.setState(4);
-			break;
-		case 2:
-			this.p1.setState(4);
-			this.p2.setState(1);
-			this.p3.setState(2);
-			this.p4.setState(3);
-			break;
-		case 3:
-			this.p1.setState(3);
-			this.p2.setState(4);
-			this.p3.setState(1);
-			this.p4.setState(2);
-			break;		
-		case 4:
-			this.p1.setState(2);
-			this.p2.setState(3);
-			this.p3.setState(4);
-			this.p4.setState(1);
-			break;
-		}
-		
-		
-	}
-	
-	public void voidCheck(){
-        this.p1.checkForVoids();
-        this.p2.checkForVoids();     
-        this.p3.checkForVoids();
-        this.p4.checkForVoids();
-	}
-	public void setPass() {
-		
-		switch (round%4){
-		case 1:
-			p1.setPass(2);
-			p2.setPass(3);
-			p3.setPass(4);
-			p4.setPass(1);
-			break;
-		case 2:
-			p1.setPass(4);
-			p2.setPass(1);
-			p3.setPass(2);
-			p4.setPass(3);
-			break;
-		case 3:
-			p1.setPass(3);
-			p2.setPass(4);
-			p3.setPass(1);
-			p4.setPass(2);
-			break;
-		case 4:
-			p1.setPass(0);
-			p2.setPass(0);
-			p3.setPass(0);
-			p4.setPass(0);
-			break;
-		case 5://round is out of bounds should be 1
-			p1.setPass(2);
-			p2.setPass(3);
-			p3.setPass(4);
-			p4.setPass(1);
-			round=1;
-			break;
-			
-		}
-		
-		
-	}
-	//euphoria 1:18
-	
-	public void onPlayCardPressed(View v){
-		if(cardToPlay!=null&&playing){ //make sure we have a card selected and we have not already played.
-			pile.add(cardToPlay);			
-			playing=false;
-			switch(cardToPlay.getSuit()){
-				case 0:{
-					
-					p1.getClubs().removeCardAtIndex(selectedCardPlace);
-					break;
-				}
-				case 1:{
-					p1.getDiamonds().removeCardAtIndex(selectedCardPlace);
-					break;
-				}
-				case 2:{
-					p1.getSpades().removeCardAtIndex(selectedCardPlace);
-					break;
-				}
-				case 3:{
-					p1.getHearts().removeCardAtIndex(selectedCardPlace);
-					break;
-				}
-				//TODO reset the deckHolder view
-			}
-				
-			//String rs=cardToPlay.name.replaceFirst(" of ", eol);
-			if(pile.size()==0){
-				clearTableCards();
-			}
-			tableViewDH.addCard(cardToPlay);
+		if(p3.getScore()>=pointsTillEndGame){
+			Log.d(TAG, "Player 3 LOOSES");
+			return true;
 
-			if(pile.size()==4){
-				//Toast.makeText(HeartsActivity.this, "Last card",  Toast.LENGTH_SHORT).show();
-				pickUpHand();			
+		}
+		if(p4.getScore()>=pointsTillEndGame){
+			Log.d(TAG, "Player 4 LOOSES");
+			return true;
+
+		}
+		return false;  //Nobody has too many points
+		//TODO End game mode, find winner, show scores, 
+	}
+	
+	/**
+	 * Called when endGameCheck returns true, Stops the game and sets winner.
+	 */
+	private void gameOver(){
+		curPlayer =winnerCheck();
+		if(main.gt.fullAutoRun)
+			main.gt.fullAutoRun=!main.gt.fullAutoRun;
+		main.gt.autoRunState.compareAndSet(AutoRunState.RUNNING,  AutoRunState.PAUSED);
+		playCard.setText("Game Saved");
+		playCard.setEnabled(false);
+		bottomText.setText(curPlayer.getRealName()+" WON THE GAME!!!");
+		bottomText2.append("Press menu, then Exit to play again.");
+		Toast.makeText(context, curPlayer.getRealName() + " Won the GAME!!",  Toast.LENGTH_LONG).show();
+	}
+	
+	/**
+	 * Finds lowest scoring player and set winner to true.
+	 * Does less than or equal to...should be just less than or tie.
+	 */
+	public Player winnerCheck(){//this prob needs some rework
+		Log.d(TAG, "winnerCheck()");
+		int scorep1 = p1.getScore();
+		int scorep2 = p2.getScore();
+		int scorep3 = p3.getScore();
+		int scorep4 = p4.getScore();
+
+		if(scorep1<=scorep2){
+			if(scorep1<=scorep3){
+				if(scorep1<=scorep4){
+					Log.d(TAG, "YOU WON");
+					p1.winner=true;
+					saveGameStats(p1.getRealName());
+
+					return p1;
+				}
+				else{
+					Log.d(TAG, "P4 WON");
+					p4.winner=true;
+					saveGameStats(p4.getRealName());
+					return p4;
+				}
+			}
+			else if(scorep3<=scorep4){
+				Log.d(TAG, "P3 WON");
+				p3.winner=true;
+				saveGameStats(p3.getRealName());
+				return p3;
+			}
+
+		}
+		else if(scorep2<=scorep3){
+			if(scorep2<=scorep4){
+				Log.d(TAG, "P2 WON");
+				p2.winner=true;
+				saveGameStats(p2.getRealName());
+				return p2;
 			}
 			else{
-				curPlayer=nextPlayer(curPlayer);
+				Log.d(TAG, "P4 WON");
+				p4.winner=true;
+				saveGameStats(p4.getRealName());
+				return p4;
+				
 			}
-			bottomText.setText("You played the "+cardToPlay.name);
+		}
+		else if(scorep3<=scorep4){
+				Log.d(TAG, "P3 WON");
+				p3.winner=true;
+				saveGameStats(p3.getRealName());
+				return p3;
+			}
+			else{
+				Log.d(TAG, "P4 WON");
+				p4.winner=true;
+				saveGameStats(p4.getRealName());
+				return p4;
+				
+			}
+		Log.d(TAG, "returning null on winner");
+		return null;
+	}
+		
+	
+	
+///////////////////////////////////////////////////////////////////////////////GAMEVIEW ////////////////////////////////////
+    public void findViewsById() {
+    	Log.d(TAG, "firstStart()");
+    	roundView = (TextView) main.findViewById(R.id.roundView);
+    	bottomText = (TextView) main.findViewById(R.id.bottomTV);
+    	bottomText2 = (TextView) main.findViewById(R.id.bottomTV2);
+	
+        clubsPlayed = (TextView) main.findViewById(R.id.clubsPlayed);
+        diamondsPlayed = (TextView) main.findViewById(R.id.diamondsPlayed);
+        spadesPlayed = (TextView) main.findViewById(R.id.spadesPlayed);
+        heartsPlayed = (TextView) main.findViewById(R.id.heartsPlayed);
+        
+        deckHolderLayout = (HorizontalScrollView) main.findViewById(R.id.DeckHolderLayout);
+        tableHolderLayout = (LinearLayout) main.findViewById(R.id.TableHolderLayout);
+        topLayout =  (LinearLayout) main.findViewById(R.id.topLayout);
+        middleLayout  =  (LinearLayout) main.findViewById(R.id.MiddleLayout);
+        tableRightView  =  (LinearLayout) main.findViewById(R.id.TableRightView);
+        
+    	playCard = (Button) main.findViewById(R.id.playCard);
+//    	leftButton = (Button) main.findViewById(R.id.left);
+//    	rightButton = (Button) main.findViewById(R.id.right);
+    	playCard.setWidth(screenWidth/4);
+//    	rightButton.setWidth(screenWidth/4);
+//    	leftButton.setWidth(screenWidth/4);
+    	
+   
+    	findCardBitmaps();
+	}
+	
+	public void createDeckTableViews(){
+		Log.d(TAG, "CreateViews");
 
-			selectedCardPlace = 0;
-			selectedCardSuit = -1;
-			selectedCard = 0;
-			displayCards(p1);
-			cardToPlay=null;
+//    	deckHolder = new DeckHolder(context, this, screenWidth, screenHeight/8);
+//        deckHolderlayoutParams = new LinearLayout.LayoutParams(screenWidth, screenHeight/8);
+		slidingDeckHolder = new SlidingDeckHolder(context, this, screenWidth, screenHeight/8);
+        slidingDeckHolderlayoutParams = new LinearLayout.LayoutParams(screenWidth, screenHeight/8);
+
+        tableHolder = new TableHolder(context, this, (int) (screenWidth*.75), (int) (screenHeight/6));
+        tableHolderlayoutParams = new LinearLayout.LayoutParams((int) (screenWidth*.75), (int) (screenHeight/6));
+
+//        deckHolder.setLayoutParams(deckHolderlayoutParams);
+        slidingDeckHolder.setLayoutParams(slidingDeckHolderlayoutParams);
+        tableHolder.setLayoutParams(tableHolderlayoutParams);
+
+//        deckHolderLayout.addView(this.deckHolder);
+        deckHolderLayout.addView(slidingDeckHolder);
+        tableHolderLayout.addView(this.tableHolder);
+        tableHolderLayout.setLayoutParams(tableHolderlayoutParams);
+        
+      
+
+        this.initialized=true;
+    }
+	
+	/**
+	 * Creates the Views for the players.
+	 */
+	public void createPlayerViews(){
+		LayoutParams playerLayout = new LinearLayout.LayoutParams((int) (screenWidth*.25), screenHeight/10);
+		//New code to add player info
+		p1Holder = new PlayerHolder(context, main, this, (int) (screenWidth*.25), screenHeight/10, p1);
+	    p2Holder = new PlayerHolder(context, main, this, (int) (screenWidth*.25), screenHeight/10, p2);
+	    p3Holder = new PlayerHolder(context, main, this, (int) (screenWidth*.25), screenHeight/10, p3);
+	    p4Holder = new PlayerHolder(context, main, this, (int) (screenWidth*.25), screenHeight/10, p4);
+        p1Holder.setLayoutParams(playerLayout);
+        p2Holder.setLayoutParams(playerLayout);
+        p3Holder.setLayoutParams(playerLayout);
+        p4Holder.setLayoutParams(playerLayout);
+        topLayout.addView(this.p1Holder);
+        topLayout.addView(this.p2Holder);
+        topLayout.addView(this.p3Holder);
+        topLayout.addView(this.p4Holder);
+	}
+	 
+	////////////////////////////////////////Start Updates//////////////////////////////////////////////////////////////////////
+	/**
+	 * Call to refresh the screen.
+	 */
+	public synchronized void update() {
+		if(this.initialized){
+			//updateDH();
+			slidingDeckHolder.invalidate();
+			updateTH();
+			updatePH();
+			updateTable();
+			//p1.updateDeckFromSuits();
+			//deckHolder.addDeck(p1.getDeck());
 		}
 		else{
-			Toast.makeText(Game.this, "Not your turn",  Toast.LENGTH_SHORT).show();
-
+			Log.d(TAG, "not Initialized");
 		}
-		p1.updateDeck();
-		cardViewDH.updateDeck(p1.getDeck());
-		cardViewDH.invalidate();
-		tableViewDH.invalidate();
-		tableViewDH.refreshDrawableState();
-		cardViewDH.refreshDrawableState();
-		
+	}
+	
+	public synchronized void updateDH(){
+//		if (!deckHolder.initialized){
+//			Log.d(TAG, "DeckHolder not initialized");
+//		}
+//		else{
+//			//deckHolder.addDeck(p1.getDeck());
+//			deckHolder.updateDeck(p1.getDeck());
+//
+////			deckHolder.invalidate();
+////			deckHolder.draw();
+//			deckHolderCanvas = deckHolder.getHolder().lockCanvas();
+//			deckHolder.onDraw(deckHolderCanvas);
+//			deckHolder.getHolder().unlockCanvasAndPost(deckHolderCanvas);
+//			
+//		}
+	}
+
+	public synchronized void updateTH(){
+		if (!tableHolder.initialized){
+			Log.d(TAG, "TableHolder not initialized");
+		}
+		else{
+			tableHolderCanvas = tableHolder.getHolder().lockCanvas();
+			tableHolder.onDraw(tableHolderCanvas);
+			tableHolder.getHolder().unlockCanvasAndPost(tableHolderCanvas);
+			}
+	}
+	
+	public void updatePH(){
+		if (!p1Holder.initialized){
+			Log.d(TAG, "p1HolderCanvas not initialized");
+		}
+		else{
+			p1Holder.invalidate();
+			p1HolderCanvas = p1Holder.getHolder().lockCanvas();
+			p1Holder.onDraw(p1HolderCanvas);
+			p1Holder.getHolder().unlockCanvasAndPost(p1HolderCanvas);
+			}
+		if (!p2Holder.initialized){
+			Log.d(TAG, "p2HolderCanvas not initialized");
+		}
+		else{
+			p2Holder.invalidate();
+			p2HolderCanvas = p2Holder.getHolder().lockCanvas();
+			p2Holder.onDraw(p2HolderCanvas);
+			p2Holder.getHolder().unlockCanvasAndPost(p2HolderCanvas);
+			}
+		if (!p3Holder.initialized){
+			Log.d(TAG, "p3HolderCanvas not initialized");
+		}
+		else{
+			p3HolderCanvas = p3Holder.getHolder().lockCanvas();
+			p3Holder.onDraw(p3HolderCanvas);
+			p3Holder.getHolder().unlockCanvasAndPost(p3HolderCanvas);
+			}
+		if (!p4Holder.initialized){
+			Log.d(TAG, "p4HolderCanvas not initialized");
+		}
+		else{
+			p4HolderCanvas = p4Holder.getHolder().lockCanvas();
+			p4Holder.onDraw(p4HolderCanvas);
+			p4Holder.getHolder().unlockCanvasAndPost(p4HolderCanvas);
+			}
+	}
+	
+	public void updatePlayerInfo(){
+		p1Holder.invalidate();
+		p2Holder.invalidate();
+		p3Holder.invalidate();
+		p4Holder.invalidate();
+	}
+	
+	private void updateTable() {
+
+     	roundView.invalidate();
+    	bottomText.invalidate();
+    	bottomText2.invalidate();
+	    	
+        clubsPlayed.invalidate();
+        diamondsPlayed.invalidate();
+        spadesPlayed.invalidate();
+        heartsPlayed.invalidate();
 
 	}
- 	
 	
-	public void displayCards(Player p){ 
+	public void UserUpdate(){
+			Log.d(TAG,  "User Update");
+			displayPlayerCards(p1);
+			updateTable();
+		}
+	//////////////////////////////////////Card/ DeckHolder/ Table holder methods//////////////////////////////////////////////////////////////	
+	
+	/**
+	 * Outputs to the Log a list of all the player and their points.
+	 */
+	public void logPlayerPoints(){
+		Log.d(TAG, "P1 points="+p1.getScore());
+		Log.d(TAG, "P2 points="+p2.getScore());
+		Log.d(TAG, "P3 points="+p3.getScore());
+		Log.d(TAG, "P4 points="+p4.getScore());
+	}
+
+	public void playCardBottomText(Card nextCard){
+		//TODO set text to scroll to bottom.
+		if(tableTrick.getSize()==1){	//first card was just laid down.
+			if(round==1){
+				if(session==4)
+					bottomText2.setText("No Trading Round!"+eol+curPlayer.getRealName()+" had the "+ nextCard.name+eol);
+				else
+					bottomText2.append(curPlayer.getRealName()+" played  "+ nextCard.name+eol);
+			}
+				bottomText2.setText(curPlayer.getRealName()+" played  "+ nextCard.name+eol);
+		}
+		else
+			bottomText2.append(curPlayer.getRealName()+" played  "+ nextCard.name+eol);
+	}
+	
+	/**
+	 * @param p the player who's deck is about to be printed
+	 */
+	public String displayPlayerCards(Player p){ 
+		Log.d(TAG, "displayCards for "+p.getRealName());
 		Deck c = p.getClubs();
 		Deck d = p.getDiamonds();
 		Deck s = p.getSpades();
 		Deck h = p.getHearts();
+		int deckSize = p.getDeck().getSize();
+		int totalSize=c.getSize()+d.getSize()+s.getSize()+h.getSize();
 		String clubs = "";
 		String diamonds = "";
 		String spades = "";
@@ -927,763 +1284,639 @@ public class Game extends Activity{
 		for(int i=0; i<h.getSize();i++){
 			hearts+=h.getCard(i).getValue()+", ";
 		}
+		Log.d(TAG, "clubs=" + clubs);
+		Log.d(TAG, "diamonds=" + diamonds);
+		Log.d(TAG, "spades=" + spades);
+		Log.d(TAG, "hearts=" + hearts);
+		Log.d(TAG, "Size=" + totalSize+" Deck Size ="+deckSize);
+		String sDeck= "The deck of "+p.getRealName()+"\n";
+		sDeck+="clubs=" + clubs+"\n";
+		sDeck+="diamonds=" + diamonds+"\n";
+		sDeck+="spades=" + spades+"\n";
+		sDeck+="hearts=" + hearts+"\n";
+		return sDeck;
+		//TODO update gameView in thread.
+	}
 	
-		switch(p.getSeat()){
+	/**
+	 * @param deck the Deck of cards to be returned in a string list.
+	 */
+	public String displayDeckCards(Deck deck){ 
+		Log.d(TAG, "displayTable cards");
+		String sDeck= "";
+		for(int i=0; i<deck.getSize();i++){
+			sDeck += (1+i)+". "+deck.getCard(i).getOwner().getRealName()+" : "+deck.getCard(i).cardToString()+"\n";
+		}
+		return sDeck;
+		//TODO update gameView in thread.
+	}
+	
+	public DeckHolder getDeckHolder() {
+		return deckHolder;
+	}
+
+	public TableHolder getTableHolder() {
+		return tableHolder;
+	}
+
+	///////////////////////////////////////////////////////////////////////VOID methods////////////////////////////////////////////////////
+	
+	/**
+	 * Takes the curPlayer and updates to the nextPlayer.
+	 * 
+	 */
+	public void nextPlayer(){
+		main.gt.updateLastTime();
+		if(curPlayer==null){
+			Log.d(TAG, "CurPlayer not set");
+			return;
+		}
+		switch(curPlayer.getSeat()){
 			case 1:
-				p1Clubs.setText(clubs);
-				p1Diamonds.setText(diamonds);
-				p1Spades.setText(spades);
-				p1Hearts.setText(hearts);
-		        p1tvScore.setText("P1 has "+p1.getScore()+" points");
+				playCard.setText("Next");
+				p1Holder.addBlankCard(3);
+				p2Holder.addBlankCard(0);
+				this.curPlayer = this.p2;		
 				break;
 			case 2:
-		       // p2tvScore.setText("P2 has "+p2.getScore()+" points");
-		        break;
-				//TODO
+				playCard.setText("Next");
+				p2Holder.addBlankCard(3);
+				p3Holder.addBlankCard(0);
+				this.curPlayer = this.p3;		
+				break;
 			case 3:
-		       // p3tvScore.setText("P3 has "+p3.getScore()+" points");
-		        break;
-				//TODO	
+				playCard.setText("Next");
+				p3Holder.addBlankCard(3);
+				p4Holder.addBlankCard(0);
+				this.curPlayer = this.p4;	
+				break;
 			case 4:
-		        //p4tvScore.setText("P4 has "+p4.getScore()+" points");
-		        break;
-				//TODO
+				playing = true;
+				playCard.setText("Play Card");
+				p4Holder.addBlankCard(3);
+				p1Holder.addBlankCard(0);
+				this.curPlayer = this.p1;
+				break;
 		}
+		bottomText.setText("Current player is "+curPlayer.getRealName());
 
-		
 	}
-
-	public void onClearPressed(View v){
-		print("onClearPressed", 782);
-		clearTableCards();
+	
+	public void resetPlayerHolderCards(){
+		p1Holder.addBlankCard(1);
+		p2Holder.addBlankCard(1);
+		p3Holder.addBlankCard(1);
+		p4Holder.addBlankCard(1);
 	}
-
-	public void clearTableCards(){
-		//
-		tableViewDH.removeAll();
-		tableViewDH.addBlankCards();
-		/*
-	    tableCard1.setText("1");
-	    tableCard2.setText("2");
-	    tableCard3.setText("3");
-	    tableCard4.setText("4");
-	    tableCard1.setBackgroundColor(Color.LTGRAY);
-	    tableCard2.setBackgroundColor(Color.LTGRAY);
-	    tableCard3.setBackgroundColor(Color.LTGRAY);
-	    tableCard4.setBackgroundColor(Color.LTGRAY);
-	*/
-	    
+	
+	/**
+     * Resets all the Variables used in each round
+     * Called after pickUpHand && round ==14
+     */
+	private void resetRoundVars(){
+		heartsBroken=false;
+		playing = false;
+		if(cardToPlay!=null){
+			cardToPlay.setTouched(false);
+			cardToPlay=null;
+		}
+		clubsPlayedInt =	0;
+		diamondsPlayedInt =	0;
+		spadesPlayedInt =	0;
+		heartsPlayedInt =	0;
+		roundCardString =	"";
+		roundScore =	0;
+		roundScoreP1 = 	0;
+		roundScoreP2 = 	0;
+		roundScoreP3 = 	0;
+		roundScoreP4 = 	0;
+		jackFoundP1 = false;
+		jackFoundP2 = false;
+		jackFoundP3 = false;
+		jackFoundP4 = false;		
+		jackFound 	= false;
+		queenFound	= false;
+		p1.claimedDeck= false;
+		p2.claimedDeck= false;
+		p3.claimedDeck= false;
+		p4.claimedDeck= false;
+		roundView.setText("Round="+round);
+		clubsPlayed.setText("C="+clubsPlayedInt);
+		diamondsPlayed.setText("D="+diamondsPlayedInt);
+		spadesPlayed.setText("S="+spadesPlayedInt);
+		heartsPlayed.setText("H="+heartsPlayedInt);
+		resetPlayerHolderCards();
+		update();
 	}
-	public void clearALL(){
-		clearTableCards();
+	
+	/**
+	 * Used to restart the game.
+	 * Call heartsMe() after this.
+	 */
+	public void restartGame(){
+	    resetRoundVars();
+		restart=true;
 		p1 = null;
 		p2 = null;
 		p3 = null;
 		p4 = null;
-		playing = false;
-		heartsBroken=false;
 	    round=1;
-	    count=0;
-		
-	}
-	
-	public void onMenuPressed(View v){
-		super.onBackPressed();
-	}
-	public void onExitPressed(View v){
-		finish();
-	}
-	public void onDebugButtonPressed(View v){
-		showHand(p1);
-		showHand(p2);
-		showHand(p3);
-		showHand(p4);
-		Toast.makeText(Game.this, "Printed Hands",  Toast.LENGTH_SHORT).show();
-		p1.updateDeck();
-		cardViewDH.updateDeck(p1.getDeck());
-		cardViewDH.invalidate();
-		tableViewDH.invalidate();
-		tableViewDH.refreshDrawableState();
-		cardViewDH.refreshDrawableState();
-		
+	    session=1;
+		clearTableCards();
 
-	}
-	public void onNextButtonPressed(View v){
-		if(playing){
-			
-			if(playerHelper&&playerHelperInt>0){
-				playerHelperInt=0;
-				GO();
-				
-			}
-			else{
-				playerHelperInt++;
-				Toast.makeText(Game.this, "Please play card",  Toast.LENGTH_SHORT).show();
-			}
-		}
-		else{
-			GO();
-		}
-
-	}
-	
-	
-	public void onSwipeLeftPressed(View v){
-		this.cardViewDH.swipeLeft();
-		Toast.makeText(Game.this, "position is "+cardViewDH.getPosition(),  Toast.LENGTH_SHORT).show();
-
-	}
-	
-	public void onSwipeRightPressed(View v){
-		this.cardViewDH.swipeRight();
-		Toast.makeText(Game.this, "position is "+cardViewDH.getPosition(),  Toast.LENGTH_SHORT).show();
-		
-
-	}
-	
-	public void GO(){
-		print("GO()",  619);
-		roundView.setText("Round= "+round);
-		Card r=(curPlayer.go(round, pile, curPlayer));
-		String rs=r.name.replaceFirst(" of ", eol);
-		print (rs, 832);
-		pile.add(r);
-		if(curPlayer.getSeat()==4&&pile.size()!=4){
-			playing=true;
-			//Toast.makeText(HeartsActivity.this, "Please play card",  Toast.LENGTH_SHORT).show();//  Should not be necessary.
-		}
-		else{
-			playing=false;//added so that player helper does not call as many toast
-		}
-		bottomText2.setText(curPlayer.getRealName()+" played the "+ r.name);
-		curPlayer.updateDeck();
-		setCardText(curPlayer, rs, r);//ADVANCES THE CUR PLAYER
-		cardViewDH.invalidate();
-		tableViewDH.invalidate();
-
+	    
 	}
 	
 	/**
-	 * Plays the selected card and advances the curPlayer
-	 * @param p seat of person who is playing a card
-	 * @param rs the string to be set to the layout.
+	 * Sets all the player's states for the next round.
+	 * @param startSeat the player who will start the round.
 	 */
-	public void setCardText(Player P, String rs, Card r){
-		
-		int p=P.getState();  //could just call curPlayer but this makes sense in my head
-		switch(p){//is is player state 1-4
+	private void setState(int startSeat){
+		switch (startSeat){
 		case 1:
-			clearTableCards();
-			tableViewDH.addCard(r);
-			curPlayer=nextPlayer(curPlayer);	//this is the error line
+			p1.setState(1);
+			p2.setState(2);
+			p3.setState(3);
+			p4.setState(4);
 			break;
-			
 		case 2:
-			tableViewDH.addCard(r);
-
-			//tableCard2.setBackgroundResource(r.getRid());
-			curPlayer=nextPlayer(curPlayer);	//this is the error line
-
+			p1.setState(4);
+			p2.setState(1);
+			p3.setState(2);
+			p4.setState(3);
 			break;
 		case 3:
-			tableViewDH.addCard(r);
-
-			//tableCard3.setBackgroundResource(r.getRid());
-			curPlayer=nextPlayer(curPlayer);	//this is the error line
+			p1.setState(3);
+			p2.setState(4);
+			p3.setState(1);
+			p4.setState(2);
 			break;
 		case 4:
-			tableViewDH.addCard(r);
-
-			//tableCard4.setBackgroundResource(r.getRid());
-			if(pile.size()>=4){
-				print("picking up hand", 652);
-				pickUpHand();
-			}
-			else{
-				print("PLAYER TURN", 624);
-				curPlayer=nextPlayer(curPlayer);	//this is the error line
-				if(playing){
-					print("redundant call to set playing=true", 626);
-				}
-				playing=true;
-			}
-			break;
-		case 5:
-			//playState=-1; commented out
-			print("OUT OF BOUNDS!!! playstate=5", 637);
-			Toast.makeText(Game.this, "playState=0",  Toast.LENGTH_SHORT).show();
+			p1.setState(2);
+			p2.setState(3);
+			p3.setState(4);
+			p4.setState(1);
 			break;
 		}
-		tableViewDH.refreshDrawableState();
-		bottomText2.append(eol + "Current player is "+curPlayer.getRealName());
 	}
 	
 	/**
-	 * Sets the first round of the game going
-	 * Plays two and then sets next CurPlayer
+	 * Clears and then adds blank cards to the tableHolder
 	 */
-	public void playTwoOfClubs(){
-		Card r=(curPlayer.getClubs().getCard(0));
-		if(r.getValue()!=2){  //has the one and the two of clubs
-			r=(curPlayer.getClubs().getCard(1));
-			curPlayer.getClubs().removeCardAtIndex(1);//Thus only remove 2
+  	public void clearTableCards(){
+		tableHolder.removeAll();
+		tableHolder.addBlankCards();
+	    
+	}
+
+  	
+  	///////////////////////////////////////////////////////////////////////Save Game//////////////////////////////////////////////////////////////////////////////
+  	/**
+	 * Saves the Trick history to a JSON
+	 * @param winner  Not being used....later implementation
+	 */
+	public void saveGameStats(String winner) {
+		//TODO better way to keep track of file scores.
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(main);
+		int wonCount = preferences.getInt("wonInt", 0);
+		wonCount++;
+	    if(wonCount>10){
+	    	wonCount=1;
+	    }
+  		String jsonData = writeJSON();
+  		Log.d(TAG, jsonData.length()+"");
+	    try {
+			saveToSD("winner"+wonCount, jsonData);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		else{
-			curPlayer.getClubs().removeCardAtIndex(0); //Does not have Ace thus remove place one.
-		}
-		print("game started by "+curPlayer.getRealName(), 653);
-		String rs=r.name.replaceFirst(" of ", eol);
-		pile.add(r);
-		bottomText2.setText(curPlayer.getRealName()+" played the 2 of Clubs");
-		setCardText(curPlayer, null, r);//This advances the curPlayer.
-		//test CODE TODO
-		//canvas.drawBitmap(bitmap, x - (bitmap.getWidth() /2), y - (bitmap.getHeight() /2), null); 
-		//
-		//Rect rect;
-		//rect= new Rect(10, 10, 120, 80);
-		if(curPlayer.getSeat()==1){
-			playing=true;
-			bottomText.setText("Your Turn");
-		}
-		
-		
-		
-		
-		print("0101010", 959);
+
+	    SharedPreferences.Editor editor = preferences.edit();
+	    editor.putInt("wonInt", wonCount);
+	    editor.commit();
+
+	    
 	}
 	
-	public void getCardResources(){
-		cardArrayRes[0] = R.drawable.clubs_ace;
-		cardArrayRes[2] = R.drawable.clubs2;
-		cardArrayRes[3] = R.drawable.clubs3;
-		cardArrayRes[4] = R.drawable.clubs4;
-		cardArrayRes[5] = R.drawable.clubs5;
-        //arr[1] = R.drawable.icon;
+    /**
+     * Saves the Coords to the SD card.
+     * @param v
+     * @throws FileNotFoundException
+     */
+    public void saveToSD(String fileName, String data) throws FileNotFoundException{
+    	Log.d(TAG, "Saving new save file to\n"+path+fileName+".txt");
+    	File file = new File(path, fileName+".txt");
+		    	
+    	if(!path.exists()){
+    		path.mkdirs();
+    	}
+	    if(path.canWrite()){
+	    	try {
+	    		FileOutputStream logWriter = new FileOutputStream(file);
+	    		BufferedOutputStream out = new BufferedOutputStream(logWriter);
+	    		out.write(data.getBytes("UTF-8"));
+	            out.flush();
+	            out.close();   
+	            logWriter.close();
+		    	Toast.makeText(context, "Saved "+fileName, Toast.LENGTH_SHORT).show();
+
+	        }
+	    	catch (IOException e) {	
+				e.printStackTrace();
+				bottomText.setText("File failed to write");
+	    	}
+	    	
+    	}
+    	else{
+    		//cant write
+    		Toast.makeText(context, "Not Writable", Toast.LENGTH_SHORT).show();
+
+    	}
+        
+    }
+        
+    /**
+	 * Takes the list of tricks played and writes that to a JSON
+	 * @return Json as a String.
+	 */
+	public String writeJSON() {
+		Log.d(TAG, "writeJSON()");
+		JSONObject object = new JSONObject();
+		  try {
+			  int trickCounter=0;
+			  int hand=1;
+			  for(int i=0; i<roundHands.size();i++){
+				  trickCounter++;
+				  if(trickCounter==13){
+					  hand++;
+					  trickCounter=0;
+				  }
+				  object.put("Hand="+hand+" Trick="+trickCounter, roundHands.get(i).toJson());
+
+			  }
+		  } catch (JSONException e) {
+		    e.printStackTrace();
+		  }
+		  
+		  return object.toString();
 	}
 	
-	public void pickUpHand(){
-		roundHands.add(pile);
-		int high = 0;
-		int highSeat  = 0;
-		int points = 0;
-		int firstSuit=pile.get(0).getSuit();
-		for(int i=0;i<pile.size();i++){		// maybe start at the back of the pile...yet it does not really matter
-			pile.get(i).setPlayed(true);	//just added Not sdfused yet but could be used to check what cards have been played on crash.
-			int curSuit=pile.get(i).getSuit();
-			int curCard =pile.get(i).getValue();
-			if(firstSuit==curSuit){  	
-				if(high<=curCard){ //equals so that p1 can take the lead.
-					high=curCard;
-					highSeat=pile.get(i).getOwner().getSeat();//Seats are 1-4 
-				}
-			}
-			if(curSuit==0){
-				clubsPlayedInt++;
-			}
-			
-			else if(curSuit==1){ //Diamonds  check for jack.
-				diamondsPlayedInt++;
-				if(curCard==11){
-					points-=10;
-					Toast.makeText(Game.this, "Jack - 10",  Toast.LENGTH_SHORT).show();
+  	///////////////////////////////////////////////////////////////////////Touch Events///////////////////////////////////////////////////////////////////////////
+	public void deckViewTouched(int x, int y) {
+		boolean done =false;
+		for(Card c :deckHolder.getDeck().getDeck()){
+	    	if(c.getBounds().contains(x, y)){
+	    		if(trading){//Pick up to three cards
+	    			if(p1.cardsToTrade.size()>0){
+	    				int cardInt = 0;
+		    			for(Card card : p1.cardsToTrade){
+	    					if(card.equals(c)){
+	    	    				p1.cardsToTrade.get(cardInt).setTouched(false);
+	    	    				p1.cardsToTrade.remove(cardInt);
+	    						done=true;	//Already picked that one. Now it is unselected.
+	    						break;
+							}
+		    				cardInt++;
+
+	    				}
+		    			if(done){
+		    				Log.d(TAG, "deselected a card ");
+		    				updateBottomTextWithTradingCards(true, p1.cardsToTrade);
+    						playCard.setEnabled(false);
+		    				continue;
+		    			}
+	    			}
+    				c.setTouched(true);
+    				int size = p1.cardsToTrade.size();
+        			if(size<3){//Nothing picked yet
+        				p1.cardsToTrade.add(c);
+	    				updateBottomTextWithTradingCards(true, p1.cardsToTrade);
+	    				if(p1.cardsToTrade.size()==3){
+	    					playCard.setEnabled(true);
+	    				}
+	    				break;
+	    			}
+	    			else {
+	    				
+	    				p1.cardsToTrade.get(0).setTouched(false);
+	    				p1.cardsToTrade.remove(0);
+	    				p1.cardsToTrade.add(c);
+	    				updateBottomTextWithTradingCards(true, p1.cardsToTrade);
+	    				break;
+	    			}
+	    			
+	    		}
+	    		//Not Trading, just check to see if it can be played
+	    		else if (checkPlayability(c)){	//Select a card to play.
+		    			if(cardToPlay==null){//Nothing picked yet
+		    				cardToPlay=c;
+		    				cardToPlay.setTouched(true);
+		    				myToast.setText("You picked the "+c.cardToString());
+		    				myToast.show();
+		    				break;
+		    			}
+		    			else{
+		    				cardToPlay.setTouched(false);
+		    				cardToPlay=c;
+		    				cardToPlay.setTouched(true);
+		    				myToast.setText("You picked the "+c.cardToString());
+		    				myToast.show();
+
+		    				break;
+		    			}
+		    		}
+	    	}
+    	}
+
+	}
+	
+	public void slidingDeckViewTouched(Card c) {
+		boolean done =false;
+   		if(trading){//Pick up to three cards
+			if(p1.cardsToTrade.size()>0){
+				int cardInt = 0;
+    			for(Card card : p1.cardsToTrade){
+					if(card.equals(c)){
+	    				p1.cardsToTrade.get(cardInt).setTouched(false);
+	    				p1.cardsToTrade.remove(cardInt);
+						done=true;	//Already picked that one. Now it is unselected.
+						break;
+					}
+    				cardInt++;
 
 				}
+    			if(done){
+    				Log.d(TAG, "deselected a card ");
+    				updateBottomTextWithTradingCards(true, p1.cardsToTrade);
+					playCard.setEnabled(false);
+					return;
+    			}
 			}
-			else if(curSuit==2){//Spades   check for queen
-				spadesPlayedInt++;
-
-				if(curCard==12){
-					heartsBroken=true;
-					points+=13;
-					Toast.makeText(Game.this, "Queen + 13",  Toast.LENGTH_SHORT).show();
-
+			c.setTouched(true);
+			int size = p1.cardsToTrade.size();
+			if(size<3){//Nothing picked yet
+				p1.cardsToTrade.add(c);
+				updateBottomTextWithTradingCards(true, p1.cardsToTrade);
+				if(p1.cardsToTrade.size()==3){
+					playCard.setEnabled(true);
 				}
 			}
-			else if(curSuit==3){//heart--add points
-				heartsPlayedInt++;
-				heartsBroken=true;
-				points++;
-			}
+			else {
 				
+				p1.cardsToTrade.get(0).setTouched(false);
+				p1.cardsToTrade.remove(0);
+				p1.cardsToTrade.add(c);
+				updateBottomTextWithTradingCards(true, p1.cardsToTrade);
+			}
+
+			
 		}
-		clubsPlayed.setText("clubs = "+clubsPlayedInt);
-		diamondsPlayed.setText("diamonds = "+diamondsPlayedInt);
-		spadesPlayed.setText("spades = "+spadesPlayedInt);
-		heartsPlayed.setText("hearts = "+heartsPlayedInt);
-		int total=clubsPlayedInt+diamondsPlayedInt+spadesPlayedInt+heartsPlayedInt;
-		totalPlayed.setText("total= "+total);
-		switch(highSeat){
-		case 1:
-			this.curPlayer=this.p1;
-			this.p1.addToScore(points);
-	        p1tvScore.setText("P1 has "+p1.getScore()+" points");
-			playing=true;
-			bottomText2.setText("You won, points="+points);
-			bottomText2.append(eol+"Pick a Start Card");
-			
-			break;
-		case 2:
-			this.curPlayer=this.p2;
-			this.p2.addToScore(points);
-	        p2tvScore.setText("P2 has "+p2.getScore()+" points");
-			bottomText2.append(eol+"P2 won, points="+points);
-			
-			break;
-		case 3:
-			this.curPlayer=this.p3;
-			this.p3.addToScore(points);
-	        p3tvScore.setText("P3 has "+p3.getScore()+" points");
-			bottomText2.append(eol+"P3 won, points="+points);
-			
-			break;
-		case 4: 
-			this.curPlayer=this.p4;
-			this.p4.addToScore(points);
-	        p4tvScore.setText("P4 has "+p4.getScore()+" points");
-			bottomText2.append(eol+"P4 won, taking="+points+" points");
-			break;
-		}	
-		print("pickUpHand() for "+curPlayer.getRealName(), 770);
-		curPlayer.addDeckItem(pile);
-		pile.clear();
-		setPlayState(curPlayer);  //for next round.
-
-
-		round++;	//cards left counter
-		if(round==14){//Done playing need new cards.
-			Toast.makeText(Game.this, "New round!",  Toast.LENGTH_SHORT).show();
-			count++;
-			round=0;  	//ROUND INCREMENTER!!!
-			if(endGameCheck()){
-				curPlayer = winnerCheck();
-				bottomText.setText(curPlayer.getRealName()+" won the game!");
-				bottomText2.setText("Press menu, then restart to play again");
-
+		//Not Trading, just check to see if it can be played
+		else if (checkPlayability(c)){	//Select a card to play.
+			if(cardToPlay==null){//Nothing picked yet
+				cardToPlay=c;
+				cardToPlay.setTouched(true);
+				myToast.setText("You picked the "+c.cardToString());
+				myToast.show();
+				
 			}
 			else{
-				print("New round", 982);
-				restart=false;
-				start();
-			}
-			
-		}
-		
-		//clears on start of next round....usually
-		//Toast.makeText(HeartsActivity.this, "Press Clear to clear Board",  Toast.LENGTH_SHORT).show();
-		
-		/*  Kept getting ViewRoot called from wrong thread exception
-		Timer t=new Timer();
-		t.schedule(new TimerTask(){
-			public void run(){
-				EditText tableCard12 = (EditText)findViewById(R.id.card1);
-				EditText  tableCard22 = (EditText)findViewById(R.id.card2);
-				EditText tableCard32 = (EditText)findViewById(R.id.card3);
-				EditText  tableCard42 = (EditText)findViewById(R.id.card4);
-			    tableCard12.setText("");
-			    tableCard22.setText("");
-			    tableCard32.setText("");
-			    tableCard42.setText("");
-			}
-		}, 5000);
-		*/
+				cardToPlay.setTouched(false);
+				cardToPlay=c;
+				cardToPlay.setTouched(true);
+				myToast.setText("You picked the "+c.cardToString());
+				myToast.show();
 
-		
+				
+			}
+		}
+		updateDH();
+
 	}
+    	
+
+	
 	/**
-	 * Finds lowest scoring player and sets winner to true.
-	 * Does less than or equal to...should be just less than or tie.
+	 * 
+	 * @param sentRecieved true if picking cards false if received them
+	 * @param cards
 	 */
-	public Player winnerCheck(){//this prob needs some rework
-		int scorep1 = p1.getScore();
-		int scorep2 = p2.getScore();
-		int scorep3 = p3.getScore();
-		int scorep4 = p4.getScore();
-
-
-		if(scorep1<=scorep2){
-			if(scorep1<=scorep3){
-				if(scorep1<=scorep4){
-					print("YOU WON", 995);
-					p1.winner=true;
-					return p1;
-				}
-				else{
-					print("P4 WON", 995);
-					p4.winner=true;
-					return p4;
-				}
-			}
-			else if(scorep3<=scorep4){
-				print("P3 WON", 995);
-				p3.winner=true;
-				return p3;
-			}
-
-		}
-		else if(scorep2<=scorep3){
-			if(scorep2<=scorep4){
-				print("P2 WON", 995);
-				p2.winner=true;
-				return p2;
-			}
-			else{
-				print("P4 WON", 995);
-				p4.winner=true;
-				return p4;
-				
-			}
-		}
-		else if(scorep3<=scorep4){
-				print("P3 WON", 995);
-				p3.winner=true;
-				return p3;
-			}
-			else{
-				print("P4 WON", 995);
-				p4.winner=true;
-				return p4;
-				
-			}
-		print("returning null on winner", 1040);
-		return null;
-		}
-		
-	public boolean endGameCheck(){
-		if(p1.getScore()>=100){
-			print("Player 1 LOOSES", 912);
-			return true;
-		}
-		if(p2.getScore()>=100){
-			print("Player 2 LOOSES", 912);
-			return true;
-
-		}
-		if(p3.getScore()>=100){
-			print("Player 3 LOOSES", 912);
-			return true;
-
-		}
-		if(p4.getScore()>=100){
-			print("Player 4 LOOSES", 912);
-			return true;
-
-		}
-		return false;  //Nobody has too many points
-		//TODO End game mode, find winner, show scores, 
-	}
-	
-
-	public Player nextPlayer(Player p){
-
-		switch(p.getSeat()){
+	public void updateBottomTextWithTradingCards(boolean picking, ArrayList<Card> cards){
+		if(picking){
+			switch (session){
 			case 1:
-				return this.p2;		
+				bottomText2.setText("Cards picked to trade left:"+eol);
+				for(Card c : cards)
+					bottomText2.append(c.cardToString()+eol);
+				break;
 			case 2:
-				return this.p3;		
+				bottomText2.setText("Cards picked to trade right:"+eol);
+				for(Card c : cards)
+					bottomText2.append(c.cardToString()+eol);
+				break;
 			case 3:
-				return this.p4;		
-			case 4:
-				playing=true;
-				return this.p1;
+				bottomText2.setText("Cards picked to trade across:"+eol);
+				for(Card c : cards)
+					bottomText2.append(c.cardToString()+eol);
+				break;
+			default:
+				Log.d(TAG, "Traiding on round 4. BAD PLAN!");
+				break;
+			}
 		}
-		return null;
-	}
-	public void onp1ClubsButtonPressed(View v){
+		else{		
+			bottomText2.setText("Cards given to you:"+eol);
+			for(Card c : cards)
+				bottomText2.append(c.cardToString()+eol);
+			bottomText2.append(eol);
+		}
 		
-		//DO NOT PUT STUFF ABOVE THIS  this check should happen first.
-		Deck cArray=p1.getClubs();
-		if(cArray.getSize()==0){
-			return;
-		}
-		if(pile.size()>=1){
-			int startSuit = pile.get(0).getSuit();
-			if(startSuit==0||curPlayer.checkVoid(startSuit)||round==13){//error fix...||round==13
-				if(selectedCard==0){
-					selectedCard=cArray.getCard(selectedCardPlace).getValue();
-					//pile.add((cArray.get(selectedCardPlace)));
-					selectedCardSuit=0;
-				}
-				else{
-					if(selectedCardSuit==0){
-						selectedCardPlace++;
-						if(selectedCardPlace>=cArray.getSize()){
-							selectedCardPlace=0;
-							selectedCard=cArray.getCard(selectedCardPlace).getValue();
-						}
-						else{
-							selectedCard=cArray.getCard(selectedCardPlace).getValue();
-						}
-					}
-					else{
-						selectedCard=cArray.getCard(0).getValue();
-						selectedCardSuit=0;
-						selectedCardPlace=0;
-					}
-				}
-			}
-			else{
-				print("Trying to play wrong suit", 1309);
-				Toast.makeText(Game.this, "Not a Valid Choice",  Toast.LENGTH_SHORT).show();
-				return;
-			}
-		}
-		else{//we are playing the first card of the pile.
-			if(selectedCard==0){
-				selectedCard=cArray.getCard(selectedCardPlace).getValue();
-				//pile.add((cArray.get(selectedCardPlace)));
-				selectedCardSuit=0;
-			}
-			else{
-				if(selectedCardSuit==0){
-					selectedCardPlace++;
-					if(selectedCardPlace>=cArray.getSize()){
-						selectedCardPlace=0;
-						selectedCard=cArray.getCard(selectedCardPlace).getValue();
-					}
-					else{
-						selectedCard=cArray.getCard(selectedCardPlace).getValue();
-					}
-				}
-				else{
-					selectedCard=cArray.getCard(0).getValue();
-					selectedCardSuit=0;
-					selectedCardPlace=0;
-				}
-			}
-		}
-		cardToPlay=cArray.getCard(selectedCardPlace);
-		bottomText.setText(cardToPlay.name);
+
 	}
-	public void onp1DiamondsButtonPressed(View v){
-		//DO NOT PUT STUFF ABOVE THIS  this check should happen first.
-		Deck cArray=p1.getDiamonds();
-		if(cArray.getSize()==0){
-			return;
+    	
+	public void tableViewTouched(int x, int y){
+		String tableInfo = displayDeckCards(tableTrick.TrickToDeck());
+		main.displayTableInfo(tableInfo);
+	}
+	
+	
+	/**
+	 * Checks to see if the card is playable
+	 * @param c card to be checked.
+	 * @return
+	 */
+	public boolean checkPlayability(Card c){
+		if(justPickedUpPile){
+			if(c.getSuit()==3){
+				if(heartsBroken){//Playing a heart
+					return true;
+				}
+				else if (p1.voidClubs&&p1.voidDiamonds&&p1.voidSpades){	//Play heart if that all you got.
+					return true;
+				}else{
+					myToast.cancel();
+					myToast.setText("Hearts have not been broken.");
+					myToast.show();
+					return false;
+				}
+			}
+			return true;//we are playing the first card of the pile.
 		}
-		voidCheck();
-		if(pile.size()>=1){
-			int startSuit = pile.get(0).getSuit();
-			if(startSuit==1||curPlayer.checkVoid(startSuit)||round==13){
-				if(selectedCard==0){
-					selectedCard=cArray.getCard(selectedCardPlace).getValue();
-					//pile.add((cArray.get(selectedCardPlace)));
-					selectedCardSuit=1;
-				}
-				else{
-					if(selectedCardSuit==1){
-						selectedCardPlace++;
-						if(selectedCardPlace>=cArray.getSize()){
-							selectedCardPlace=0;
-							selectedCard=cArray.getCard(selectedCardPlace).getValue();
-						}
-						else{
-							selectedCard=cArray.getCard(selectedCardPlace).getValue();
-						}
-					}
-					else{
-						selectedCard=cArray.getCard(0).getValue();
-						selectedCardSuit=1;
-						selectedCardPlace=0;
-					}
-				}
+		if(tableTrick.getSize()>=1){
+			int startSuit = tableTrick.getCard(0).getSuit();
+			if(c.getSuit()==startSuit){	//Good to play card of same suit
+				return true;
+				
+			}
+			else if(p1.checkVoid(startSuit)){	//If we are void still ok to play.
+				return true;
 			}
 			else{
-				print("Trying to play wrong suit", 915);
-				Toast.makeText(Game.this, "Not a Valid Choice",  Toast.LENGTH_SHORT).show();
-				return;
-
+				Log.d(TAG, "Trying to play "+c.cardToString());
+				myToast.setText("Not a Valid Choice");
+				myToast.show();
+				return false;
 			}
 		}
-		else{//we are playing the first card of the pile.
-			if(selectedCard==0){
-				selectedCard=cArray.getCard(selectedCardPlace).getValue();
-				//pile.add((cArray.get(selectedCardPlace)));
-				selectedCardSuit=1;
+		else if(c.getSuit()==3){
+			if(heartsBroken){//Playing a heart
+				return true;
 			}
-			else{
-				if(selectedCardSuit==1){
-					selectedCardPlace++;
-					if(selectedCardPlace>=cArray.getSize()){
-						selectedCardPlace=0;
-						selectedCard=cArray.getCard(selectedCardPlace).getValue();
-					}
-					else{
-						selectedCard=cArray.getCard(selectedCardPlace).getValue();
-					}
-				}
-				else{
-					selectedCard=cArray.getCard(0).getValue();
-					selectedCardSuit=1;
-					selectedCardPlace=0;
-				}
+			else if (p1.voidClubs&&p1.voidDiamonds&&p1.voidSpades){	//Play heart if that all you got.
+				return true;
+			}else{
+				myToast.cancel();
+				myToast.setText("Hearts have not been broken.");
+				myToast.show();
+				return false;
 			}
 		}
-		cardToPlay=cArray.getCard(selectedCardPlace);
-		bottomText.setText(cardToPlay.name);
+		return true;//we are playing the first card of the pile.
 	}
-	public void onp1SpadesButtonPressed(View v){
+			
+	public void findCardBitmaps(){
+		GreenBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.green_back);
+		BlueBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.blue_back);
+		BlackBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.black_back);
+		RedBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.red_back);
 
-		Deck cArray=p1.getSpades();
-		if(cArray.getSize()==0){
-			return;
-		}
-		voidCheck();
-		if(pile.size()>=1){
-			int startSuit = pile.get(0).getSuit();
+		ClubsTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.clubs2);
+		ClubsThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.clubs3);
+		ClubsFour = BitmapFactory.decodeResource(main.getResources(), R.drawable.clubs4);
+		ClubsFive = BitmapFactory.decodeResource(main.getResources(), R.drawable.clubs5);
+		ClubsSix = BitmapFactory.decodeResource(main.getResources(), R.drawable.clubs6);
+		ClubsSeven = BitmapFactory.decodeResource(main.getResources(), R.drawable.clubs7);
+		ClubsEight = BitmapFactory.decodeResource(main.getResources(), R.drawable.clubs8);
+		ClubsNine = BitmapFactory.decodeResource(main.getResources(), R.drawable.clubs9);
+		ClubsTen = BitmapFactory.decodeResource(main.getResources(), R.drawable.clubs10);
+		ClubsJack = BitmapFactory.decodeResource(main.getResources(), R.drawable.clubs_jack);
+		ClubsQueen = BitmapFactory.decodeResource(main.getResources(), R.drawable.clubs_queen);
+		ClubsKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.clubs_king);
+		ClubsAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.clubs_ace);
 
-			if(startSuit==2||curPlayer.checkVoid(startSuit)||round==13){
-				if(selectedCard==0){
-					selectedCard=cArray.getCard(selectedCardPlace).getValue();
-					//pile.add((cArray.get(selectedCardPlace)));
-					selectedCardSuit=2;
-				}
-				else{
-					if(selectedCardSuit==2){
-						selectedCardPlace++;
-						if(selectedCardPlace>=cArray.getSize()){
-							selectedCardPlace=0;
-							selectedCard=cArray.getCard(selectedCardPlace).getValue();
-						}
-						else{
-							selectedCard=cArray.getCard(selectedCardPlace).getValue();
-						}
-					}
-					else{
-						selectedCard=cArray.getCard(0).getValue();
-						selectedCardSuit=2;
-						selectedCardPlace=0;
-					}
-				}
-			}
-			else{
-				print("Trying to play wrong suit", 980);
-				Toast.makeText(Game.this, "Not a Valid Choice",  Toast.LENGTH_SHORT).show();
-				return;
+		DiamondsTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.diamonds2);
+		DiamondsThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.diamonds3);
+		DiamondsFour = BitmapFactory.decodeResource(main.getResources(), R.drawable.diamonds4);
+		DiamondsFive = BitmapFactory.decodeResource(main.getResources(), R.drawable.diamonds5);
+		DiamondsSix = BitmapFactory.decodeResource(main.getResources(), R.drawable.diamonds6);
+		DiamondsSeven = BitmapFactory.decodeResource(main.getResources(), R.drawable.diamonds7);
+		DiamondsEight = BitmapFactory.decodeResource(main.getResources(), R.drawable.diamonds8);
+		DiamondsNine = BitmapFactory.decodeResource(main.getResources(), R.drawable.diamonds9);
+		DiamondsTen = BitmapFactory.decodeResource(main.getResources(), R.drawable.diamonds10);
+		DiamondsJack = BitmapFactory.decodeResource(main.getResources(), R.drawable.diamonds_jack);
+		DiamondsQueen = BitmapFactory.decodeResource(main.getResources(), R.drawable.diamonds_queen);
+		DiamondsKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.diamonds_king);
+		DiamondsAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.diamonds_ace);
 
+		SpadesTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade2);
+		SpadesThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade3);
+		SpadesFour = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade4);
+		SpadesFive = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade5);
+		SpadesSix = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade6);
+		SpadesSeven = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade7);
+		SpadesEight = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade8);
+		SpadesNine = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade9);
+		SpadesTen = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade10);
+		SpadesJack = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade_jack);
+		SpadesQueen = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade_queen);
+		SpadesKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade_king);
+		SpadesAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade_ace);
 
-			}
-		}
-		else{//we are playing the first card of the pile.
-			if(selectedCard==0){
-				selectedCard=cArray.getCard(selectedCardPlace).getValue();
-				//pile.add((cArray.get(selectedCardPlace)));
-				selectedCardSuit=2;
-			}
-			else{
-				if(selectedCardSuit==2){
-					selectedCardPlace++;
-					if(selectedCardPlace>=cArray.getSize()){
-						selectedCardPlace=0;
-						selectedCard=cArray.getCard(selectedCardPlace).getValue();
-					}
-					else{
-						selectedCard=cArray.getCard(selectedCardPlace).getValue();
-					}
-				}
-				else{
-					selectedCard=cArray.getCard(0).getValue();
-					selectedCardSuit=2;
-					selectedCardPlace=0;
-				}
-			}
-		}
-		cardToPlay=cArray.getCard(selectedCardPlace);
-		bottomText.setText(cardToPlay.name);
+		HeartsTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts2);
+		HeartsThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts3);
+		HeartsFour = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts4);
+		HeartsFive = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts5);
+		HeartsSix = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts6);
+		HeartsSeven = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts7);
+		HeartsEight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts8);
+		HeartsNine = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts9);
+		HeartsTen = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts10);
+		HeartsJack = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts_jack);
+		HeartsQueen = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts_queen);
+		HeartsKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts_king);
+		HeartsAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts_ace);
 	}
-	public void onp1HeartsButtonPressed(View v){
+//////////////////////////BITMAPS
+public Bitmap GreenBack;
+public Bitmap BlueBack;
+public Bitmap BlackBack;
+public Bitmap RedBack;
 
-		Deck cArray=p1.getHearts();
-		if(cArray.getSize()==0){
-			return;
-		}
-		voidCheck();
+public Bitmap ClubsTwo;
+public Bitmap ClubsThree;
+public Bitmap ClubsFour;
+public Bitmap ClubsFive;
+public Bitmap ClubsSix;
+public Bitmap ClubsSeven;
+public Bitmap ClubsEight;
+public Bitmap ClubsNine;
+public Bitmap ClubsTen;
+public Bitmap ClubsJack;
+public Bitmap ClubsQueen;
+public Bitmap ClubsKing;
+public Bitmap ClubsAce;
 
-		if(pile.size()>=1){
-			int startSuit = pile.get(0).getSuit();
+public Bitmap DiamondsTwo;
+public Bitmap DiamondsThree;
+public Bitmap DiamondsFour;
+public Bitmap DiamondsFive;
+public Bitmap DiamondsSix;
+public Bitmap DiamondsSeven;
+public Bitmap DiamondsEight;
+public Bitmap DiamondsNine;
+public Bitmap DiamondsTen;
+public Bitmap DiamondsJack;
+public Bitmap DiamondsQueen;
+public Bitmap DiamondsKing;
+public Bitmap DiamondsAce;
 
-			if(startSuit==3||curPlayer.checkVoid(startSuit)||round==13){
-				if(selectedCard==0){
-					selectedCard=cArray.getCard(selectedCardPlace).getValue();
-					//pile.add((cArray.get(selectedCardPlace)));
-					selectedCardSuit=3;
-				}
-				else{
-					if(selectedCardSuit==3){
-						selectedCardPlace++;
-						if(selectedCardPlace>=cArray.getSize()){
-							selectedCardPlace=0;
-							selectedCard=cArray.getCard(selectedCardPlace).getValue();
-						}
-						else{
-							selectedCard=cArray.getCard(selectedCardPlace).getValue();
-						}
-					}
-					else{
-						print("CODE CHECK ### CODE CHECK", 1089);
-						selectedCard=cArray.getCard(0).getValue();
-						selectedCardSuit=3;
-						selectedCardPlace=0;
-					}
-				}
-			}
-			else{
-				print("Trying to play wrong suit", 1045);
-				Toast.makeText(Game.this, "Not a Valid Choice",  Toast.LENGTH_SHORT).show();
-				return;
+public Bitmap SpadesTwo;
+public Bitmap SpadesThree;
+public Bitmap SpadesFour;
+public Bitmap SpadesFive;
+public Bitmap SpadesSix;
+public Bitmap SpadesSeven;
+public Bitmap SpadesEight;
+public Bitmap SpadesNine;
+public Bitmap SpadesTen;
+public Bitmap SpadesJack;
+public Bitmap SpadesQueen;
+public Bitmap SpadesKing;
+public Bitmap SpadesAce;
 
-			}
+public Bitmap HeartsTwo;
+public Bitmap HeartsThree;
+public Bitmap HeartsFour;
+public Bitmap HeartsFive;
+public Bitmap HeartsSix;
+public Bitmap HeartsSeven;
+public Bitmap HeartsEight;
+public Bitmap HeartsNine;
+public Bitmap HeartsTen;
+public Bitmap HeartsJack;
+public Bitmap HeartsQueen;
+public Bitmap HeartsKing;
+public Bitmap HeartsAce;
 
-		}
-		else{
-			if(!heartsBroken){
-				print("Hearts not broken", 1101);
-				Toast.makeText(Game.this, "Hearts not broken",  Toast.LENGTH_SHORT).show();
-
-				return;
-			}//we are playing the first card of the pile.
-			if(selectedCard==0){
-				selectedCard=cArray.getCard(selectedCardPlace).getValue();
-				//pile.add((cArray.get(selectedCardPlace)));
-				selectedCardSuit=3;
-			}
-			else{
-				if(selectedCardSuit==3){
-					selectedCardPlace++;
-					if(selectedCardPlace>=cArray.getSize()){
-						selectedCardPlace=0;
-						selectedCard=cArray.getCard(selectedCardPlace).getValue();
-					}
-					else{
-						selectedCard=cArray.getCard(selectedCardPlace).getValue();
-					}
-				}
-				else{
-					selectedCard=cArray.getCard(0).getValue();
-					selectedCardSuit=3;
-					selectedCardPlace=0;
-				}
-			}
-		}		
-		cardToPlay=cArray.getCard(selectedCardPlace);
-		bottomText.setText(cardToPlay.name);
-	}
-	public void showHand(Player p){
-		Deck hand = p.gethand();
-		String wholeHand=p.getRealName()+" ";
-		for(int i=0;i<hand.getSize();i++){
-			wholeHand+=hand.getCard(i).name+", ";
-		}
-		print(wholeHand, 1467);
-		print("total="+hand.getSize(), 1580);
-	}
-	public DeckHolder getDeckHolder() {
-		// TODO Auto-generated method stub
-		return cardViewDH;
-	}
-	public TableHolder getTableHolder() {
-		// TODO Auto-generated method stub
-		return tableViewDH;
-	}
 }
-
-

@@ -1,27 +1,23 @@
 package game.shad.tempus.hearts;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Toast;
 
 public class Card {
-    private static final String TAG = Card.class.getSimpleName();
+	public static final String TAG = "Hearts--Card";
     private Bitmap bitmap;
     public int Rid;
     private boolean touched;
+    public boolean inView=false;
     private Player owner = null;
     public boolean played = false;
 	final static int CLUBS = 0;
 	final static int DIAMONDS = 1;
 	final static int SPADES = 2;
-	final static int blue_backS = 3;
+	final static int HEARTS = 3;
 	final static int NOTSET = 4;
 	private int x;
 	private int y;
@@ -30,267 +26,228 @@ public class Card {
 	private int x2;
 	private int y2;
 	private int z;
+	private Rect r;
+	
 	private int value  = 0;
 	private int suit = 4;
-	private Context con;
+	private Game game;
 	public String name = "";
-    private Game view;
     
-	 public Card( int value, int suit, Context con){
-		this.view = view;
-	    this.con = con;
+	public Card( int value, int suit, Game game){
+	    this.game = game;
 	    this.bitmap = getImage(value, suit);
 		this.value = value;
 		this.suit = suit;
 		this.name = cardToString();
-	 }
-	    
-	    private Bitmap getImage(int v, int s){
-	        int im = 0;
-	        
-	        switch (s){
-	            case 0:
-	                switch(v){	 
-	                	case 0:
-	                		im = R.drawable.blueback;
-	                		break;
-		                case 1:
-	                        im = R.drawable.clubs_ace;
-	                        break;
-	                    case 2:
-                            im = R.drawable.clubs2;
-                            break;
-	                    case 3:
-                            im = R.drawable.clubs3;
-                            break;
-	                    case 4:
-                    		im = R.drawable.clubs4;
-                    		break;
-	                    case 5:
-                    		im = R.drawable.clubs5;
-	                        break;
-	                    case 6:
-                    		im = R.drawable.clubs6;
-	                        break;
-	                    case 7:
-                    		im = R.drawable.clubs7;
-	                        break;
-	                    case 8:
-                    		im = R.drawable.clubs8;
-	                        break;
-	                    case 9:
-                    		im = R.drawable.clubs9;
-	                        break;
-	                    case 10:
-                    		im = R.drawable.clubs10;
-	                        break;
-	                    case 11:
-                            im = R.drawable.clubs_jack;
-	                        break;
-	                    case 12:
-                            im = R.drawable.clubs_queen;
-	                        break;
-	                    case 13:
-                            im = R.drawable.clubs_king;
-	                        break;
+		
+	}
+	 
+   public void draw(Canvas canvas) {
+		//Add z layer
+        //Paint paint = new Paint();
+        //paint.setStrokeWidth(2);
+        //paint.setColor(Color.CYAN);
+        //canvas.drawRect(150,350,400,600, paint);
+        //canvas.drawBitmap(bitmap, x - (bitmap.getWidth() /2), y - (bitmap.getHeight() /2), null);
+        //Rect r = new Rect(x, y, x + bitmap.getWidth()/2, y + bitmap.getHeight()/2);
+        r = new Rect(x1, y1, x2,  y2);
+        if(touched){
+        	//TODO make this look better
+        	Paint p= new Paint();
+        	//This does not work, p.setColor(Color.YELLOW);
+        	p.setAlpha(180);
+        	canvas.drawBitmap(bitmap, null, r, p);
+        }
+        else{
+        	canvas.drawBitmap(bitmap, null, r, null);
+        }
+    }
+   
+	private Bitmap getImage(int v, int s){
+        switch (s){
+        case 0:
+            switch(v){	 
+            	case 0:
+            		return game.GreenBack;
+                case 2:
+                    return game.ClubsTwo;
+                case 3:
+                    return game.ClubsThree;
+                case 4:
+                    return game.ClubsFour;
 
-	                    default:
-	                            im = R.drawable.blue_back;
-	                        break;  
-	                }
-	                break;
-	            case 1:
-	                switch(v){
-	                case 1:
-	                		im = R.drawable.diamonds_ace;
-                        break;
-	                case 2:
-	                        im = R.drawable.diamonds2;
-	                    break;
-	                case 3:
-	                        im = R.drawable.diamonds3;
-	                    break;
-	                case 4:
-	                        im = R.drawable.diamonds4;
-	                    break;
-	                case 5:
-	                        im = R.drawable.diamonds5;
-	                    break;
-	                case 6:
-	                        im = R.drawable.diamonds6;
-	                    break;
-	                case 7:
-	                        im = R.drawable.diamonds7;
-	                    break;
-	                case 8:
-	                        im = R.drawable.diamonds8;
-	                    break;
-	                case 9:
-	                        im = R.drawable.diamonds9;
-	                    break;
-	                case 10:
-	                        im = R.drawable.diamonds10;
-	                    break;
-	                case 11:
-	                        im = R.drawable.diamonds_jack;
-	                    break;
-	                case 12:
-	                        im = R.drawable.diamonds_queen;
-	                    break;
-	                case 13:
-	                        im = R.drawable.diamonds_king;
-	                    break;
+                case 5:
+                    return game.ClubsFive;
 
-	                default:
-	                        im = R.drawable.red_back;
-	                    break;  
-	            }
-	                break;
-	            case 2:
-	                switch(v){
-	                case 1:
-	                		im = R.drawable.spade_ace;
-	                	break;
-	                case 2:
-	                        im = R.drawable.spade2;
-	                    break;
-	                case 3:
-	                        im = R.drawable.spade3;
-	                    break;
-	                case 4:
-	                        im = R.drawable.spade4;
-	                    break;
-	                case 5:
-	                        im = R.drawable.spade5;
-	                    break;
-	                case 6:
-	                        im = R.drawable.spade6;
-	                    break;
-	                case 7:
-	                        im = R.drawable.spade7;
-	                    break;
-	                case 8:
-	                        im = R.drawable.spade8;
-	                    break;
-	                case 9:
-	                        im = R.drawable.spade9;
-	                    break;
-	                case 10:
-	                        im = R.drawable.spade10;
-	                    break;
-	                case 11:
-	                        im = R.drawable.spade_jack;
-	                    break;
-	                case 12:
-	                        im = R.drawable.spade_queen;
-	                    break;
-	                case 13:
-	                        im = R.drawable.spade_king;
-	                    break;
+                case 6:
+                    return game.ClubsSix;
 
-	                default:
-	                        im = R.drawable.blue_back;
-	                    break;  
-	            }
-	                break;
-	            case 3:
-	                switch(v){
-	                case 1:
-                        	im = R.drawable.hearts_ace;
-                        	break;
-	                case 2:
-	                        im = R.drawable.hearts2;
-	                    break;
-	                case 3:
-	                        im = R.drawable.hearts3;
-	                    break;
-	                case 4:
-	                        im = R.drawable.hearts4;
-	                    break;
-	                case 5:
-	                        im = R.drawable.hearts5;
-	                    break;
-	                case 6:
-	                        im = R.drawable.hearts6;
-	                    break;
-	                case 7:
-	                        im = R.drawable.hearts7;
-	                    break;
-	                case 8:
-	                        im = R.drawable.hearts8;
-	                    break;
-	                case 9:
-	                        im = R.drawable.hearts9;
-	                    break;
-	                case 10:
-	                        im = R.drawable.hearts10;
-	                    break;
-	                case 11:
-	                        im = R.drawable.hearts_jack;
-	                    break;
-	                case 12:
-	                        im = R.drawable.hearts_queen;
-	                    break;
-	                case 13:
-	                        im = R.drawable.hearts_king;
-	                    break;
+                case 7:
+                    return game.ClubsSeven;
 
-	                default:
-	                        im = R.drawable.red_back;
-	                    break;  
-	            }
-	                break;  
-	            default:
-	                switch(v){
-	                case 1:
-	                        im = R.drawable.blue_back;
-	                    break;
-	                case 2:
-	                        im = R.drawable.blue_back;
-	                    break;
-	                case 3:
-	                        im = R.drawable.blue_back;
-	                    break;
-	                case 4:
-	                        im = R.drawable.blue_back;
-	                    break;
-	                case 5:
-	                        im = R.drawable.blue_back;
-	                    break;
-	                case 6:
-	                        im = R.drawable.blue_back;
-	                    break;
-	                case 7:
-	                        im = R.drawable.blue_back;
-	                    break;
-	                case 8:
-	                        im = R.drawable.blue_back;
-	                    break;
-	                case 9:
-	                        im = R.drawable.blue_back;
-	                    break;
-	                case 10:
-	                        im = R.drawable.blue_back;
-	                    break;
-	                case 11:
-	                        im = R.drawable.blue_back;
-	                    break;
-	                case 12:
-	                        im = R.drawable.blue_back;
-	                    break;
-	                case 13:
-	                        im = R.drawable.blue_back;
-	                    break;
-	                
-	                default:
-	                        im = R.drawable.blue_back;
-	                    break;  
-	            }
-	                break;
-	        }
-	        Rid=im;
-	        return BitmapFactory.decodeResource(this.con.getResources(),im);
-	    }
+                case 8:
+                    return game.ClubsEight;
+
+                case 9:
+                    return game.ClubsNine;
+
+                case 10:
+                    return game.ClubsTen;
+
+                case 11:
+                    return game.ClubsJack;
+
+                case 12:
+                    return game.ClubsQueen;
+
+                case 13:
+                    return game.ClubsKing;
+
+                case 14:
+                    return game.ClubsAce;
+
+                default:
+                    return game.GreenBack;
+
+            }
+            case 1:
+                switch(v){
+            	case 0:
+            		return game.BlueBack;
+                case 2:
+                    return game.DiamondsTwo;
+                case 3:
+                    return game.DiamondsThree;
+                case 4:
+                    return game.DiamondsFour ;
+
+                case 5:
+                    return game.DiamondsFive;
+
+                case 6:
+                    return game.DiamondsSix;
+
+                case 7:
+                    return game.DiamondsSeven;
+
+                case 8:
+                    return game.DiamondsEight;
+
+                case 9:
+                    return game.DiamondsNine;
+
+                case 10:
+                    return game.DiamondsTen;
+
+                case 11:
+                    return game.DiamondsJack;
+
+                case 12:
+                    return game.DiamondsQueen;
+
+                case 13:
+                    return game.DiamondsKing;
+
+                case 14:
+                    return game.DiamondsAce;
+
+                default:
+                    return game.BlueBack;
+
+            }
+            case 2:
+                switch(v){
+            	case 0:
+            		return game.BlackBack;
+                case 2:
+                    return game.SpadesTwo;
+                case 3:
+                    return game.SpadesThree;
+                case 4:
+                    return game.SpadesFour ;
+
+                case 5:
+                    return game.SpadesFive;
+
+                case 6:
+                    return game.SpadesSix;
+
+                case 7:
+                    return game.SpadesSeven;
+
+                case 8:
+                    return game.SpadesEight;
+
+                case 9:
+                    return game.SpadesNine;
+
+                case 10:
+                    return game.SpadesTen;
+
+                case 11:
+                    return game.SpadesJack;
+
+                case 12:
+                    return game.SpadesQueen;
+
+                case 13:
+                    return game.SpadesKing;
+
+                case 14:
+                    return game.SpadesAce;
+
+                default:
+                    return game.BlackBack;
+
+            }
+            case 3:
+                switch(v){
+            	case 0:
+            		return game.RedBack;
+                case 2:
+                    return game.HeartsTwo;
+                case 3:
+                    return game.HeartsThree;
+                case 4:
+                    return game.HeartsFour ;
+
+                case 5:
+                    return game.HeartsFive;
+
+                case 6:
+                    return game.HeartsSix;
+
+                case 7:
+                    return game.HeartsSeven;
+
+                case 8:
+                    return game.HeartsEight;
+
+                case 9:
+                    return game.HeartsNine;
+
+                case 10:
+                    return game.HeartsTen;
+
+                case 11:
+                    return game.HeartsJack;
+
+                case 12:
+                    return game.HeartsQueen;
+
+                case 13:
+                    return game.HeartsKing;
+
+                case 14:
+                    return game.HeartsAce;
+
+                default:
+                    return game.RedBack;
+
+            }
+        }
+        return game.BlueBack;
+    }
 	
     public Bitmap getBitmap(){
 		return bitmap;
@@ -298,8 +255,7 @@ public class Card {
     public Rect getBounds(){
     	return new Rect(x1, y1, x2, y2);
     }
-    
-    
+       
 	public int getRid(){
 		return Rid;
 	}
@@ -358,9 +314,6 @@ public class Card {
 		}
 		
 		switch (value){
-			case 1:
-				sValue="Ace";
-				break;
 			case 2: 
 				sValue="Two";
 				break;
@@ -396,6 +349,9 @@ public class Card {
 				break;
 			case 13:
 				sValue="King";
+				break;
+			case 14:
+				sValue="Ace";
 				break;
 			}
 		return sValue+" of "+sSuit;
@@ -441,27 +397,12 @@ public class Card {
     public Player getOwner(){
 		return owner;
 }
-    public void draw(Canvas canvas) {
-		//Add z layer
-        //Paint paint = new Paint();
-        //paint.setStrokeWidth(2);
-        //paint.setColor(Color.CYAN);
-        //canvas.drawRect(150,350,400,600, paint);
-        //canvas.drawBitmap(bitmap, x - (bitmap.getWidth() /2), y - (bitmap.getHeight() /2), null);
-        //Rect r = new Rect(x, y, x + bitmap.getWidth()/2, y + bitmap.getHeight()/2);
-        Rect r = new Rect(x1, y1, x2,  y2);
-        if(touched){
-        	//do code to make it special.
-
-        }
-    	canvas.drawBitmap(bitmap, null, r, null);
-    }
-    
+ 
     public void handleActionDown(int eventX, int eventY) {
         if(eventX >= (x1-bitmap.getWidth() /2) && (eventX <= (x1 + bitmap.getWidth()/2))){
             if(eventY >= (y1-bitmap.getHeight() /2) && (y <= (y1+bitmap.getHeight() /2))){
                 setTouched(true);
-    		    bitmap = BitmapFactory.decodeResource(con.getResources(), R.drawable.blue_back);
+    		    bitmap = BitmapFactory.decodeResource(game.getResources(), R.drawable.blue_back);
     		    
             }else{
                 setTouched(false);
@@ -480,7 +421,7 @@ public class Card {
 		setTouched(false);
 		this.x = eventX;
 		this.y = eventY;
-		bitmap = BitmapFactory.decodeResource(con.getResources(), R.drawable.blue_back);
+		bitmap = BitmapFactory.decodeResource(game.getResources(), R.drawable.blue_back);
 	}
     public boolean col(int x, int y){
         if (x >= this.x1 && x < (this.x1 + (bitmap.getWidth()) )

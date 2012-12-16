@@ -12,16 +12,17 @@ GestureDetector.OnDoubleTapListener
 {
 
     private Game game;
+    private MainActivity main;
     private static final int SWIPE_MIN_DISTANCE = 100;
     private static final int SWIPE_MAX_OFF_PATH = 250;
-    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 75;
     
     private DeckHolder deckView = null;
     private TableHolder tableView = null;
-
-    public Gestures(Game game)
+    public Gestures(Game game, MainActivity main)
     {
        this.game = game;
+       this.main = main;
        this.deckView = game.getDeckHolder();
        this.tableView = game.getTableHolder();
 
@@ -31,7 +32,7 @@ GestureDetector.OnDoubleTapListener
     public boolean onDoubleTap(MotionEvent e)
     {
         //To select a card and send to pile
-        Toast.makeText(game.getApplicationContext(), "Double Tap", Toast.LENGTH_SHORT).show();
+        Toast.makeText(main.getApplicationContext(), "Double Tap", Toast.LENGTH_SHORT).show();
         return false;
     }
 
@@ -53,18 +54,13 @@ GestureDetector.OnDoubleTapListener
         Rect bondsTV=tableView.getBounds();
 
         if(bondsDV.contains(x, y)){
-            Toast.makeText(game.getApplicationContext(), "DeckView", Toast.LENGTH_SHORT).show();
-            ArrayList<Card> deckCards = new ArrayList<Card>();
-            deckCards.addAll((deckView.getDeck().getDeck()));
-            for(Card c :deckCards){
-            	if(c.getBounds().contains(x, y)){
-            		c.setTouched(true);
-            	}
-            	
-            }
+        	int y2=y-bondsDV.top;
+            Toast.makeText(main.getApplicationContext(), "DeckView", Toast.LENGTH_SHORT).show();
+
+        	game.deckViewTouched(x, y2);
         }
         else if(bondsTV.contains(x, y)){
-            Toast.makeText(game.getApplicationContext(), "TableView", Toast.LENGTH_SHORT).show();
+            Toast.makeText(main.getApplicationContext(), "TableView", Toast.LENGTH_SHORT).show();
         }
         return false;
     }
@@ -77,19 +73,17 @@ GestureDetector.OnDoubleTapListener
     }
 
     @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-            float velocityY)
-    {
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY){
         //to move through cards in hand (fix sensitvity in up and down)
         try {
             if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
                 return false;
             // right to left swipe
                 if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    Toast.makeText(game.getApplicationContext(), "Left Swipe", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(game.getApplicationContext(), "Left Swipe", Toast.LENGTH_SHORT).show();
                     this.deckView.swipeLeft();
                 } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                    Toast.makeText(game.getApplicationContext(), "Right Swipe", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(game.getApplicationContext(), "Right Swipe", Toast.LENGTH_SHORT).show();
                     this.deckView.swipeRight();
                 }
                 else if(e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {

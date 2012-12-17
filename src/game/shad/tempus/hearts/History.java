@@ -21,7 +21,7 @@ public class History extends  Activity{
     public String loadPath = "";
     public File path;
     public int winnerCount = 1;
-    public int totalWins =1;
+    public int totalWins =10;
 
     //So far only 10 files for Saves.
     public void onCreate(Bundle savedInstanceState) {

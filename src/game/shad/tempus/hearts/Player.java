@@ -81,24 +81,24 @@ public class Player {
 	 * @return
 	 */
 	public Card go(int round, Trick trick){
-		Log.d(TAG, "player.go ="+this.realName);
+		Log.d(TAG+this.getRealName(), "player.go ="+this.realName);
 		
 		if(trick.getSize()==0){	
-			Log.d(TAG, "First Card of Pile");
+			Log.d(TAG+this.getRealName(), "First Card of Pile");
 			//TODO add more AI smarts here
 			return playLow(getLargestSuit(), 0);
 		}
 		
 		int startSuit=trick.getCard(0).getSuit();
-		Log.d(TAG, "Start suit is "+startSuit);
+		Log.d(TAG+this.getRealName(), "Start suit is "+startSuit);
 		if(checkVoid(startSuit)){//This is the void CODE
 			if(hasQueen){
-				Log.d(TAG, "Queencheck = true");
+				Log.d(TAG+this.getRealName(), "Queencheck = true");
 				if(game.round!=1){
 					return getQueen();
 				}
 			}
-			Log.d(TAG, "void--PlayHigh(getLargestSuit)");
+			Log.d(TAG+this.getRealName(), "void--PlayHigh(getLargestSuit)");
 			if(game.round==1){
 				playHighDontBreakHearts(); //Play a high card but no points!
 			}
@@ -110,7 +110,7 @@ public class Player {
 		switch (state){  //Set at the start of each round. Basically says where in the rotation does this player sit.
 		//No case 1: that is for picking start card.  Taken care of above.
 		case 2:
-			Log.d(TAG, "Seat 2!");
+			Log.d(TAG+this.getRealName(), "Seat 2!");
 
 			switch (round){
 			case 1: 
@@ -121,7 +121,7 @@ public class Player {
 			case 5:
 			case 6:
 			case 7:
-				Log.d(TAG, "round 0-7 --PlayLow("+startSuit+")");
+				Log.d(TAG+this.getRealName(), "round 0-7 --PlayLow("+startSuit+")");
 				return playLowSimple(startSuit, 0);
 			case 8:
 			case 9:
@@ -130,11 +130,11 @@ public class Player {
 			case 12:			
 			case 13:
 
-				Log.d(TAG, "round 8-12 --PlayLow("+startSuit+")");
+				Log.d(TAG+this.getRealName(), "round 8-12 --PlayLow("+startSuit+")");
 				return playLowSimple(startSuit, 0);
 			}
 		case 3:
-			Log.d(TAG, "Seat 3!");
+			Log.d(TAG+this.getRealName(), "Seat 3!");
 			switch (round){
 			case 1: 
 				return playHighSimple(0, 0);
@@ -151,7 +151,7 @@ public class Player {
 			case 12:
 			case 13:
 				if(trickHasPoints){
-					Log.d(TAG, "Play low/CardBelow--POINTS in pile!!");
+					Log.d(TAG+this.getRealName(), "Play low/CardBelow--POINTS in pile!!");
 					return getDeckCardBelow(trick.getHighCard(), false);
 				}
 				if(trickNegativePoints)
@@ -165,9 +165,9 @@ public class Player {
 			if(round==1){
 				playHighSimple(0, 0);
 			}
-			Log.d(TAG, "Seat 4!");
+			Log.d(TAG+this.getRealName(), "Seat 4!");
 			if(trickHasPoints){
-				Log.d(TAG, "Play below highest in pile --POINTS in pile!!");
+				Log.d(TAG+this.getRealName(), "Play below highest in pile --POINTS in pile!!");
 				return getDeckCardBelow(trick.getHighCard(), true);
 			}
 			else if(startSuit==2 && hasQueen){
@@ -181,8 +181,8 @@ public class Player {
 			return playHighSimple(startSuit, 0);
 		}
 			
-		Log.d(TAG, "Out of all Loops !!SHOULD NOT HAPPEN!!--PlayHigh("+startSuit+")");
-		Log.d(TAG, "retuning 2 2 to not crash CODE!");
+		Log.d(TAG+this.getRealName(), "Out of all Loops !!SHOULD NOT HAPPEN!!--PlayHigh("+startSuit+")");
+		Log.d(TAG+this.getRealName(), "retuning 2 2 to not crash CODE!");
 
 		Toast.makeText(main, "OUT OF CARDS!!", Toast.LENGTH_SHORT).show();
 		Card oddBall = new Card(3, 0, game);
@@ -202,61 +202,61 @@ public class Player {
 		Card nextCard = null;
 
 		if(count>6){
-			Log.d(TAG, "PlayLow is Out of cards!!!");
+			Log.d(TAG+this.getRealName(), "PlayLow is Out of cards!!!");
 			return new Card(3, 0, game);	//Red back card
 		}
 		switch(suit){
 			case 0:
 				if(clubs.getSize()==0){
-					Log.d(TAG, "out of Clubs");
+					Log.d(TAG+this.getRealName(), "out of Clubs");
 	
 					return playLow(++suit, ++count);
 				}
-				Log.d(TAG, "Playing Club");
+				Log.d(TAG+this.getRealName(), "Playing Club");
 				nextCard = this.clubs.getCard(0);
 				return nextCard;
 			case 1:
 				if(diamonds.getSize()==0){
-					Log.d(TAG, "out of Diamonds");
+					Log.d(TAG+this.getRealName(), "out of Diamonds");
 	
 					return playLow(++suit, ++count);
 				}
-				Log.d(TAG, "Playing Diamond");
+				Log.d(TAG+this.getRealName(), "Playing Diamond");
 				nextCard=diamonds.getCard(0);
 				return nextCard;
 			case 2:
 				if(spades.getSize()==0){			
-					Log.d(TAG, "out of Spades");
+					Log.d(TAG+this.getRealName(), "out of Spades");
 					return playLow(++suit, ++count);
 				}
-				Log.d(TAG, "Playing Spade");
+				Log.d(TAG+this.getRealName(), "Playing Spade");
 	
 				nextCard=spades.getCard(0);
 				if(spades.getSize()>1 && nextCard.getValue()==12){	//This should fix dropping queen on self
-					Log.d(TAG, "play low, trying to playing queen");
+					Log.d(TAG+this.getRealName(), "play low, trying to playing queen");
 					nextCard=spades.getCard(1);
 					return nextCard;
 				}
 				return nextCard;
 			case 3: 
 				if(hearts.getSize()==0){
-					Log.d(TAG, "out of Hearts");
+					Log.d(TAG+this.getRealName(), "out of Hearts");
 					return playLow(0, ++count);
 				}
 				else if(game.heartsBroken||game.trading){
-					Log.d(TAG, "Playing Hearts");
+					Log.d(TAG+this.getRealName(), "Playing Hearts");
 					nextCard=hearts.getCard(0);
 					this.playingVoid=false;
 					return nextCard;
 				}
 				else{
-					Log.d(TAG, "hearts not broken!");
+					Log.d(TAG+this.getRealName(), "hearts not broken!");
 					return playLow(0, ++count);
 				}
 			case 4:
-				Log.d(TAG, "Error no suit 4!");
+				Log.d(TAG+this.getRealName(), "Error no suit 4!");
 			}	
-		Log.d(TAG, "count="+count);
+		Log.d(TAG+this.getRealName(), "count="+count);
 		
 		return new Card(3, 0, game);
 	}
@@ -272,61 +272,61 @@ public class Player {
 		Log.d(TAG+this.getRealName(), "Play High");
 		Card nextCard = null;
 		if(count>6){
-			Log.d(TAG, "Out of cards!!!");
+			Log.d(TAG+this.getRealName(), "Out of cards!!!");
 			return new Card(3, 0, game); //Red back card
 		}
 		switch(suit){
 		case 0:
 			if(clubs.getSize()==0){  //if suit is empty just recall this method with a higher suit.
-				Log.d(TAG, "out of Clubs");
+				Log.d(TAG+this.getRealName(), "out of Clubs");
 				return playHigh(++suit, ++count);
 			}
 			else{
-				Log.d(TAG, "Playing Club");
+				Log.d(TAG+this.getRealName(), "Playing Club");
 				nextCard = clubs.getCard(clubs.getSize()-1);
-				Log.d(TAG, nextCard.toString());
+				Log.d(TAG+this.getRealName(), nextCard.toString());
 				return nextCard;
 			}	
 		case 1:
 			if(diamonds.getSize()==0){
-				Log.d(TAG, "out of Diamonds");
+				Log.d(TAG+this.getRealName(), "out of Diamonds");
 				return playHigh(++suit, ++count);
 			}
 			else{
-				Log.d(TAG, "Playing Diamond");
+				Log.d(TAG+this.getRealName(), "Playing Diamond");
 				nextCard=diamonds.getCard(diamonds.getSize()-1);
-				Log.d(TAG, nextCard.toString());
+				Log.d(TAG+this.getRealName(), nextCard.toString());
 				return nextCard;
 			}
 		case 2:
 			if(spades.getSize()==0){
-				Log.d(TAG, "out of Spades");
+				Log.d(TAG+this.getRealName(), "out of Spades");
 				return playHigh(++suit, ++count);
 			}else{
-				Log.d(TAG, "Playing Spade");
+				Log.d(TAG+this.getRealName(), "Playing Spade");
 				nextCard=spades.getCard(spades.getSize()-1);
 				if(spades.getSize()>1 && nextCard.getValue()==12 && !game.trading){	//This should fix dropping queen on self
-					Log.d(TAG, "play high, trying to playing queen");
+					Log.d(TAG+this.getRealName(), "play high, trying to playing queen");
 					nextCard=spades.getCard(spades.getSize()-2);
 					return nextCard;
 				}
 				spades.removeCardAtIndex(spades.getSize()-1);
-				Log.d(TAG, nextCard.toString());
+				Log.d(TAG+this.getRealName(), nextCard.toString());
 				return nextCard;
 			}
 		case 3: 
 			if(hearts.getSize()==0){
-				Log.d(TAG, "out of Hearts");
+				Log.d(TAG+this.getRealName(), "out of Hearts");
 				return playHigh(0, ++count);
 			}else if(game.heartsBroken||playingVoid||game.trading){
-				Log.d(TAG, "Playing heart");
+				Log.d(TAG+this.getRealName(), "Playing heart");
 				nextCard=hearts.getCard(hearts.getSize()-1);
-				Log.d(TAG, nextCard.toString());
+				Log.d(TAG+this.getRealName(), nextCard.toString());
 				this.playingVoid=false;
 				return nextCard;
 			}
 			else{
-				Log.d(TAG, "hearts not broken!");
+				Log.d(TAG+this.getRealName(), "hearts not broken!");
 				playHigh(0, ++count);
 			}
 		}
@@ -345,14 +345,14 @@ public class Player {
 			if(c.getValue()==12){
 				card = c;
 				
-				Log.d(TAG, "PLAYING queen from deck for "+this.getRealName());
+				Log.d(TAG+this.getRealName(), "PLAYING queen from deck for "+this.getRealName());
 				hasQueen = false;
 				break;
 			}
 		}
 //		spades.removeCard(card);	//remove it from the suit deck
 		if(card==null){
-			Log.d(TAG, "Returning Null, no Queen in DECK!  Should have done a QueenCheck");
+			Log.d(TAG+this.getRealName(), "Returning Null, no Queen in DECK!  Should have done a QueenCheck");
 		}
 		return card;
 	}
@@ -362,7 +362,7 @@ public class Player {
 	 * @return
 	 */
 	private Card playHighDontBreakHearts(){
-		Log.d(TAG, "voidPlayHighHearts");
+		Log.d(TAG+this.getRealName(), "voidPlayHighHearts");
 		switch(getLargestSuit()){
 		case 0:
 			return playHigh(0, 0);
@@ -371,10 +371,10 @@ public class Player {
 		case 2:
 			return playHigh(2, 0);
 		case 3:
-			Log.d(TAG, "Trying to play hearts on void, Attempting next best... playLow(clubs).");
+			Log.d(TAG+this.getRealName(), "Trying to play hearts on void, Attempting next best... playLow(clubs).");
 			return playLow(0, 0);
 		default:
-			Log.d(TAG, "out of loop, playing  clubs.");
+			Log.d(TAG+this.getRealName(), "out of loop, playing  clubs.");
 			return playHigh(0, 0);
 
 
@@ -390,7 +390,7 @@ public class Player {
 	 * @return playLow(getLagerstSuit());
 	 */
 	private Card playLowDontBreakHearts(){
-		Log.d(TAG, "voidPlayHighHearts");
+		Log.d(TAG+this.getRealName(), "voidPlayHighHearts");
 		switch(getLargestSuit()){
 		case 0:
 			return playLow(0, 0);
@@ -399,10 +399,10 @@ public class Player {
 		case 2:
 			return playLow(2, 0);
 		case 3:
-			Log.d(TAG, "Trying to play hearts on void, Attempting next best... playLow(clubs).");
+			Log.d(TAG+this.getRealName(), "Trying to play hearts on void, Attempting next best... playLow(clubs).");
 			return playLow(0, 0);
 		default:
-			Log.d(TAG, "out of loop, playing  clubs.");
+			Log.d(TAG+this.getRealName(), "out of loop, playing  clubs.");
 			return playHigh(0, 0);
 
 		}
@@ -410,7 +410,7 @@ public class Player {
 	}
 	
 	private Card playLargestSuitHighCard(){
-		Log.d(TAG, "voidPlayHighHearts");
+		Log.d(TAG+this.getRealName(), "voidPlayHighHearts");
 		switch(getLargestSuit()){
 			case 0:
 				return playHigh(0, 0);
@@ -421,7 +421,7 @@ public class Player {
 			case 3:
 				return playHigh(3, 0);
 			default:
-				Log.d(TAG, "out of loop");
+				Log.d(TAG+this.getRealName(), "out of loop");
 				return playHigh(0, 0);
 	
 		}
@@ -453,7 +453,7 @@ public class Player {
 			}
 
 		}
-		Log.d(TAG, "Largest suit position is ="+position);
+		Log.d(TAG+this.getRealName(), "Largest suit position is ="+position);
 		return position;
 			
 	}
@@ -465,7 +465,7 @@ public class Player {
 	 * @param c
 	 */
 	private Card getDeckCardBelow(Card c, boolean lastPlayer){
-		Log.d(TAG, "Checking for a card below "+c.toString());
+		Log.d(TAG+this.getRealName(), "Checking for a card below "+c.toString());
 		int top = c.getValue();
 		Card bestPick = new Card(0, -1, game);
 		switch (c.getSuit()){
@@ -509,11 +509,11 @@ public class Player {
 		}
 		if(bestPick.getSuit()==-1)
 			if(lastPlayer){
-				Log.d(TAG, "No card found, Last Card in trick sooo, play high and save lower cards for later");
+				Log.d(TAG+this.getRealName(), "No card found, Last Card in trick sooo, play high and save lower cards for later");
 				return playHigh(c.getSuit(), 0);
 			}
 			else{
-				Log.d(TAG, "No card found, Playing next best");
+				Log.d(TAG+this.getRealName(), "No card found, Playing next best");
 				return playLow(c.getSuit(), 0);
 			}
 		return bestPick;
@@ -534,7 +534,7 @@ public class Player {
 	 * @return
 	 */
 	public boolean checkForCardsHigher(Deck cards, int valueToCheck){
-		Log.d(TAG, "Checking for higher cards than " + valueToCheck + " for "+this.getRealName());
+		Log.d(TAG+this.getRealName(), "Checking for higher cards than " + valueToCheck + " for "+this.getRealName());
 		int suitToCheck = cards.getCard(0).getSuit();
 		for(Card c :cards.getDeck()){
 			if(c.getSuit()==suitToCheck){
@@ -573,7 +573,7 @@ public class Player {
 	 * Claims Cards for owner.
 	 */
 	public void sortHandFromDeck() {
-		Log.d(TAG, "Sorting hand from deck");
+		Log.d(TAG+this.getRealName(), "Sorting hand from deck");
 		sortSuitsFromDeck();	
         updateDeckFromSuits();	//to rearrange deck nicely
 	}
@@ -585,8 +585,8 @@ public class Player {
 	public void sortSuitsFromDeck(){
 		Deck thand = new Deck();
 		thand.addAllCards(deck);
-		Log.d(TAG, "sorting hand for "+this.realName);
-		Log.d(TAG, "deck size is "+thand.getSize());
+		Log.d(TAG+this.getRealName(), "sorting hand for "+this.realName);
+		Log.d(TAG+this.getRealName(), "deck size is "+thand.getSize());
 		int hc = 0;  //high club
         int hd = 0;  //high diamond
         int hs = 0;  //high spade
@@ -676,7 +676,7 @@ public class Player {
 	 * Clears deck and replaces it with a new Deck from the suit arrays.
 	 */
 	public void updateDeckFromSuits(){
-		Log.d(TAG, "updateDeckfromSuits for "+this.realName);
+		Log.d(TAG+this.getRealName(), "updateDeckfromSuits for "+this.realName);
 		this.deck.clearALL();
         Deck newDeck = new  Deck();
         newDeck.addAllCards(this.clubs);
@@ -684,7 +684,7 @@ public class Player {
         newDeck.addAllCards(this.spades);
         newDeck.addAllCards(this.hearts);
         this.deck.addAllCards(newDeck);
-		Log.d(TAG, "deck size= "+deck.getSize());
+		Log.d(TAG+this.getRealName(), "deck size= "+deck.getSize());
 
         
 	}
@@ -694,7 +694,7 @@ public class Player {
 	 * @param Deck of cards
 	 */
 	public void updateDeckCards(Deck cards){
-		Log.d(TAG, "updateDeckCards for "+this.realName);
+		Log.d(TAG+this.getRealName(), "updateDeckCards for "+this.realName);
 		deck.clearALL();
 		for(int i = 0; i<cards.getSize();i++){
 			this.deck.addCard(cards.getCard(i));
@@ -708,7 +708,7 @@ public class Player {
 	 * @return 
 	 */
 	public synchronized void updateSuitsFast(){
-		Log.d(TAG, "updateSuits for "+this.realName);
+		Log.d(TAG+this.getRealName(), "updateSuits for "+this.realName);
 		clubs.clearALL();
 		diamonds.clearALL();
 		spades.clearALL();
@@ -739,7 +739,7 @@ public class Player {
 	 * @return true if has points
 	 */
 	public int checkForPoints(ArrayList<Card> c) {
-		Log.d(TAG, "checkForPoints for "+this.realName);
+		Log.d(TAG+this.getRealName(), "checkForPoints for "+this.realName);
 		int points=0;
 		for(int i=0; i<c.size();i++){
 			int curCard = c.get(i).getValue();
@@ -760,7 +760,7 @@ public class Player {
 				points++;
 			}
 		}
-		Log.d(TAG, "Points found= "+points);
+		Log.d(TAG+this.getRealName(), "Points found= "+points);
 		return points;
 	}
 	//////////////////////////////////////////Check for ******//////////////////////////////////////
@@ -769,8 +769,8 @@ public class Player {
 	 * @return true if player has Two of Clubs in deck
 	 */
 	public boolean checkForTwo(){
-		Log.d(TAG, "checkForTwo for "+this.realName);
-		Log.d(TAG, "Deck Size is="+this.deck.getSize());
+		Log.d(TAG+this.getRealName(), "checkForTwo for "+this.realName);
+		Log.d(TAG+this.getRealName(), "Deck Size is="+this.deck.getSize());
 		for (int i=0;i<3;i++){//Should only need to check the first two the rest is overkill.
 			if(this.deck.getCard(i).getValue()==(2)&&this.deck.getCard(i).getSuit()==(0)){	
 				twoOfClubs = this.deck.getCard(i);
@@ -784,7 +784,7 @@ public class Player {
 	 * Call this to check size of suits and set boolean voids.
 	 */
 	public void checkForVoids(){ 	
-		Log.d(TAG, "checkForVoids for "+this.realName);
+		Log.d(TAG+this.getRealName(), "checkForVoids for "+this.realName);
 		int empty =0;
 		if(clubs.getSize()==0){
 			empty++;
@@ -814,7 +814,7 @@ public class Player {
 		else
 			this.voidHearts = false;
 		if(empty==4){
-			Log.d(TAG, "The ship is SINKING!!, we are out of cards");
+			Log.d(TAG+this.getRealName(), "The ship is SINKING!!, we are out of cards");
 		}
 		
 
@@ -825,7 +825,7 @@ public class Player {
 	 * Sets hasQueen boolean.
 	 */
 	public void checkForQueen(){
-		Log.d(TAG, "QueenCheck for "+this.realName);
+		Log.d(TAG+this.getRealName(), "QueenCheck for "+this.realName);
 		for(Card c: spades.getDeck()){
 			if(c.getValue()==12){
 				this.hasQueen = true;
@@ -862,10 +862,10 @@ public class Player {
 	 */
 	public void getCardsToTrade(){
 		this.cardsToTrade.clear();
-		Log.d(TAG+"-Trading", "Finding Cards to trade for "+this.getRealName());
+		Log.d(TAG+this.getRealName()+"-Trading", "Finding Cards to trade for "+this.getRealName());
 		ArrayList<Card> worstCards = new ArrayList<Card>();
 		if(hasQueen){
-			Log.d(TAG+"-Trading", "Trading the Queen");
+			Log.d(TAG+this.getRealName()+"-Trading", "Trading the Queen");
 			worstCards.add(getQueen());
 		}
 		else{
@@ -884,7 +884,7 @@ public class Player {
 	 * @return
 	 */
 	private synchronized Card getTradingCard(){
-		Log.d(TAG, "");
+		Log.d(TAG+this.getRealName(), "");
 		Card c = null;
 		switch(getLargestSuit()){
 			case 0:
@@ -906,7 +906,7 @@ public class Player {
 		}
 		c.setTouched(false);
 		this.deck.removeCard(c);
-		Log.d(TAG, "card to trade ===="+c.toString());
+		Log.d(TAG+this.getRealName(), "card to trade ===="+c.toString());
 		return c;
 				
 	}
@@ -917,7 +917,7 @@ public class Player {
 	 * Should update deck/suits after this
 	 */
 	public void addCardsToDeck(ArrayList<Card> cards){
-		Log.d(TAG, "Cards to be added for "+this.getRealName());
+		Log.d(TAG+this.getRealName(), "Cards to be added for "+this.getRealName());
 		this.deck.addCards(cards);
 	}
 	
@@ -927,7 +927,7 @@ public class Player {
 	 * Should update deck/suits after this
 	 */
 	public void removeCardsFromDeck(ArrayList<Card> cards){
-		Log.d(TAG, "Cards to be Removed for "+this.getRealName());
+		Log.d(TAG+this.getRealName(), "Cards to be Removed for "+this.getRealName());
 		this.deck.removeCards(cards);
 	}
 	
@@ -947,48 +947,48 @@ public class Player {
 		Card nextCard = null;
 
 		if(count>6){
-			Log.d(TAG, "PlayLow is Out of cards!!!");
+			Log.d(TAG+this.getRealName(), "PlayLow is Out of cards!!!");
 			return new Card(3, 0, game);	//Red back card
 		}
 		switch(suit){
 			case 0:
 				if(clubs.getSize()==0){
-					Log.d(TAG, "out of Clubs");
+					Log.d(TAG+this.getRealName(), "out of Clubs");
 					return playLow(++suit, ++count);
 				}
-				Log.d(TAG, "Playing Club");
+				Log.d(TAG+this.getRealName(), "Playing Club");
 				nextCard = this.clubs.getCard(0);
 				return nextCard;
 			case 1:
 				if(diamonds.getSize()==0){
-					Log.d(TAG, "out of Diamonds");
+					Log.d(TAG+this.getRealName(), "out of Diamonds");
 	
 					return playLow(++suit, ++count);
 				}
-				Log.d(TAG, "Playing Diamond");
+				Log.d(TAG+this.getRealName(), "Playing Diamond");
 				nextCard=diamonds.getCard(0);
 				return nextCard;
 			case 2:
 				if(spades.getSize()==0){			
-					Log.d(TAG, "out of Spades");
+					Log.d(TAG+this.getRealName(), "out of Spades");
 					return playLow(++suit, ++count);
 				}
-				Log.d(TAG, "Playing Spade");
+				Log.d(TAG+this.getRealName(), "Playing Spade");
 				nextCard=spades.getCard(0);
 				return nextCard;
 	
 			case 3: 
 				if(hearts.getSize()==0){
-					Log.d(TAG, "out of Hearts");
+					Log.d(TAG+this.getRealName(), "out of Hearts");
 					return playLow(0, ++count);
 				}
-				Log.d(TAG, "Playing Hearts");
+				Log.d(TAG+this.getRealName(), "Playing Hearts");
 					nextCard=hearts.getCard(0);
 					return nextCard;
 			case 4:
-				Log.d(TAG, "Error no suit 4!");
+				Log.d(TAG+this.getRealName(), "Error no suit 4!");
 			}	
-		Log.d(TAG, "count="+count);
+		Log.d(TAG+this.getRealName(), "count="+count);
 		
 		return new Card(3, 0, game);
 	}
@@ -1004,51 +1004,51 @@ public class Player {
 		Log.d(TAG+this.getRealName(), "Play HighSimple");
 		Card nextCard = null;
 		if(count>6){
-			Log.d(TAG, "Out of cards!!!");
+			Log.d(TAG+this.getRealName(), "Out of cards!!!");
 			return new Card(3, 0, game); //Red back card
 		}
 		switch(suit){
 		case 0:
 			if(clubs.getSize()==0){  //if suit is empty just recall this method with a higher suit.
-				Log.d(TAG, "out of Clubs");
+				Log.d(TAG+this.getRealName(), "out of Clubs");
 				return playHigh(++suit, ++count);
 			}
 			else{
-				Log.d(TAG, "Playing Club");
+				Log.d(TAG+this.getRealName(), "Playing Club");
 				nextCard = clubs.getCard(clubs.getSize()-1);
 				return nextCard;
 			}	
 		case 1:
 			if(diamonds.getSize()==0){
-				Log.d(TAG, "out of Diamonds");
+				Log.d(TAG+this.getRealName(), "out of Diamonds");
 				return playHigh(++suit, ++count);
 			}
 			else{
-				Log.d(TAG, "Playing Diamond");
+				Log.d(TAG+this.getRealName(), "Playing Diamond");
 				nextCard=diamonds.getCard(diamonds.getSize()-1);
 				return nextCard;
 			}
 		case 2:
 			if(spades.getSize()==0){
-				Log.d(TAG, "out of Spades");
+				Log.d(TAG+this.getRealName(), "out of Spades");
 				return playHigh(++suit, ++count);
 			}else{
-				Log.d(TAG, "Playing Spade");
+				Log.d(TAG+this.getRealName(), "Playing Spade");
 				nextCard=spades.getCard(spades.getSize()-1);
 				return nextCard;
 			}
 		case 3: 
 			if(hearts.getSize()==0){
-				Log.d(TAG, "out of Hearts");
+				Log.d(TAG+this.getRealName(), "out of Hearts");
 				return playHigh(0, ++count);
 			}
-			Log.d(TAG, "Playing heart");
+			Log.d(TAG+this.getRealName(), "Playing heart");
 			nextCard=hearts.getCard(hearts.getSize()-1);
-			Log.d(TAG, nextCard.toString());
+			Log.d(TAG+this.getRealName(), nextCard.toString());
 			return nextCard;
 			
 		case 4:
-			Log.d(TAG, "Error should not be case 4");
+			Log.d(TAG+this.getRealName(), "Error should not be case 4");
 		}
 		return nextCard;
 	}
@@ -1088,7 +1088,7 @@ public class Player {
 	}
 	
 	public void addToScore(int score){
-		Log.d(TAG, "Adding to score ="+score);
+		Log.d(TAG+this.getRealName(), "Adding to score ="+score);
 		this.score += score;
 	}
 	public void addToTotalScore(int i){
@@ -1122,7 +1122,7 @@ public class Player {
 	public void setClubs(Deck c){
 		this.clubs.clearALL();
 		this.clubs.addAllCards(c);
-		Log.d(TAG, "clubs.size="+clubs.getSize());
+		Log.d(TAG+this.getRealName(), "clubs.size="+clubs.getSize());
 	}
 	/**
 	 * Clears the deck then sets it
@@ -1132,7 +1132,7 @@ public class Player {
 	public void setDiamonds(Deck d){
 		this.diamonds.clearALL();
 		this.diamonds.addAllCards(d);
-		Log.d(TAG, "Diamonds.size="+diamonds.getSize());
+		Log.d(TAG+this.getRealName(), "Diamonds.size="+diamonds.getSize());
 	}
 	/**
 	 * Clears the deck then sets it
@@ -1142,7 +1142,7 @@ public class Player {
 	public void setSpades(Deck s){
 		this.spades.clearALL();
 		this.spades.addAllCards(s);
-		Log.d(TAG, "Spades.size="+spades.getSize());
+		Log.d(TAG+this.getRealName(), "Spades.size="+spades.getSize());
 	}
 	/**
 	 * Clears the deck then sets it
@@ -1152,7 +1152,7 @@ public class Player {
 	public void setHearts(Deck h){
 		this.hearts.clearALL();
 		this.hearts.addAllCards(h);
-		Log.d(TAG, "Hearts.size="+hearts.getSize());
+		Log.d(TAG+this.getRealName(), "Hearts.size="+hearts.getSize());
 	}
 	
 	public Deck getClubs(){

@@ -50,7 +50,6 @@ public class Game extends Activity {
 	
 	private Deck cardDeck=new Deck();
 	private Trick tableTrick=new Trick();
-	private Deck blankCards=new Deck();
 	
     public Player p1;
 	public Player p2;
@@ -68,6 +67,7 @@ public class Game extends Activity {
     public boolean playing 			= false;  //initialized to false but set true during check for 2
     public boolean heartsBroken 	= false;
     public boolean restart 			= false;
+    public boolean gameOver 		= false; 
     public boolean cardCounterB		= false;
     public boolean newRound			= false;
     public boolean trading 			= false; 
@@ -105,7 +105,6 @@ public class Game extends Activity {
 	//////////////////////gameview stuff
 
 	
-	private Canvas deckHolderCanvas = null;
 	private Canvas tableHolderCanvas = null;
 	private Canvas p1HolderCanvas = null;
 	private Canvas p2HolderCanvas = null;
@@ -120,8 +119,6 @@ public class Game extends Activity {
     private LinearLayout tableRightView;
     
     private Button playCard;
-    private Button leftButton;
-    private Button rightButton;
     
     public DeckHolder deckHolder;
     public SlidingDeckHolder slidingDeckHolder;
@@ -353,10 +350,10 @@ public class Game extends Activity {
 				Deck deck2 = new Deck();
 				deck2.addAllCards(cardDeck);
 				while(x<z){
-					decks.addAll(splitDeck(deck2));
+					decks=(splitDeck(deck2));
 					Log.d(TAG, "the deck is "+decks.size());
 					deck2.clearALL();
-					deck2.addAllCards(mixOutIn(decks));
+					deck2 = (mixOutIn(decks));
 					decks.clear();
 					x++;
 				}	
@@ -384,7 +381,10 @@ public class Game extends Activity {
 				t--;
 			}
 			decks.add(deck2);
+			Log.d(TAG, "deck size="+ deck2.getSize());
+
 		}
+		Log.d(TAG, "final cards size="+ a.getSize());
 		decks.add(a);
 		return decks;
 	}
@@ -943,6 +943,7 @@ public class Game extends Activity {
 	public boolean endGameCheck(){
 		if(p1.getScore()>=pointsTillEndGame){
 			Log.d(TAG, "Player 1 LOOSES");
+			
 			return true;
 		}
 		if(p2.getScore()>=pointsTillEndGame){
@@ -968,7 +969,8 @@ public class Game extends Activity {
 	 * Called when endGameCheck returns true, Stops the game and sets winner.
 	 */
 	private void gameOver(){
-		curPlayer =winnerCheck();
+		gameOver=true;
+		winnerCheck();
 		if(main.gt.fullAutoRun)
 			main.gt.fullAutoRun=!main.gt.fullAutoRun;
 		main.gt.autoRunState.compareAndSet(AutoRunState.RUNNING,  AutoRunState.PAUSED);
@@ -977,13 +979,15 @@ public class Game extends Activity {
 		bottomText.setText(curPlayer.getRealName()+" WON THE GAME!!!");
 		bottomText2.append("Press menu, then Exit to play again.");
 		Toast.makeText(context, curPlayer.getRealName() + " Won the GAME!!",  Toast.LENGTH_LONG).show();
+		saveGameStats(curPlayer.getRealName());
+
 	}
 	
 	/**
 	 * Finds lowest scoring player and set winner to true.
 	 * Does less than or equal to...should be just less than or tie.
 	 */
-	public Player winnerCheck(){//this prob needs some rework
+	public void winnerCheck(){//this prob needs some rework
 		Log.d(TAG, "winnerCheck()");
 		int scorep1 = p1.getScore();
 		int scorep2 = p2.getScore();
@@ -995,22 +999,24 @@ public class Game extends Activity {
 				if(scorep1<=scorep4){
 					Log.d(TAG, "YOU WON");
 					p1.winner=true;
-					saveGameStats(p1.getRealName());
-
-					return p1;
+//					saveGameStats(p1.getRealName());
+					curPlayer=p1;
+					return;
 				}
 				else{
-					Log.d(TAG, "P4 WON");
+					Log.d(TAG, "P4 WON-2");
 					p4.winner=true;
-					saveGameStats(p4.getRealName());
-					return p4;
+//					saveGameStats(p4.getRealName());
+					curPlayer=p4;
+					return;
 				}
 			}
 			else if(scorep3<=scorep4){
 				Log.d(TAG, "P3 WON");
 				p3.winner=true;
-				saveGameStats(p3.getRealName());
-				return p3;
+//				saveGameStats(p3.getRealName());
+				curPlayer=p3;
+				return;
 			}
 
 		}
@@ -1018,32 +1024,35 @@ public class Game extends Activity {
 			if(scorep2<=scorep4){
 				Log.d(TAG, "P2 WON");
 				p2.winner=true;
-				saveGameStats(p2.getRealName());
-				return p2;
+//				saveGameStats(p2.getRealName());
+				curPlayer=p2;
+				return;
 			}
 			else{
-				Log.d(TAG, "P4 WON");
+				Log.d(TAG, "P4 WON-3");
 				p4.winner=true;
-				saveGameStats(p4.getRealName());
-				return p4;
+//				saveGameStats(p4.getRealName());
+				curPlayer=p4;
+				return;
 				
 			}
 		}
 		else if(scorep3<=scorep4){
 				Log.d(TAG, "P3 WON");
 				p3.winner=true;
-				saveGameStats(p3.getRealName());
-				return p3;
+//				saveGameStats(p3.getRealName());
+				curPlayer=p3;
+
+				return;
 			}
 			else{
-				Log.d(TAG, "P4 WON");
+				Log.d(TAG, "P4 WON-4");
 				p4.winner=true;
-				saveGameStats(p4.getRealName());
-				return p4;
+//				saveGameStats(p4.getRealName());
+				curPlayer=p4;
+				return ;
 				
 			}
-		Log.d(TAG, "returning null on winner");
-		return null;
 	}
 		
 	
@@ -1484,8 +1493,11 @@ public class Game extends Activity {
 	    if(wonCount>10){
 	    	wonCount=1;
 	    }
-  		String jsonData = writeJSON();
-  		Log.d(TAG, jsonData.length()+"");
+	    JSONObject jsonData = writeJSON();
+	    Log.d(TAG, jsonData.length()+"");
+		Log.d(TAG, jsonData.toString());
+		
+
 	    try {
 			saveToSD("winner"+wonCount, jsonData);
 		} catch (FileNotFoundException e) {
@@ -1505,7 +1517,7 @@ public class Game extends Activity {
      * @param v
      * @throws FileNotFoundException
      */
-    public void saveToSD(String fileName, String data) throws FileNotFoundException{
+    public void saveToSD(String fileName, JSONObject data) throws FileNotFoundException{
     	Log.d(TAG, "Saving new save file to\n"+path+fileName+".txt");
     	File file = new File(path, fileName+".txt");
 		    	
@@ -1516,7 +1528,12 @@ public class Game extends Activity {
 	    	try {
 	    		FileOutputStream logWriter = new FileOutputStream(file);
 	    		BufferedOutputStream out = new BufferedOutputStream(logWriter);
-	    		out.write(data.getBytes("UTF-8"));
+	    		if(gameOver){
+	    			String winner = curPlayer.getRealName()+" Winner score="+curPlayer.getScore();
+	    			out.write(winner.getBytes());
+	    		}
+	    		out.write(data.toString().getBytes());
+
 	            out.flush();
 	            out.close();   
 	            logWriter.close();
@@ -1541,7 +1558,7 @@ public class Game extends Activity {
 	 * Takes the list of tricks played and writes that to a JSON
 	 * @return Json as a String.
 	 */
-	public String writeJSON() {
+	public JSONObject writeJSON() {
 		Log.d(TAG, "writeJSON()");
 		JSONObject object = new JSONObject();
 		  try {
@@ -1560,7 +1577,7 @@ public class Game extends Activity {
 		    e.printStackTrace();
 		  }
 		  
-		  return object.toString();
+		  return object;
 	}
 	
   	///////////////////////////////////////////////////////////////////////Touch Events///////////////////////////////////////////////////////////////////////////

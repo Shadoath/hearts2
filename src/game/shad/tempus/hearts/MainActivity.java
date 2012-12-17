@@ -220,7 +220,7 @@ public class MainActivity extends Activity {
 		game.update();
 		game.updatePlayerInfo();
 			
-		Log.d(TAG, game.writeJSON());
+//		Log.d(TAG, game.writeJSON().toString());
 		game.saveGameStats("winner");
 
 

@@ -54,7 +54,7 @@ public class SlidingDeckHolder extends LinearLayout
         this.screenHeight = sH;
        	cardWidth=screenWidth/7;
        	params = new LinearLayout.LayoutParams(cardWidth, screenHeight);
-       	params.setMargins(1, 1, 1, 1);
+       	params.setMargins(0, 0, 0, 0);
        	
        	this.deck = new Deck();
         
@@ -73,10 +73,10 @@ public class SlidingDeckHolder extends LinearLayout
     		ImageView cView= new ImageView(mContext);
 			cView.setMaxHeight(screenHeight-10);
 			cView.setMaxWidth(cardWidth-10);
-			cView.setPadding(10,10,10,10);
 			cView.setVisibility(View.VISIBLE);
 			cView.setLayoutParams(params);
 			cView.setImageBitmap(game.BlueBack);
+			cView.setPadding(10,10,10,10);
 			addView(cView);
 	        i++;
     	}
@@ -144,7 +144,7 @@ public class SlidingDeckHolder extends LinearLayout
 					    			}
 								}
 								v.setSelected(true);
-								v.setBackgroundColor(Color.GREEN);
+								v.setBackgroundColor(Color.YELLOW);
 								int size = tradingViews.size();
 								if(size<3){//Nothing picked yet
 									tradingViews.add(v);
@@ -162,14 +162,14 @@ public class SlidingDeckHolder extends LinearLayout
 							if(game.checkPlayability(c)){
 								if(viewSelected==null){
 									v.setSelected(true);
-									v.setBackgroundColor(Color.GREEN);
+									v.setBackgroundColor(Color.YELLOW);
 									viewSelected=v;
 								}
 								else{
 									viewSelected.setSelected(false);
 									
 									viewSelected.setBackgroundColor(Color.BLACK);
-									v.setBackgroundColor(Color.GREEN);
+									v.setBackgroundColor(Color.YELLOW);
 									v.setSelected(true);
 									viewSelected=v;
 									

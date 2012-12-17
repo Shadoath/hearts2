@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager.WakeLock;
@@ -52,7 +53,15 @@ public class MainActivity extends Activity {
         gameBundle = gameIntent.getExtras();
         Log.d(TAG, "onCreate");
         //TODO create option for landscape mode.
-        setContentView(R.layout.tableportrait);
+        if(gameBundle.getBoolean("portaitMode", true)){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            setContentView(R.layout.tableportrait);
+
+        }
+        else{
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        	setContentView(R.layout.tablelandscape);
+        }
         myContext = getBaseContext();
     	main= this;
     	game = new Game(gameBundle, myContext, main);

@@ -1411,10 +1411,12 @@ public class Game extends Activity {
 		p3.claimedDeck= false;
 		p4.claimedDeck= false;
 		roundView.setText("Round="+round);
-		clubsPlayed.setText("C="+clubsPlayedInt);
-		diamondsPlayed.setText("D="+diamondsPlayedInt);
-		spadesPlayed.setText("S="+spadesPlayedInt);
-		heartsPlayed.setText("H="+heartsPlayedInt);
+		if(cardCounterB){
+			clubsPlayed.setText("C="+clubsPlayedInt);
+			diamondsPlayed.setText("D="+diamondsPlayedInt);
+			spadesPlayed.setText("S="+spadesPlayedInt);
+			heartsPlayed.setText("H="+heartsPlayedInt);
+		}
 		resetPlayerHolderCards();
 		update();
 	}
@@ -1562,16 +1564,16 @@ public class Game extends Activity {
 		Log.d(TAG, "writeJSON()");
 		JSONObject object = new JSONObject();
 		  try {
-			  int trickCounter=0;
+			  int trickCounter=1;
 			  int hand=1;
 			  for(int i=0; i<roundHands.size();i++){
-				  trickCounter++;
-				  if(trickCounter==13){
+				  
+				  if(trickCounter==14){
 					  hand++;
-					  trickCounter=0;
+					  trickCounter=1;
 				  }
 				  object.put("Hand="+hand+" Trick="+trickCounter, roundHands.get(i).toJson());
-
+				  trickCounter++;
 			  }
 		  } catch (JSONException e) {
 		    e.printStackTrace();

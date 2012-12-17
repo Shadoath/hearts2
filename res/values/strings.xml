@@ -62,16 +62,16 @@
         <string name="p3Score">P3:0 points</string>
         <string name="p4Score">P4:0 points</string>
         <string name="you">You</string>
-        <string name="howToPlay">The goal of hearts is to have the least points at the end, the game is over when someone breaks 50 points. \n
-            Each hand is played in thirteen rounds or \'tricks\' of four cards.  The first round is always started with the Two of Clubs.  \n
-            The leading card\'s suit of the trick must be played unless you are void. \n
-            The highest card of the starting suit (Two to Ace), determines the winner of the trick and then they chooses the next starting card.\n
-            Each heart is one point, the Queen of Spades is +13, and the Jack of Diamonds is -10. \n
-            Hearts can not be played to start a trick till \'Broken.\  To break heart the Queen of Spades or a heart from a void round must be played.
+        <string name="howToPlay">The goal of hearts is to have the least points at the end, the game is over when someone breaks 50 points. 
+            \nEach hand is played in thirteen rounds or \'tricks\' of four cards.  The first round is always started with the Two of Clubs.  
+            \nThe leading card\'s suit of the trick must be played unless you are void. 
+            \nThe highest card of the starting suit (Two to Ace), determines the winner of the trick and then they chooses the next starting card.
+            \nEach heart is one point, the Queen of Spades is +13, and the Jack of Diamonds is -10. 
+            \nHearts can not be played to start a trick till \'Broken.\'  To break hearts the Queen of Spades or a heart played when void.
             The game is played in four hands per session.  The first three hands players trade three cards before the round begins.\n
             On the fourth round there is no trading, then a new session begins.\n
-            On the rare chance a single player takes all the points in a round (Jack of Diamonds excluded). They then \'Shoot the moon\'\n
-            This takes the 26 points from their score and instead gives it to everyone else.
+            On the rare chance a single player takes all the points in a round (Jack of Diamonds excluded). They then \'Shoot the moon.\'
+            \nThis takes the 26 points from their score and gives it to everyone else.
             </string>
         <string name="startuphelp">Touch the card you want to play, then press Next to manualy advance the game till your turn. \n OR go to menu then turn on AutoRun, then the game will advance automatically till your turn and wait for you to play. \nArrow buttons to move through your Cards \nIf you get lost just hit \'Next\'.</string>
         <string name="resume">Resume</string>

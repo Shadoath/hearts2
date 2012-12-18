@@ -30,15 +30,16 @@ public class TrickStats {
 			Card c = newTrick.getCard(i);
 			cards[i] = new CardStats();
 			cards[i].owner=c.getOwner().getRealName();
-			cards[i].suit=c.getSuit();
-			cards[i].value=c.getValue();
+//			cards[i].suit=c.getSuit();
+//			cards[i].value=c.getValue();
+			cards[i].name=c.toString();
 		}
 	}
 	
 	
 	public JSONArray toJson(){
 		JSONArray jsonTrickArray = new JSONArray();
-
+		int i=1;
 		for(CardStats cs : cards){
 			if(cs==null){
 				Log.d(TAG, "bad CARD in TRICK!");
@@ -46,10 +47,11 @@ public class TrickStats {
 			}
 			JSONObject jsonCard = new JSONObject();
 			try {
-				jsonCard.put("Suit", cs.suit);
-				jsonCard.put("Value", cs.value);
-				jsonCard.put("Owner", cs.owner);
-
+				String cardValueString = cs.owner+" "+cs.name;
+				jsonCard.put("card"+i, cardValueString);
+//				jsonCard.put("Value", cs.value);
+//				jsonCard.put("Owner", cs.owner);
+				i++;
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -64,11 +66,13 @@ public class TrickStats {
 		public String owner;
 		public int suit;
 		public int value;
+		public String name;
 		
 		public CardStats(){
 			owner=null;
 			suit=0;
 			value=0;
+			name="";
 		}
 	}
 	

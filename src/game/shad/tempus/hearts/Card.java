@@ -295,6 +295,11 @@ public class Card {
 		this.suit = suit;
 	}
 
+	/**
+	 * Return the name of the card
+	 * value +of+ suit
+	 * Four of Clubs
+	 */
 	@Override
 	public String toString(){
 		String sValue = "";

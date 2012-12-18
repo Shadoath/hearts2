@@ -816,7 +816,7 @@ public class Game extends Activity {
 		}	
 		Log.d(TAG, "pickUpHand() for "+curPlayer.getRealName());
 		roundScore+=points;
-		roundHands.add(new TrickStats(tableTrick.TrickToDeck(), round, curPlayer));  
+		roundHands.add(new TrickStats(points, curPlayer));  
 		if(cardToPlay!=null){
 			cardToPlay.setTouched(false);
 			cardToPlay=null;
@@ -1572,7 +1572,7 @@ public class Game extends Activity {
 					  hand++;
 					  trickCounter=1;
 				  }
-				  object.put("Hand="+hand+" Trick="+trickCounter, roundHands.get(i).toJson());
+				  object.put("Hand="+hand+" Trick="+trickCounter, roundHands.get(i).pointsWinnerString);
 				  trickCounter++;
 			  }
 		  } catch (JSONException e) {

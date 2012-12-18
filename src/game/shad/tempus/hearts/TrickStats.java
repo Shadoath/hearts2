@@ -12,32 +12,15 @@ import android.util.Log;
 public class TrickStats {
 	public static final String TAG = "Hearts--Trick";
 
-	public Player winner;
-	public int points;
-	public int round;
-	public CardStats[] cards;
+
+	public String pointsWinnerString;
 	
-	public TrickStats(Deck newTrick, int round, Player winner){
-		this.round=round;
-		this.winner=winner;
-		cards = new CardStats[4];
-		if(newTrick.getSize()!=4){
-			Log.d(TAG, "Wrong SIZE TRICK!");
-			return;
-		}
-		
-		for (int i=0; i<newTrick.getSize(); i++){
-			Card c = newTrick.getCard(i);
-			cards[i] = new CardStats();
-			cards[i].owner=c.getOwner().getRealName();
-//			cards[i].suit=c.getSuit();
-//			cards[i].value=c.getValue();
-			cards[i].name=c.toString();
-		}
+	public TrickStats(int points, Player winner){
+		pointsWinnerString="Points="+points+" Won by="+winner.realName;
 	}
 	
 	
-	public JSONArray toJson(){
+	/*public JSONArray toJson(){
 		JSONArray jsonTrickArray = new JSONArray();
 		int i=1;
 		for(CardStats cs : cards){
@@ -60,7 +43,8 @@ public class TrickStats {
 			
 		}
 		return jsonTrickArray;
-	}
+		}*/
+	
 	public class CardStats{
 		
 		public String owner;

@@ -50,7 +50,7 @@ public class Game extends Activity {
 	public String name;
 	
 	private Deck cardDeck=new Deck();
-	private Trick tableTrick=new Trick();
+	public Trick tableTrick=new Trick();
 	
     public Player p1;
 	public Player p2;
@@ -81,6 +81,7 @@ public class Game extends Activity {
 	private boolean jackFoundP2 	= false;
 	private boolean jackFoundP3 	= false;
 	private boolean jackFoundP4 	= false;
+	private boolean portaitMode 	= false;
 	
 	public int playerHelperInt=0;
     public int round=1;
@@ -118,6 +119,8 @@ public class Game extends Activity {
     private LinearLayout topLayout;
     private LinearLayout middleLayout;
     private LinearLayout tableRightView;
+    private LinearLayout bottomTVlayout;
+
     
     private Button playCard;
     
@@ -165,7 +168,7 @@ public class Game extends Activity {
         Log.d(TAG, "shuffle type= "+shuffleType);
 
         Log.d(TAG, "difficulty= "+difficulty);
-               
+        portaitMode = b.getBoolean("portaitMode", true);
         this.restart = (Boolean) b.get("restart");
 //        createBlankHand();
         myToast  = Toast.makeText(context, "", Toast.LENGTH_SHORT);
@@ -592,6 +595,9 @@ public class Game extends Activity {
 		nextCard.setOwner(curPlayer);
 		curPlayer.removeCardFromDeck(nextCard);
 		curPlayer.updateSuitsFast();
+		if(curPlayer==p1){
+			slidingDeckHolder.addDeck(p1.getDeck());
+		}
 		Log.d(TAG, "Game started by "+curPlayer.getRealName());
 		tableTrick.addCard(nextCard);
 		tableHolder.addCard(nextCard);
@@ -622,7 +628,6 @@ public class Game extends Activity {
 	    p3.checkForQueen();
 	    p4.checkForQueen();
 	}	
-	
 	
 	/**
 	 * When player hits the Play/next Button or when game thread is continuing the Game
@@ -1073,14 +1078,22 @@ public class Game extends Activity {
         deckHolderLayout = (HorizontalScrollView) main.findViewById(R.id.DeckHolderLayout);
         tableHolderLayout = (LinearLayout) main.findViewById(R.id.TableHolderLayout);
         topLayout =  (LinearLayout) main.findViewById(R.id.topLayout);
-        middleLayout  =  (LinearLayout) main.findViewById(R.id.MiddleLayout);
-        tableRightView  =  (LinearLayout) main.findViewById(R.id.TableRightView);
+//        bottomTVlayout =  (LinearLayout) main.findViewById(R.id.bottomTVlayout);
+//        middleLayout  =  (LinearLayout) main.findViewById(R.id.MiddleLayout);
+//        tableRightView  =  (LinearLayout) main.findViewById(R.id.TableRightView);
         
     	playCard = (Button) main.findViewById(R.id.playCard);
 //    	leftButton = (Button) main.findViewById(R.id.left);
 //    	rightButton = (Button) main.findViewById(R.id.right);
-    	playCard.setWidth(screenWidth/4);
-//    	rightButton.setWidth(screenWidth/4);
+    	if(portaitMode){
+    		playCard.setWidth(screenWidth/4);
+    	}
+
+    	else{
+    		playCard.setWidth(screenWidth/4);
+
+    	}
+    	//    		rightButton.setWidth(screenWidth/4);
 //    	leftButton.setWidth(screenWidth/4);
     	
    

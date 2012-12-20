@@ -44,6 +44,7 @@ public class Game extends Activity {
 	//current issues
 	//BOTS ARE CHEATING AND NOT PLAYING CARDS WHEN THEY SHOULD!!
 	//TODO Scrolling cards by creating a start value for where to start drawing a card.
+    //TODO When AI picks p1 card show it was picked.
 	private MainActivity main;
 	public String eol = System.getProperty("line.separator");
 	public String name;

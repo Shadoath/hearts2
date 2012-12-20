@@ -76,6 +76,7 @@ public class MainActivity extends Activity {
    	
     }
     
+    
 	@Override
     protected void onStart(){
     	super.onStart();
@@ -277,7 +278,9 @@ public class MainActivity extends Activity {
 					else{
 						game.playerHelperInt++;
 						myToast.cancel();
-						myToast.setText("Please pick a card, or press 'Play Card' again to let the game play for you.");
+						Card cardToChooseCard = game.p1.go(game.round, game.tableTrick);
+						game.slidingDeckHolder.setSelectedCard(cardToChooseCard);
+						myToast.setText("Pick a card, or press 'Play Card' again to let the game play the "+cardToChooseCard.toString());
 				        myToast.setDuration(Toast.LENGTH_LONG);
 						myToast.show();
 				        myToast.setDuration(Toast.LENGTH_SHORT);

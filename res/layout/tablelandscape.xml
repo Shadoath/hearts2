@@ -13,8 +13,7 @@
         <LinearLayout
             android:id="@+id/TableHolderLayout"
             android:layout_width="139dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.29" >
+            android:layout_height="match_parent" >
         </LinearLayout>
 
         <LinearLayout
@@ -26,12 +25,6 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/MiddleLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </LinearLayout>
-
     <HorizontalScrollView
         android:id="@+id/DeckHolderLayout"
         android:layout_width="match_parent"
@@ -40,113 +33,104 @@
     </HorizontalScrollView>
 
     <LinearLayout
-        android:id="@+id/bottomLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:layout_height="wrap_content"
+        android:gravity="fill_horizontal" >
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight=".45"
+            android:orientation="vertical" >
+
+            <EditText
+                android:id="@+id/bottomTV2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="false"
+                
+                android:ems="10"
+                android:focusable="false" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/playCard"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center" >
+            android:layout_weight=".1"
+            android:onClick="onPlayCardPressed"
+            android:text="@string/playcard" />
+
+        <LinearLayout
+            android:id="@+id/TableRightView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight=".45"
+            android:gravity="right"
+            android:onClick="roundStatsPressed"
+            android:orientation="vertical" >
+
+            <EditText
+                android:id="@+id/bottomTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:ems="10"
+                android:focusable="false"
+                android:singleLine="true" >
+
+                <requestFocus />
+            </EditText>
 
             <LinearLayout
-                android:id="@+id/TableRightView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.29"
-                android:gravity="right"
-                android:onClick="roundStatsPressed"
-                android:orientation="vertical" >
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <LinearLayout
-                    android:id="@+id/ButtonLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.29"
-                    android:gravity="center" >
+                    android:gravity="right"
+                    android:orientation="vertical" >
 
-                    <Button
-                        android:id="@+id/playCard"
-                        style="?android:attr/buttonStyleSmall"
+                    <TextView
+                        android:id="@+id/roundView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.29"
-                        android:onClick="onPlayCardPressed"
-                        android:text="@string/playcard" />
+                        android:text="@string/round"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
 
+                    <TextView
+                        android:id="@+id/clubsPlayed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/unknown"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                    <TextView
+                        android:id="@+id/diamondsPlayed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/unknown"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                    <TextView
+                        android:id="@+id/spadesPlayed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/unknown"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                    <TextView
+                        android:id="@+id/heartsPlayed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/unknown"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
                 </LinearLayout>
-
-                <TextView
-                    android:id="@+id/roundView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.29"
-                    android:text="@string/round"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <TextView
-                    android:id="@+id/clubsPlayed"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.29"
-                    android:text="@string/unknown"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <TextView
-                    android:id="@+id/diamondsPlayed"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.29"
-                    android:text="@string/unknown"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <TextView
-                    android:id="@+id/spadesPlayed"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.29"
-                    android:text="@string/unknown"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <TextView
-                    android:id="@+id/heartsPlayed"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.29"
-                    android:text="@string/unknown"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
             </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="0.29"
-                android:orientation="vertical" >
-
-                <EditText
-                    android:id="@+id/bottomTV"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.29"
-                    android:clickable="false"
-                    android:ems="10"
-                    android:focusable="false"
-                    android:singleLine="true" />
-
-                <EditText
-                    android:id="@+id/bottomTV2"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.29"
-                    android:clickable="false"
-                    android:ems="10"
-                    android:focusable="false" />
-
-            </LinearLayout>
-
         </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>

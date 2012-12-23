@@ -42,7 +42,8 @@ public class TableHolder extends SurfaceView implements Callback, OnTouchListene
         this.screenWidth = sW;
         this.screenHeight = sH;
         this.deck = new Deck();
-        
+        Log.d(TAG, "ScreenWidth="+screenWidth);
+        Log.d(TAG, "screenHeight="+screenHeight);
         addBlankCards();
     }
     

@@ -4,12 +4,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.regex.Pattern;
+
+import org.achartengine.model.XYSeries;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.PatternMatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 public class History extends  Activity{
@@ -22,6 +25,11 @@ public class History extends  Activity{
     public File path;
     public int winnerCount = 1;
     public int totalWins =10;
+    XYSeries p1Series;
+    XYSeries p2Series;
+    XYSeries p3Series;
+    XYSeries p4Series;
+    public String winnerString ="";
 
     //So far only 10 files for Saves.
     public void onCreate(Bundle savedInstanceState) {
@@ -85,19 +93,19 @@ public class History extends  Activity{
 			} catch (IOException e) {
  				e.printStackTrace();
 				
-			}
-		   bottomText2.setText("loaded file="+out);
-		   bottomText.setText("Winner file:"+winnerCount);
+		}
+	winnerString=out;
+	bottomText2.setText("loaded file="+out);
+	bottomText.setText("Winner file:"+winnerCount);
     }
-    
-    
+        
     public void loadNextSave(View v){
 	    winnerCount++;
 	    if(winnerCount>10 )
 	    	winnerCount=1;
     	loadPath = path + "/winner"+winnerCount+".txt";
 	    loadFile();
-
+	    loadGraph();
     }
     
     public void onDeletePressed(View v){
@@ -124,4 +132,19 @@ public class History extends  Activity{
 
     }
    
+    
+
+    public void loadGraph(){
+//    p1Series= new XYSeries("P1");	
+//    p2Series= new XYSeries("P2");	
+//    p3Series= new XYSeries("P3");	
+//    p4Series= new XYSeries("P4");
+    String[] wonTricks =winnerString.split(",");
+    for(String s: wonTricks){
+    	Log.d(TAG, s);
+    }
+    
+    
+    }
+    
 }

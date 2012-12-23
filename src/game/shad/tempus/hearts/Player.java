@@ -705,7 +705,7 @@ public class Player {
 	/**
 	 * Fast update of Suit decks from this.deck
 	 * This method is called after updateDeckCards(Deck)
-	 * @return 
+	 *  
 	 */
 	public synchronized void updateSuitsFast(){
 		Log.d(TAG+this.getRealName(), "updateSuits for "+this.realName);

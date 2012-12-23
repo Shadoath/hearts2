@@ -54,11 +54,13 @@ public class MainActivity extends Activity {
         Log.d(TAG, "onCreate");
         //TODO create option for landscape mode.
         if(gameBundle.getBoolean("portaitMode", true)){
+        	Log.d(TAG, "Portait Mode");
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             setContentView(R.layout.tableportrait);
 
         }
         else{
+        	Log.d(TAG, "LandScape Mode");
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         	setContentView(R.layout.tablelandscape);
         }
@@ -73,6 +75,7 @@ public class MainActivity extends Activity {
         gt.start();
    	
     }
+    
     
 	@Override
     protected void onStart(){
@@ -275,7 +278,9 @@ public class MainActivity extends Activity {
 					else{
 						game.playerHelperInt++;
 						myToast.cancel();
-						myToast.setText("Please pick a card, or press 'Play Card' again to let the game play for you.");
+						Card cardToChooseCard = game.p1.go(game.round, game.tableTrick);
+						game.slidingDeckHolder.setSelectedCard(cardToChooseCard);
+						myToast.setText("Pick a card, or press 'Play Card' again to let the game play the "+cardToChooseCard.toString());
 				        myToast.setDuration(Toast.LENGTH_LONG);
 						myToast.show();
 				        myToast.setDuration(Toast.LENGTH_SHORT);

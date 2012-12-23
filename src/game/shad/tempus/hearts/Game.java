@@ -44,12 +44,13 @@ public class Game extends Activity {
 	//current issues
 	//BOTS ARE CHEATING AND NOT PLAYING CARDS WHEN THEY SHOULD!!
 	//TODO Scrolling cards by creating a start value for where to start drawing a card.
+    //TODO When AI picks p1 card show it was picked.
 	private MainActivity main;
 	public String eol = System.getProperty("line.separator");
 	public String name;
 	
 	private Deck cardDeck=new Deck();
-	private Trick tableTrick=new Trick();
+	public Trick tableTrick=new Trick();
 	
     public Player p1;
 	public Player p2;
@@ -80,6 +81,7 @@ public class Game extends Activity {
 	private boolean jackFoundP2 	= false;
 	private boolean jackFoundP3 	= false;
 	private boolean jackFoundP4 	= false;
+	private boolean portaitMode 	= false;
 	
 	public int playerHelperInt=0;
     public int round=1;
@@ -117,6 +119,8 @@ public class Game extends Activity {
     private LinearLayout topLayout;
     private LinearLayout middleLayout;
     private LinearLayout tableRightView;
+    private LinearLayout bottomTVlayout;
+
     
     private Button playCard;
     
@@ -164,7 +168,7 @@ public class Game extends Activity {
         Log.d(TAG, "shuffle type= "+shuffleType);
 
         Log.d(TAG, "difficulty= "+difficulty);
-               
+        portaitMode = b.getBoolean("portaitMode", true);
         this.restart = (Boolean) b.get("restart");
 //        createBlankHand();
         myToast  = Toast.makeText(context, "", Toast.LENGTH_SHORT);
@@ -591,6 +595,9 @@ public class Game extends Activity {
 		nextCard.setOwner(curPlayer);
 		curPlayer.removeCardFromDeck(nextCard);
 		curPlayer.updateSuitsFast();
+		if(curPlayer==p1){
+			slidingDeckHolder.addDeck(p1.getDeck());
+		}
 		Log.d(TAG, "Game started by "+curPlayer.getRealName());
 		tableTrick.addCard(nextCard);
 		tableHolder.addCard(nextCard);
@@ -621,7 +628,6 @@ public class Game extends Activity {
 	    p3.checkForQueen();
 	    p4.checkForQueen();
 	}	
-	
 	
 	/**
 	 * When player hits the Play/next Button or when game thread is continuing the Game
@@ -816,7 +822,7 @@ public class Game extends Activity {
 		}	
 		Log.d(TAG, "pickUpHand() for "+curPlayer.getRealName());
 		roundScore+=points;
-		roundHands.add(new TrickStats(tableTrick.TrickToDeck(), round, curPlayer));  
+		roundHands.add(new TrickStats(points, curPlayer));  
 		if(cardToPlay!=null){
 			cardToPlay.setTouched(false);
 			cardToPlay=null;
@@ -1072,14 +1078,22 @@ public class Game extends Activity {
         deckHolderLayout = (HorizontalScrollView) main.findViewById(R.id.DeckHolderLayout);
         tableHolderLayout = (LinearLayout) main.findViewById(R.id.TableHolderLayout);
         topLayout =  (LinearLayout) main.findViewById(R.id.topLayout);
-        middleLayout  =  (LinearLayout) main.findViewById(R.id.MiddleLayout);
-        tableRightView  =  (LinearLayout) main.findViewById(R.id.TableRightView);
+//        bottomTVlayout =  (LinearLayout) main.findViewById(R.id.bottomTVlayout);
+//        middleLayout  =  (LinearLayout) main.findViewById(R.id.MiddleLayout);
+//        tableRightView  =  (LinearLayout) main.findViewById(R.id.TableRightView);
         
     	playCard = (Button) main.findViewById(R.id.playCard);
 //    	leftButton = (Button) main.findViewById(R.id.left);
 //    	rightButton = (Button) main.findViewById(R.id.right);
-    	playCard.setWidth(screenWidth/4);
-//    	rightButton.setWidth(screenWidth/4);
+    	if(portaitMode){
+    		playCard.setWidth(screenWidth/4);
+    	}
+
+    	else{
+    		playCard.setWidth(screenWidth/4);
+
+    	}
+    	//    		rightButton.setWidth(screenWidth/4);
 //    	leftButton.setWidth(screenWidth/4);
     	
    
@@ -1411,10 +1425,12 @@ public class Game extends Activity {
 		p3.claimedDeck= false;
 		p4.claimedDeck= false;
 		roundView.setText("Round="+round);
-		clubsPlayed.setText("C="+clubsPlayedInt);
-		diamondsPlayed.setText("D="+diamondsPlayedInt);
-		spadesPlayed.setText("S="+spadesPlayedInt);
-		heartsPlayed.setText("H="+heartsPlayedInt);
+		if(cardCounterB){
+			clubsPlayed.setText("C="+clubsPlayedInt);
+			diamondsPlayed.setText("D="+diamondsPlayedInt);
+			spadesPlayed.setText("S="+spadesPlayedInt);
+			heartsPlayed.setText("H="+heartsPlayedInt);
+		}
 		resetPlayerHolderCards();
 		update();
 	}
@@ -1562,16 +1578,16 @@ public class Game extends Activity {
 		Log.d(TAG, "writeJSON()");
 		JSONObject object = new JSONObject();
 		  try {
-			  int trickCounter=0;
+			  int trickCounter=1;
 			  int hand=1;
 			  for(int i=0; i<roundHands.size();i++){
-				  trickCounter++;
-				  if(trickCounter==13){
+				  
+				  if(trickCounter==14){
 					  hand++;
-					  trickCounter=0;
+					  trickCounter=1;
 				  }
-				  object.put("Hand="+hand+" Trick="+trickCounter, roundHands.get(i).toJson());
-
+				  object.put("Hand="+hand+" Trick="+trickCounter, roundHands.get(i).pointsWinnerString);
+				  trickCounter++;
 			  }
 		  } catch (JSONException e) {
 		    e.printStackTrace();

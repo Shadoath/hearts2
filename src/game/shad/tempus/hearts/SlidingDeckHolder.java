@@ -2,6 +2,7 @@ package game.shad.tempus.hearts;
 
 import java.util.ArrayList;
 
+import android.R.integer;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -112,7 +113,7 @@ public class SlidingDeckHolder extends LinearLayout
 		cardViewSelected= new ArrayList<View>();
 		for(Card c: deck.getDeck()){
 			CardView cView= new CardView(mContext, c, params);
-
+			cView.setTag(c.toString());
 			cView.setOnClickListener(new OnClickListener() {
 				
 				@Override
@@ -212,7 +213,39 @@ public class SlidingDeckHolder extends LinearLayout
 		this.cardViewSelected= new ArrayList<View>();
     }
             
-    
+    public void setSelectedCard(Card c){
+    	int count=getChildCount();
+    	int i=0;
+    	View toHighLightView = null;
+    	while(i<count){
+	    	if(c.toString().equals(getChildAt(i).getTag())){
+	    		toHighLightView=getChildAt(i);
+	    		Log.d(TAG, "view found, Setting background yellow");
+	    		break;
+	    	}
+	    	i++;
+		}
+    	if(toHighLightView==null){
+    		Log.d(TAG, "no View found for card!");
+    		return;
+    	}
+    	
+    	if(viewSelected==null){
+    		toHighLightView.setSelected(true);
+    		toHighLightView.setBackgroundColor(Color.YELLOW);
+			viewSelected=toHighLightView;
+		}
+		else{
+			viewSelected.setSelected(false);
+			
+			viewSelected.setBackgroundColor(Color.BLACK);
+			toHighLightView.setBackgroundColor(Color.YELLOW);
+			toHighLightView.setSelected(true);
+			viewSelected=toHighLightView;
+			
+		}
+    }
+    	
     public Deck getDeck(){
         return this.deck;
     }

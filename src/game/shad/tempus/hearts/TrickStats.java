@@ -1,15 +1,33 @@
 package game.shad.tempus.hearts;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 
 public class TrickStats {
 	public static final String TAG = "Hearts--Trick";
 
 
-	public String pointsWinnerString;
+	public String winnerString;
+	public JSONObject jsonWinnerString;
+	public JSONArray cardsPileJson;
 	
-	public TrickStats(int points, Player winner){
-		pointsWinnerString="Points="+points+" Won by="+winner.realName;
+	public TrickStats(int points, Player winner, Trick pile){
+		jsonWinnerString = new JSONObject();
+		cardsPileJson = new JSONArray();
+		winnerString="Points="+points+" Won by="+winner.shortName;
+		try {
+			jsonWinnerString.put(winner.shortName, points);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		for(Card c: pile.getTrick()){
+			cardsPileJson.put(c.getOwner()+":"+c.toString());
+		}
+		
 	}
 	
 	

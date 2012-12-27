@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
         myContext = getBaseContext();
     	main= this;
     	game = new Game(gameBundle, myContext, main);
-        myToast  = Toast.makeText(getBaseContext(), "", Toast.LENGTH_SHORT);
+		myToast  = Toast.makeText(getBaseContext(), "", Toast.LENGTH_SHORT);
 		gt = new GameThread(myContext, main, game, gameBundle.getInt("aiTime"));
     	game.createDeckTableViews();
         Log.d(TAG, "created Views");
@@ -269,7 +269,6 @@ public class MainActivity extends Activity {
 		else if(game.curPlayer==game.p1){
 				if(game.playing){
 					if(game.playerHelperInt>0||game.cardToPlay!=null){
-						myToast.cancel();
 						game.playerHelperInt=0;
 						gt.updateLastTime();
 						game.GO();
@@ -277,6 +276,7 @@ public class MainActivity extends Activity {
 					}
 					else{
 						game.playerHelperInt++;
+						game.playerHelperIntTotal++;
 						myToast.cancel();
 						Card cardToChooseCard = game.p1.go(game.round, game.tableTrick);
 						game.slidingDeckHolder.setSelectedCard(cardToChooseCard);

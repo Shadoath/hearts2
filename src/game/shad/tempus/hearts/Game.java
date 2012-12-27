@@ -33,7 +33,7 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
+	//TODO swap button to take someone elses place.  Only once a round.
 public class Game extends Activity {
 	public static final String TAG = "Hearts--Game";
 	public static final int pointsTillEndGame = 50;
@@ -42,9 +42,6 @@ public class Game extends Activity {
     private File path;
 
 	//current issues
-	//BOTS ARE CHEATING AND NOT PLAYING CARDS WHEN THEY SHOULD!!
-	//TODO Scrolling cards by creating a start value for where to start drawing a card.
-    //TODO When AI picks p1 card show it was picked.
 	private MainActivity main;
 	public String eol = System.getProperty("line.separator");
 	public String name;
@@ -60,7 +57,7 @@ public class Game extends Activity {
 	
 	public Card cardToPlay;
 	public Canvas canvas = new Canvas();
-	private ArrayList<TrickStats> roundHands= new ArrayList<TrickStats>(); 
+	private ArrayList<TrickStats> roundWinnerAndPoints= new ArrayList<TrickStats>(); 
 	public String roundCardString = "";
 
 	
@@ -84,6 +81,7 @@ public class Game extends Activity {
 	private boolean portaitMode 	= false;
 	
 	public int playerHelperInt=0;
+	public int playerHelperIntTotal=0;
     public int round=1;
 	public int selectedCard=0;
 	public int selectedCardSuit=-1;
@@ -104,7 +102,6 @@ public class Game extends Activity {
     private int shuffleType;
 	private int screenWidth;
     private int screenHeight;
-	//////////////////////gameview stuff
 
 	
 	private Canvas tableHolderCanvas = null;
@@ -822,7 +819,8 @@ public class Game extends Activity {
 		}	
 		Log.d(TAG, "pickUpHand() for "+curPlayer.getRealName());
 		roundScore+=points;
-		roundHands.add(new TrickStats(points, curPlayer));  
+		roundWinnerAndPoints.add(new TrickStats(points, curPlayer, tableTrick));  
+		
 		if(cardToPlay!=null){
 			cardToPlay.setTouched(false);
 			cardToPlay=null;
@@ -1506,13 +1504,16 @@ public class Game extends Activity {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(main);
 		int wonCount = preferences.getInt("wonInt", 0);
 		wonCount++;
-	    if(wonCount>10){
+	    if(wonCount>10){//Only Ten save files.
+	    	//TODO fill empty then overwrite.
 	    	wonCount=1;
 	    }
 	    JSONObject jsonData = writeJSON();
 	    Log.d(TAG, jsonData.length()+"");
 		Log.d(TAG, jsonData.toString());
-		
+		if(path==null){
+    		setupSaveSettings();
+    	}
 
 	    try {
 			saveToSD("winner"+wonCount, jsonData);
@@ -1534,8 +1535,8 @@ public class Game extends Activity {
      * @throws FileNotFoundException
      */
     public void saveToSD(String fileName, JSONObject data) throws FileNotFoundException{
-    	Log.d(TAG, "Saving new save file to\n"+path+fileName+".txt");
-    	File file = new File(path, fileName+".txt");
+    	Log.d(TAG, "Saving new save file to\n"+path+fileName+".json");
+    	File file = new File(path, fileName+".json");
 		    	
     	if(!path.exists()){
     		path.mkdirs();
@@ -1545,8 +1546,15 @@ public class Game extends Activity {
 	    		FileOutputStream logWriter = new FileOutputStream(file);
 	    		BufferedOutputStream out = new BufferedOutputStream(logWriter);
 	    		if(gameOver){
-	    			String winner = curPlayer.getRealName()+" Winner score="+curPlayer.getScore();
-	    			out.write(winner.getBytes());
+	    			try {
+						data.put("Winner", curPlayer.getRealName().toString());
+						data.put("Score", curPlayer.getScore());
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+//	    			String winner = curPlayer.getRealName()+" Winner score="+curPlayer.getScore();
+//	    			out.write(winner.getBytes());
 	    		}
 	    		out.write(data.toString().getBytes());
 
@@ -1580,13 +1588,14 @@ public class Game extends Activity {
 		  try {
 			  int trickCounter=1;
 			  int hand=1;
-			  for(int i=0; i<roundHands.size();i++){
+			  for(int i=0; i<roundWinnerAndPoints.size();i++){
 				  
 				  if(trickCounter==14){
 					  hand++;
 					  trickCounter=1;
 				  }
-				  object.put("Hand="+hand+" Trick="+trickCounter, roundHands.get(i).pointsWinnerString);
+				  String title="Hand="+hand+" Trick="+trickCounter;
+				  object.put(title, roundWinnerAndPoints.get(i).jsonWinnerString);
 				  trickCounter++;
 			  }
 		  } catch (JSONException e) {

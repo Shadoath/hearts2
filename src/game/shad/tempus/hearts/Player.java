@@ -7,9 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
-//TODO method to play card just under the highest on the table.		DONE
 //TODO jack check to not give away so easy.		Also Not give away high diamonds on trade.
-//TODO fix queen check so it is only called once per round.  DONE
 @SuppressLint("ParserError")
 public class Player {
 	public static final String TAG = "Hearts--Player--";
@@ -21,6 +19,7 @@ public class Player {
 	private Deck deck =new Deck();
 	public int seat=0; //position
 	public String realName = "";
+	public String shortName = "";
 	public int colorInt = 0;
 	public int state = 0;   //using 1-4
 	public int score = 0;
@@ -63,6 +62,7 @@ public class Player {
 		this.deck = deck;
 		this.score = score;
 		this.seat = seat;
+		setShortName();
 		this.realName = name;
 		this.colorInt = color;
 		sortHandFromDeck();
@@ -70,8 +70,28 @@ public class Player {
 		//TODO add playerholder link here.
 		
 	}
-	
-	
+	/**
+	 * Used when Saving game data, for consistancy.
+	 */
+	public void setShortName(){
+		switch(seat){
+		case 1:
+			shortName="P1";
+			break;
+		case 2:
+			shortName="P2";
+			break;
+		case 3:
+			shortName="P3";
+			break;
+			
+		case 4:
+			shortName="P4";
+			break;
+		}
+		Log.d(TAG, "shortName="+this.shortName);
+		
+	}
 	
 	
 	/**
@@ -95,6 +115,14 @@ public class Player {
 			if(hasQueen){
 				Log.d(TAG+this.getRealName(), "Queencheck = true");
 				if(game.round!=1){
+					return getQueen();
+				}
+			}
+			else{
+				Log.d(TAG+this.getRealName(), "hasQueen = false");
+				checkForQueen();
+				if(hasQueen){//This SHOULD  be redundant.
+					Log.d(TAG+this.getRealName(), "Double  checkForQueen = true");
 					return getQueen();
 				}
 			}
@@ -181,8 +209,8 @@ public class Player {
 			return playHighSimple(startSuit, 0);
 		}
 			
-		Log.d(TAG+this.getRealName(), "Out of all Loops !!SHOULD NOT HAPPEN!!--PlayHigh("+startSuit+")");
-		Log.d(TAG+this.getRealName(), "retuning 2 2 to not crash CODE!");
+		Log.d(TAG+this.getRealName(), "++++++Out of all Loops !!SHOULD NOT HAPPEN!!--PlayHigh("+startSuit+")");
+		Log.d(TAG+this.getRealName(), "++++++retuning 3 0 to not crash CODE!");
 
 		Toast.makeText(main, "OUT OF CARDS!!", Toast.LENGTH_SHORT).show();
 		Card oddBall = new Card(3, 0, game);
@@ -409,7 +437,7 @@ public class Player {
 	
 	}
 	
-	private Card playLargestSuitHighCard(){
+	private Card playLargestSuitAndPlay(){
 		Log.d(TAG+this.getRealName(), "voidPlayHighHearts");
 		switch(getLargestSuit()){
 			case 0:
@@ -445,7 +473,6 @@ public class Player {
 		int[] test = {c, d, s, h};
 		int position = 0;
 		int high = 0;
-		//TODO TEST ME!
 		for(int i=0; i<test.length;i++){
 			if(test[i]>high){
 				position = i;
@@ -1070,9 +1097,7 @@ public class Player {
 	public int getSeat() {
 		return seat;
 	}
-	public void setValue(int c) {
-		seat = c;
-	}
+
 	public int getState() {
 		return state;
 	}

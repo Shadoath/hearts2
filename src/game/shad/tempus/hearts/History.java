@@ -89,6 +89,7 @@ public class History extends Activity{
     }
     
     public void setNewData(String[] data){
+    	//TODO dont error out when reading who WON!!
     	Log.d(TAG, "Setting new Graph Data, size ="+data.length);
     	int count = -1;
     	

@@ -47,14 +47,13 @@ public class History extends Activity{
     public int[] data3 = {0, 0, 0, 0, 7, 7, 12, 14, 14, 17, 17, 17};
     public int[] data4 = {0, 3, 3, 3, 16, 17, 23, 24, 14, 14, 14, 22};
     public JSONArray fileJsonArray;
-    public ArrayList<String> trickPoints;
-    public ArrayList<String> fileArrayString;
+    public String[] fileArrayString;
 
     //So far only 10 files for Saves.
     public void onCreate(Bundle savedInstanceState) {
     	 super.onCreate(savedInstanceState);
          setContentView(R.layout.historyportrait);
-
+         winnerString = "";
     	 findViewsByID();
      	 setupSettings();
     	 loadFile();
@@ -63,60 +62,128 @@ public class History extends Activity{
     }
    
     public void parseData(View view){
- 	   if(trickPoints==null){
+	   if(winnerString==null||winnerString.length()==0){
 			loadFile();
- 	   }
- 	  if(trickPoints!=null){
-	 	   
-	 	   int size=trickPoints.size();
-		   data1 = new int[size];
-		   data2 = new int[size];
-		   data3 = new int[size];
-		   data4 = new int[size];
-	 	   setNewData(trickPoints);
- 	  }
- 	  else{
- 		  Log.d(TAG, "Failed JSON SAVE");
- 	  }
+	   }
+	   Log.d(TAG, "parsing data for:"+winnerString);
+	   
+	  fileArrayString=winnerString.split("\\$");
+	  int size = fileArrayString.length;
+	  Log.d(TAG,"Size="+size);
+	  size+=5;	//safety reasons
+	  data1 = new int[size];
+	  data2 = new int[size];
+	  data3 = new int[size];
+	  data4 = new int[size];
+	  data1[0] = 0;
+	  data2[0] = 0;
+	  data3[0] = 0;
+	  data4[0] = 0;
+	  setNewData(fileArrayString);
+  
+ 	 
     	
     }
     
-    public void setNewData(ArrayList<String> data){
-    	Log.d(TAG, "Setting new Graph Data");
-    	int plusSpot=0;
+    public void setNewData(String[] data){
+    	Log.d(TAG, "Setting new Graph Data, size ="+data.length);
+    	int count = -1;
+    	
     	for(String d : data){
-    		Log.d(TAG, "data="+data);
-    		int hand=d.charAt(5);
+    		boolean negativePoints=false;
+    		count++;
+        	int plusSpot=0;
+
+    		Log.d(TAG, "data="+d);
+    		int hand=d.charAt(5) - '0';
     		if(d.charAt(6)!=' '){
-    			hand=hand*10+d.charAt(6);
+    			hand=hand*10;
+    			hand+=d.charAt(6) - '0';
     			plusSpot++;
+    			Log.d(TAG, "plusSpot++ hand");
     		}
 			Log.d(TAG, "hand="+hand);
 			
-    		int trick=d.charAt(13+plusSpot);
-    		if(d.charAt(13+plusSpot)!='"'){
-    			trick=trick*10+d.charAt(13+plusSpot);
+    		int trick=d.charAt(13+plusSpot) - '0';
+    		if(d.charAt(14+plusSpot)!=':'){
+    			trick=trick*10;
+    			trick+=d.charAt(14+plusSpot) - '0';
     			plusSpot++;
+    			Log.d(TAG, "plusSpot++ Trick");
+
+
     		}
 			Log.d(TAG, "trick="+trick);
 
-			int winnerSeat =d.charAt(19+plusSpot);
-    		if(d.charAt(19+plusSpot)!='"'){
-    			winnerSeat=winnerSeat*10+d.charAt(19+plusSpot);
-    			plusSpot++;
-    		}
-			Log.d(TAG, "winnerSeat="+winnerSeat);
-			if(d.charAt(22+plusSpot)=='-'){
+			int winnerSeat = d.charAt(18+plusSpot) - '0';
+    		Log.d(TAG, "winnerSeat="+winnerSeat);
+			
+			if(d.charAt(21+plusSpot)=='-'){
+				negativePoints=true;
 				plusSpot++;
+				Log.d(TAG, "negative Points");
+
 			}
-			int points = d.charAt(22+plusSpot);
+			int points = d.charAt(21+plusSpot) - '0';
     		if(d.charAt(22+plusSpot)!='}'){
-    			points=points*10+d.charAt(22+plusSpot);
+    			points=points*10;
+    			points+=d.charAt(22+plusSpot) - '0';
     			plusSpot++;
+    			Log.d(TAG, "plusSpot++ Points");
+
+        		if(d.charAt(22+plusSpot)!='}'){
+        			points=points*10;
+        			points+=(int)d.charAt(22+plusSpot) - '0';
+        			Log.d(TAG, "LOTS OF POINTS");
+
+        		}
+    		}
+    		if(negativePoints){
+    			points*=-1;
     		}
 			Log.d(TAG, "points="+points);
+			
+			addToData(hand, trick, winnerSeat, points);
+			
+			
     	}
+    	makeNewLineGraph();
     	
+    }
+    
+    public void makeNewLineGraph(){
+ 	   LineGraph line = new LineGraph();
+ 	   line.graphData(data1, data2, data3, data4);
+ 	   Intent lineIntent = line.getInent(this);
+ 	   startActivity(lineIntent); 
+    }
+    
+    public void addToData(int hand, int trick, int winnerSeat, int points){
+    	int count = (hand-1)*13+trick;
+    	int countMinusOne = count-1; 
+    	data1[count]=data1[countMinusOne];
+    	data2[count]=data2[countMinusOne];
+		data3[count]=data3[countMinusOne];
+		data4[count]=data4[countMinusOne];
+    	switch(winnerSeat){
+    	case 1:
+    		points += data1[countMinusOne];
+    		data1[count]=points;
+    		break;
+    	case 2:
+    		points += data2[countMinusOne];
+    		data2[count]=points;
+    		break;
+    	case 3:
+    		points += data3[countMinusOne];
+  		    data3[count]=points;
+    		break;
+    	case 4:
+    		points += data4[countMinusOne];
+    		data4[count]=points;
+    		break;
+    	}
+    	Log.d(TAG, "P:"+winnerSeat+" Added data at:"+count+" points:"+points);
     }
     
    public void showLineGraph (View view){
@@ -125,7 +192,6 @@ public class History extends Activity{
 	   startActivity(lineIntent); 
    }
     
-
     
     protected void setDatasetRenderer(XYMultipleSeriesDataset dataset, XYMultipleSeriesRenderer renderer){
  
@@ -136,18 +202,19 @@ public class History extends Activity{
     	switch(2){
     	case 1:
         	path = this.getCacheDir();
-        	loadPath = path + "/winner"+winnerCount+".json";
+        	loadPath = path + "/winner"+winnerCount+".txt";
         	Log.d(TAG, loadPath);
+        	break;
     	case 2:
         	path = this.getFilesDir();
-        	loadPath = path + "/winner"+winnerCount+".json";
+        	loadPath = path + "/winner"+winnerCount+".txt";
         	Log.d(TAG, loadPath);
-
+        	break;
     	case 3:
         	path = this.getExternalCacheDir();
-        	loadPath = path + "/winner"+winnerCount+".json";
+        	loadPath = path + "/winner"+winnerCount+".txt";
         	Log.d(TAG, loadPath);
-
+        	break;
         
     	}
     	Log.d(TAG, "settings Saved");
@@ -159,7 +226,6 @@ public class History extends Activity{
      */
     public void loadFile(){
 		String out=""; 
-		trickPoints.clear();
     	try
     	  {
     	     FileReader fro = new FileReader(loadPath);
@@ -171,7 +237,6 @@ public class History extends Activity{
 
     	    while( stringRead != null ) // end of the file
     	    {
-    	    	trickPoints.add(stringRead);	 
 	    	    out+=stringRead;
     	      
     	        stringRead = bro.readLine( );  // read next line
@@ -182,7 +247,6 @@ public class History extends Activity{
 				
 		}
 		Log.d(TAG, out.length()+out);
-    	
 		winnerString=out;
 		bottomText.setText("Winner file:"+winnerCount);
 		bottomText2.setText("loaded file="+out);
@@ -192,9 +256,8 @@ public class History extends Activity{
 	    winnerCount++;
 	    if(winnerCount>10 )
 	    	winnerCount=1;
-    	loadPath = path + "/winner"+winnerCount+".json";
+    	loadPath = path + "/winner"+winnerCount+".txt";
 	    loadFile();
-	    loadGraph();
     }
     
     public void onDeletePressed(View v){
@@ -210,7 +273,7 @@ public class History extends Activity{
 	    winnerCount--;
 	    if(winnerCount<1)
 	    	winnerCount=totalWins;
-    	loadPath = path + "/winner"+winnerCount+".json";
+    	loadPath = path + "/winner"+winnerCount+".txt";
 	    loadFile();
 
     }
@@ -225,17 +288,5 @@ public class History extends Activity{
    
     
 
-    public void loadGraph(){
-//    p1Series= new XYSeries("P1");	
-//    p2Series= new XYSeries("P2");	
-//    p3Series= new XYSeries("P3");	
-//    p4Series= new XYSeries("P4");
-    String[] wonTricks =winnerString.split(",");
-    for(String s: wonTricks){
-    	Log.d(TAG, s);
-    }
-    
-    
-    }
     
 }

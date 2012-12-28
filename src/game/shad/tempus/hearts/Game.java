@@ -1670,7 +1670,7 @@ public class Game extends Activity {
 	    		BufferedOutputStream out = new BufferedOutputStream(logWriter);
 	    		if(gameOver){
 						data+="Winner=" + curPlayer.getRealName().toString();
-						data+="Score=" + curPlayer.getScore();
+						data+=" Score=" + curPlayer.getScore();
 //	    			String winner = curPlayer.getRealName()+" Winner score="+curPlayer.getScore();
 //	    			out.write(winner.getBytes());
 	    		}

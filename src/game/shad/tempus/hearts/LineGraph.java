@@ -26,11 +26,11 @@ public class LineGraph {
     public XYMultipleSeriesDataset dataset;
     public XYMultipleSeriesRenderer mRenderer;
     
-	public Intent getInent(Context context, int[] data1, int[] data2, int[] data3, int[] data4){
+	public Intent getInent(Context context, int[] data1, int[] data2, int[] data3, int[] data4, String title){
 		
 		graphData(data1, data2, data3, data4);
 		
-		Intent intent = ChartFactory.getLineChartIntent(context, dataset, mRenderer, "Points per Player per Round");
+		Intent intent = ChartFactory.getLineChartIntent(context, dataset, mRenderer, title);
 		
 		
 		return intent;

@@ -179,10 +179,13 @@ public class Game extends Activity {
     	switch(2){
     	case 1:
         	path = main.getCacheDir();
+        	break;
     	case 2:
-        	path = main.getApplicationContext().getFilesDir();
+        	path = main.getFilesDir();
+        	break;
     	case 3:
         	path = main.getExternalCacheDir();
+        	break;
         
     	}
     	Log.d(TAG, "settings Saved");
@@ -936,6 +939,7 @@ public class Game extends Activity {
 				gameOver();
 				return true;
 			}
+			roundWinnerAndPoints.add(new TrickStats(points, curPlayer, tableTrick));  
 		return false;
 	}
 	
@@ -1508,19 +1512,30 @@ public class Game extends Activity {
 	    	//TODO fill empty then overwrite.
 	    	wonCount=1;
 	    }
-	    JSONObject jsonData = writeJSON();
-	    Log.d(TAG, jsonData.length()+"");
-		Log.d(TAG, jsonData.toString());
-		if(path==null){
-    		setupSaveSettings();
-    	}
-
+	    String als = writeTextFile();
 	    try {
-			saveToSD("winner"+wonCount, jsonData);
+			saveStringArray("winner"+wonCount, als);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	    	
+	    	
+	    	
+	    	
+//	    JSONObject jsonData = writeJSON();
+//	    Log.d(TAG, jsonData.length()+"");
+//		Log.d(TAG, jsonData.toString());
+//		if(path==null){
+//    		setupSaveSettings();
+//    	}
+//
+//	    try {
+//			saveToSD("winner"+wonCount, jsonData);
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
 	    SharedPreferences.Editor editor = preferences.edit();
 	    editor.putInt("wonInt", wonCount);
@@ -1535,8 +1550,8 @@ public class Game extends Activity {
      * @throws FileNotFoundException
      */
     public void saveToSD(String fileName, JSONObject data) throws FileNotFoundException{
-    	Log.d(TAG, "Saving new save file to\n"+path+fileName+".json");
-    	File file = new File(path, fileName+".json");
+    	Log.d(TAG, "Saving new save file to\n"+path+fileName+".txt");
+    	File file = new File(path, fileName+".txt");
 		    	
     	if(!path.exists()){
     		path.mkdirs();
@@ -1605,6 +1620,67 @@ public class Game extends Activity {
 		  return object;
 	}
 	
+	public String writeTextFile() {
+		Log.d(TAG, "writeJSON()");
+		String tricks = "";
+			  int trickCounter=1;
+			  int hand=1;
+			  for(int i=0; i<roundWinnerAndPoints.size();i++){
+				  
+				  if(trickCounter==14){
+					  hand++;
+					  trickCounter=1;
+				  }
+				  String trick="Hand="+hand+" Trick="+trickCounter+":"+roundWinnerAndPoints.get(i).jsonWinnerString+"$";
+				  tricks+=trick;
+				  trickCounter++;
+			  }
+		  
+		  return tricks;
+	}
+	/**
+	 * Saves the Coords to the SD card.
+     * @param v
+     * @throws FileNotFoundException
+     */
+    public void saveStringArray(String fileName, String data) throws FileNotFoundException{
+    	Log.d(TAG, "Saving new save file to\n"+path+fileName+".txt");
+    	File file = new File(path, fileName+".txt");
+		    	
+    	if(!path.exists()){
+    		path.mkdirs();
+    	}
+	    if(path.canWrite()){
+	    	try {
+	    		FileOutputStream logWriter = new FileOutputStream(file);
+	    		BufferedOutputStream out = new BufferedOutputStream(logWriter);
+	    		if(gameOver){
+						data+="Winner=" + curPlayer.getRealName().toString();
+						data+="Score=" + curPlayer.getScore();
+//	    			String winner = curPlayer.getRealName()+" Winner score="+curPlayer.getScore();
+//	    			out.write(winner.getBytes());
+	    		}
+	    		out.write(data.toString().getBytes());
+
+	            out.flush();
+	            out.close();   
+	            logWriter.close();
+		    	Toast.makeText(context, "Saved "+fileName, Toast.LENGTH_SHORT).show();
+
+	        }
+	    	catch (IOException e) {	
+				e.printStackTrace();
+				bottomText.setText("File failed to write");
+	    	}
+	    	
+    	}
+    	else{
+    		//cant write
+    		Toast.makeText(context, "Not Writable", Toast.LENGTH_SHORT).show();
+
+    	}
+        
+    }
   	///////////////////////////////////////////////////////////////////////Touch Events///////////////////////////////////////////////////////////////////////////
 	public void deckViewTouched(int x, int y) {
 		boolean done =false;
@@ -1844,6 +1920,7 @@ public class Game extends Activity {
 		BlueBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.blue_back);
 		BlackBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.black_back);
 		RedBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.red_back);
+		CardBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.cardback);
 
 		ClubsTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.clubs2);
 		ClubsThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.clubs3);
@@ -1907,6 +1984,7 @@ public Bitmap GreenBack;
 public Bitmap BlueBack;
 public Bitmap BlackBack;
 public Bitmap RedBack;
+public Bitmap CardBack;
 
 public Bitmap ClubsTwo;
 public Bitmap ClubsThree;

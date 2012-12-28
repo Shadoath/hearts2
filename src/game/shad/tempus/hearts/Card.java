@@ -69,6 +69,8 @@ public class Card {
             switch(v){	 
             	case 0:
             		return game.GreenBack;
+            	case 1:
+            		return game.CardBack;
                 case 2:
                     return game.ClubsTwo;
                 case 3:

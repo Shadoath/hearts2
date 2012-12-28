@@ -91,4 +91,5 @@
         <string name="delete">Delete</string>
         <string name="linegraph">LineGraph</string>
         <string name="parse">ParseData</string>
+        <string name="history">Game History</string>
 </resources>

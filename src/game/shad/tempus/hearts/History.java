@@ -48,6 +48,7 @@ public class History extends Activity{
     public int[] data4 = {0, 3, 3, 3, 16, 17, 23, 24, 14, 14, 14, 22};
     public JSONArray fileJsonArray;
     public String[] fileArrayString;
+    public String winningPlayer = "nobody";
 
     //So far only 10 files for Saves.
     public void onCreate(Bundle savedInstanceState) {
@@ -94,62 +95,68 @@ public class History extends Activity{
     	int count = -1;
     	
     	for(String d : data){
-    		boolean negativePoints=false;
-    		count++;
-        	int plusSpot=0;
-
-    		Log.d(TAG, "data="+d);
-    		int hand=d.charAt(5) - '0';
-    		if(d.charAt(6)!=' '){
-    			hand=hand*10;
-    			hand+=d.charAt(6) - '0';
-    			plusSpot++;
-    			Log.d(TAG, "plusSpot++ hand");
-    		}
-			Log.d(TAG, "hand="+hand);
-			
-    		int trick=d.charAt(13+plusSpot) - '0';
-    		if(d.charAt(14+plusSpot)!=':'){
-    			trick=trick*10;
-    			trick+=d.charAt(14+plusSpot) - '0';
-    			plusSpot++;
-    			Log.d(TAG, "plusSpot++ Trick");
-
-
-    		}
-			Log.d(TAG, "trick="+trick);
-
-			int winnerSeat = d.charAt(18+plusSpot) - '0';
-    		Log.d(TAG, "winnerSeat="+winnerSeat);
-			
-			if(d.charAt(21+plusSpot)=='-'){
-				negativePoints=true;
-				plusSpot++;
-				Log.d(TAG, "negative Points");
-
-			}
-			int points = d.charAt(21+plusSpot) - '0';
-    		if(d.charAt(22+plusSpot)!='}'){
-    			points=points*10;
-    			points+=d.charAt(22+plusSpot) - '0';
-    			plusSpot++;
-    			Log.d(TAG, "plusSpot++ Points");
-
-        		if(d.charAt(22+plusSpot)!='}'){
-        			points=points*10;
-        			points+=(int)d.charAt(22+plusSpot) - '0';
-        			Log.d(TAG, "LOTS OF POINTS");
-
-        		}
-    		}
-    		if(negativePoints){
-    			points*=-1;
-    		}
-			Log.d(TAG, "points="+points);
-			if(points==26){
+    		if(d.charAt(0)=='H'){
+	    		boolean negativePoints=false;
+	    		count++;
+	        	int plusSpot=0;
+	
+	    		Log.d(TAG, "data="+d);
+	    		int hand=d.charAt(5) - '0';
+	    		if(d.charAt(6)!=' '){
+	    			hand=hand*10;
+	    			hand+=d.charAt(6) - '0';
+	    			plusSpot++;
+	    			Log.d(TAG, "plusSpot++ hand");
+	    		}
+				Log.d(TAG, "hand="+hand);
 				
-			}
-			addToData(hand, trick, winnerSeat, points);
+	    		int trick=d.charAt(13+plusSpot) - '0';
+	    		if(d.charAt(14+plusSpot)!=':'){
+	    			trick=trick*10;
+	    			trick+=d.charAt(14+plusSpot) - '0';
+	    			plusSpot++;
+	    			Log.d(TAG, "plusSpot++ Trick");
+	
+	
+	    		}
+				Log.d(TAG, "trick="+trick);
+	
+				int winnerSeat = d.charAt(18+plusSpot) - '0';
+	    		Log.d(TAG, "winnerSeat="+winnerSeat);
+				
+				if(d.charAt(21+plusSpot)=='-'){
+					negativePoints=true;
+					plusSpot++;
+					Log.d(TAG, "negative Points");
+	
+				}
+				int points = d.charAt(21+plusSpot) - '0';
+	    		if(d.charAt(22+plusSpot)!='}'){
+	    			points=points*10;
+	    			points+=d.charAt(22+plusSpot) - '0';
+	    			plusSpot++;
+	    			Log.d(TAG, "plusSpot++ Points");
+	
+	        		if(d.charAt(22+plusSpot)!='}'){
+	        			points=points*10;
+	        			points+=(int)d.charAt(22+plusSpot) - '0';
+	        			Log.d(TAG, "LOTS OF POINTS");
+	
+	        		}
+	    		}
+	    		if(negativePoints){
+	    			points*=-1;
+	    		}
+				Log.d(TAG, "points="+points);
+				if(points==26){
+					
+				}
+				addToData(hand, trick, winnerSeat, points);
+    		}
+    		else{
+    			this.winningPlayer=d.toString();
+    			
+				}
 			
 			
     	}
@@ -158,12 +165,12 @@ public class History extends Activity{
     	
     }
     
-    public void makeNewLineGraph(){
+    public void makeNewLineGraph(String title){
  	   LineGraph line = new LineGraph();
  	   Log.d(TAG, "data1.length="+data1.length);
  	   Log.d(TAG, "data1.data="+data1.toString());
  	   if(data1.length>7 && data2.length==data3.length){	//could also check length of 2 and 4
-	 	   Intent lineIntent = line.getInent(this, data1, data2, data3, data4);
+	 	   Intent lineIntent = line.getInent(this, data1, data2, data3, data4, title);
 	 	   startActivity(lineIntent); 
  	   }
  	   else
@@ -233,7 +240,7 @@ public class History extends Activity{
     	Log.d(TAG, "P:"+winnerSeat+" Added data at:"+count+" points:-"+points);
     }
     public void showLineGraph (View view){
-	   makeNewLineGraph();
+	   makeNewLineGraph(winningPlayer);
     }
     
     

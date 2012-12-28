@@ -186,6 +186,14 @@
                     android:enabled="false"
                     android:onClick="onResumePressed"
                     android:text="@string/resume" />
+
+                <Button
+                    android:id="@+id/history"
+                    android:onClick="onHistoryPressed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/history" />
+
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

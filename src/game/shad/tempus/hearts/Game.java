@@ -1964,19 +1964,19 @@ public class Game extends Activity {
 		DiamondsKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.diamonds_king);
 		DiamondsAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.diamonds_ace);
 
-		SpadesTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade2);
-		SpadesThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade3);
-		SpadesFour = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade4);
-		SpadesFive = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade5);
-		SpadesSix = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade6);
-		SpadesSeven = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade7);
-		SpadesEight = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade8);
-		SpadesNine = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade9);
-		SpadesTen = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade10);
-		SpadesJack = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade_jack);
-		SpadesQueen = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade_queen);
-		SpadesKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade_king);
-		SpadesAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.spade_ace);
+		SpadesTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.spades2);
+		SpadesThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.spades3);
+		SpadesFour = BitmapFactory.decodeResource(main.getResources(), R.drawable.spades4);
+		SpadesFive = BitmapFactory.decodeResource(main.getResources(), R.drawable.spades5);
+		SpadesSix = BitmapFactory.decodeResource(main.getResources(), R.drawable.spades6);
+		SpadesSeven = BitmapFactory.decodeResource(main.getResources(), R.drawable.spades7);
+		SpadesEight = BitmapFactory.decodeResource(main.getResources(), R.drawable.spades8);
+		SpadesNine = BitmapFactory.decodeResource(main.getResources(), R.drawable.spades9);
+		SpadesTen = BitmapFactory.decodeResource(main.getResources(), R.drawable.spades10);
+		SpadesJack = BitmapFactory.decodeResource(main.getResources(), R.drawable.spades_jack);
+		SpadesQueen = BitmapFactory.decodeResource(main.getResources(), R.drawable.spades_queen);
+		SpadesKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.spades_king);
+		SpadesAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.spades_ace);
 		
 
 		HeartsTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.hearts2);

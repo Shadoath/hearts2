@@ -83,30 +83,7 @@ public class MainMenu extends Activity{
 	}
     	
 	
-	public boolean onCreateOptionsMenu(Menu menu) {
-    	MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.startmenu, menu);
-
-	    return true;
-    	}
-    
-    @Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
-    	switch(item.getItemId()){
-
-    	case R.id.history:
-    		Intent gameIntent  =new Intent(this, game.shad.tempus.hearts.History.class);
-    		startActivity(gameIntent);
-    		break;
-    	case R.id.doubleTap:
-    		
-    		break;
-    	
-    		    		
-    	}
-    	
-    	return true;
-    }
+	
     /**
      * Testing Code
 	/*/
@@ -162,6 +139,10 @@ public class MainMenu extends Activity{
 		
 	}
 	
+	public void onHistoryPressed(View v){
+		Intent gameIntent  =new Intent(this, game.shad.tempus.hearts.History.class);
+		startActivity(gameIntent);
+	}
 	
 	public void todo(View v){
 		Toast.makeText(MainMenu.this, "Still in progress...",  Toast.LENGTH_SHORT).show();

@@ -6,9 +6,9 @@ import org.json.JSONObject;
 
 
 
+
 public class TrickStats {
 	public static final String TAG = "Hearts--Trick";
-
 
 	public String winnerString;
 	public JSONObject jsonWinnerString;
@@ -56,19 +56,7 @@ public class TrickStats {
 		return jsonTrickArray;
 		}*/
 	
-	public class CardStats{
-		
-		public String owner;
-		public int suit;
-		public int value;
-		public String name;
-		
-		public CardStats(){
-			owner=null;
-			suit=0;
-			value=0;
-			name="";
-		}
-	}
+	
+	
 	
 }

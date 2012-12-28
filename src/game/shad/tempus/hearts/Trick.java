@@ -131,6 +131,10 @@ public class Trick{
 		
 	}
 	
+	public ArrayList<Card> getTrick(){
+		return trick;
+	}
+	
 	
 	
 }

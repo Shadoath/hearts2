@@ -26,9 +26,9 @@ public class LineGraph {
     public XYMultipleSeriesDataset dataset;
     public XYMultipleSeriesRenderer mRenderer;
     
-	public Intent getInent(Context context){
+	public Intent getInent(Context context, int[] data1, int[] data2, int[] data3, int[] data4){
 		
-//		graphData(data1, data2, data3, data4);
+		graphData(data1, data2, data3, data4);
 		
 		Intent intent = ChartFactory.getLineChartIntent(context, dataset, mRenderer, "Points per Player per Round");
 		
@@ -37,7 +37,7 @@ public class LineGraph {
 
 	}
 	
-	public void graphData(int[] data1, int[] data2, int[] data3, int[] data4){
+	public synchronized void graphData(int[] data1, int[] data2, int[] data3, int[] data4){
     	int count=0;
     	for (int i: data1){
       	   	 p1Series.add(count, i);
@@ -84,7 +84,6 @@ public class LineGraph {
     	
     	mRenderer.setXTitle("Round");
     	mRenderer.setYTitle("Points");
-    	mRenderer.setXAxisMax(50);
 //    	pointsPerRound = new LineChart(dataset, mRenderer);
     	
     }

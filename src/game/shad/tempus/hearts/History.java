@@ -62,27 +62,30 @@ public class History extends Activity{
     }
    
     public void parseData(View view){
-	   if(winnerString==null||winnerString.length()==0){
+		if(winnerString==null||winnerString.length()==0){
 			loadFile();
-	   }
-	   Log.d(TAG, "parsing data for:"+winnerString);
-	   
-	  fileArrayString=winnerString.split("\\$");
-	  int size = fileArrayString.length;
-	  Log.d(TAG,"Size="+size);
-	  size+=5;	//safety reasons
-	  data1 = new int[size];
-	  data2 = new int[size];
-	  data3 = new int[size];
-	  data4 = new int[size];
-	  data1[0] = 0;
-	  data2[0] = 0;
-	  data3[0] = 0;
-	  data4[0] = 0;
-	  setNewData(fileArrayString);
+		}
+		Log.d(TAG, "parsing data for:"+winnerString);
+		   
+		fileArrayString=winnerString.split("\\$");
+		int size = fileArrayString.length;
+		Log.d(TAG,"Size="+size);
+		if(size<5){
+			Log.d(TAG, "Not enough data to build a graph");
+			bottomText.setText("Not enough data to Parse.");
+			return;
+		}
+		size+=3;	//safety reasons
+		data1 = new int[size];
+		data2 = new int[size];
+		data3 = new int[size];
+		data4 = new int[size];
+		data1[0] = 0;
+		data2[0] = 0;
+		data3[0] = 0;
+		data4[0] = 0;
+		setNewData(fileArrayString);
   
- 	 
-    	
     }
     
     public void setNewData(String[] data){
@@ -142,20 +145,30 @@ public class History extends Activity{
     			points*=-1;
     		}
 			Log.d(TAG, "points="+points);
-			
+			if(points==26){
+				
+			}
 			addToData(hand, trick, winnerSeat, points);
 			
 			
     	}
-    	makeNewLineGraph();
+		bottomText.setText("Data Parsed! Press 'graph'");
+    	//makeNewLineGraph();
     	
     }
     
     public void makeNewLineGraph(){
  	   LineGraph line = new LineGraph();
- 	   line.graphData(data1, data2, data3, data4);
- 	   Intent lineIntent = line.getInent(this);
- 	   startActivity(lineIntent); 
+ 	   Log.d(TAG, "data1.length="+data1.length);
+ 	   Log.d(TAG, "data1.data="+data1.toString());
+ 	   if(data1.length>7 && data2.length==data3.length){	//could also check length of 2 and 4
+	 	   Intent lineIntent = line.getInent(this, data1, data2, data3, data4);
+	 	   startActivity(lineIntent); 
+ 	   }
+ 	   else
+ 	   {
+			bottomText.setText("Not enough data to build a graph");
+ 	   }
     }
     
     public void addToData(int hand, int trick, int winnerSeat, int points){
@@ -186,11 +199,41 @@ public class History extends Activity{
     	Log.d(TAG, "P:"+winnerSeat+" Added data at:"+count+" points:"+points);
     }
     
-   public void showLineGraph (View view){
-	   LineGraph line = new LineGraph();
-	   Intent lineIntent = line.getInent(this);
-	   startActivity(lineIntent); 
-   }
+    /**
+     * When the moon is shoot everyone one else gets 26 points and 26 is taken from shooters score
+     * 
+     * @param hand
+     * @param trick
+     * @param winnerSeat
+     * @param points
+     */
+    public void addToDataMoonShot(int hand, int trick, int winnerSeat, int points){
+    	int count = (hand-1)*13+trick;
+    	int countMinusOne = count-1; 
+    	data1[count]=data1[countMinusOne]+points;
+    	data2[count]=data2[countMinusOne]+points;
+		data3[count]=data3[countMinusOne]+points;
+		data4[count]=data4[countMinusOne]+points;
+    	switch(winnerSeat){
+    	case 1:
+    		
+    		data1[count]=data1[countMinusOne]-points;
+    		break;
+    	case 2:
+    		data2[count]=data2[countMinusOne]-points;
+    		break;
+    	case 3:
+  		    data3[count]=data3[countMinusOne]-points;
+    		break;
+    	case 4:
+    		data4[count]=data4[countMinusOne]-points;
+    		break;
+    	}
+    	Log.d(TAG, "P:"+winnerSeat+" Added data at:"+count+" points:-"+points);
+    }
+    public void showLineGraph (View view){
+	   makeNewLineGraph();
+    }
     
     
     protected void setDatasetRenderer(XYMultipleSeriesDataset dataset, XYMultipleSeriesRenderer renderer){

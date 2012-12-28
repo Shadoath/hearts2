@@ -870,6 +870,11 @@ public class Game extends Activity {
 				
 	}
 	
+	/**
+	 * Called after pick up hand if game is not over
+	 * Resets round variables and calls heartsMe()
+	 * 
+	 */
 	private void newRound(){
 		Log.d(TAG, "New round");
 		playCard.setEnabled(false);	//This should fix hitting next to fast and causing a GO() that will crash game.  Re-enabled in HeartsMe()
@@ -880,7 +885,16 @@ public class Game extends Activity {
 	}
 
 	
-	
+	/**
+	 * Checks total scores for the round to see if anyone shot the moon
+	 * 
+	 * If true adds 26 points to everyone else and takes the 26 points away from self.
+	 * 
+	 * @return True if hit AND game is over
+	 * Else false and game continues.
+	 * OPTION if game is over due to shooting the moon just minus 26 points from players score
+	 * OR give option to choose.
+	 */
 	private boolean shootingForTheMoon(){
 		boolean hit = false;
 		Log.d(TAG, "Shooting for the Moon");
@@ -939,7 +953,7 @@ public class Game extends Activity {
 				gameOver();
 				return true;
 			}
-			roundWinnerAndPoints.add(new TrickStats(points, curPlayer, tableTrick));  
+//			roundWinnerAndPoints.add(new TrickStats(points, curPlayer, tableTrick));  
 		return false;
 	}
 	

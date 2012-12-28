@@ -15,9 +15,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.R.integer;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract.Contacts.Data;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -76,6 +78,7 @@ public class History extends Activity{
 			bottomText.setText("Not enough data to Parse.");
 			return;
 		}
+		size++;
 		data1 = new int[size];
 		data2 = new int[size];
 		data3 = new int[size];
@@ -153,6 +156,12 @@ public class History extends Activity{
 				addToData(hand, trick, winnerSeat, points);
     		}
     		else{
+    			int dataSize = data1.length-1;
+    			int dataSizeMinusOne = dataSize-1;
+    	    	data1[dataSize]=data1[dataSizeMinusOne];
+    	    	data2[dataSize]=data2[dataSizeMinusOne];
+    			data3[dataSize]=data3[dataSizeMinusOne];
+    			data4[dataSize]=data4[dataSizeMinusOne];
     			this.winningPlayer=d.toString();
     			
 				}
@@ -177,6 +186,7 @@ public class History extends Activity{
 			bottomText.setText("Not enough data to build a graph");
  	   }
     }
+    
     
     public void addToData(int hand, int trick, int winnerSeat, int points){
     	int count = (hand-1)*13+trick;

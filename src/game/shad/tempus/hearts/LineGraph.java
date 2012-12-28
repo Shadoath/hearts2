@@ -28,7 +28,7 @@ public class LineGraph {
     
 	public Intent getInent(Context context){
 		
-		graphData();
+//		graphData(data1, data2, data3, data4);
 		
 		Intent intent = ChartFactory.getLineChartIntent(context, dataset, mRenderer, "Points per Player per Round");
 		
@@ -37,7 +37,7 @@ public class LineGraph {
 
 	}
 	
-	public void graphData(){
+	public void graphData(int[] data1, int[] data2, int[] data3, int[] data4){
     	int count=0;
     	for (int i: data1){
       	   	 p1Series.add(count, i);

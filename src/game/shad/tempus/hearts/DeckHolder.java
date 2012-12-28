@@ -58,7 +58,7 @@ public class DeckHolder extends SurfaceView  implements Callback, OnTouchListene
     	this.position=0;
     	int i = 0;
     	while(i  < 12){
-	        this.deck.addCard(new Card(0,0, game));
+	        this.deck.addCard(new Card(0,1, game));
 	        i++;
     	}
     }

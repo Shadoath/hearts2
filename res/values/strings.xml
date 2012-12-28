@@ -89,7 +89,7 @@
         <string name="save">Save</string>
         <string name="prev">Previous</string>
         <string name="delete">Delete</string>
-        <string name="linegraph">LineGraph</string>
+        <string name="linegraph">Graph</string>
         <string name="parse">ParseData</string>
         <string name="history">Game History</string>
 </resources>

@@ -76,7 +76,6 @@ public class History extends Activity{
 			bottomText.setText("Not enough data to Parse.");
 			return;
 		}
-		size+=3;	//safety reasons
 		data1 = new int[size];
 		data2 = new int[size];
 		data3 = new int[size];

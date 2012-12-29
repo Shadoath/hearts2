@@ -80,12 +80,12 @@ public class LineGraph {
     	
     	XYSeriesRenderer renderer3 = new XYSeriesRenderer();
     	renderer3.setColor(Color.YELLOW);
-    	renderer3.setPointStyle(PointStyle.POINT);
+//    	renderer3.setPointStyle(PointStyle.POINT);
     	mRenderer.addSeriesRenderer(renderer3);
 
     	XYSeriesRenderer renderer4 = new XYSeriesRenderer();
     	renderer4.setColor(Color.GREEN);
-    	renderer4.setPointStyle(PointStyle.CIRCLE);
+//    	renderer4.setPointStyle(PointStyle.CIRCLE);
     	mRenderer.addSeriesRenderer(renderer4);
     	
     	mRenderer.setXTitle("Round");

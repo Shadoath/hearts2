@@ -2,6 +2,7 @@ package game.shad.tempus.hearts;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.chart.LineChart;
+import org.achartengine.chart.PointStyle;
 import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
@@ -28,7 +29,7 @@ public class LineGraph {
     
 	public Intent getInent(Context context, int[] data1, int[] data2, int[] data3, int[] data4, String title){
 		
-		graphData(data1, data2, data3, data4);
+		graphPointData(data1, data2, data3, data4);
 		
 		Intent intent = ChartFactory.getLineChartIntent(context, dataset, mRenderer, title);
 		
@@ -37,8 +38,9 @@ public class LineGraph {
 
 	}
 	
-	public synchronized void graphData(int[] data1, int[] data2, int[] data3, int[] data4){
+	public synchronized void graphPointData(int[] data1, int[] data2, int[] data3, int[] data4){
     	int count=0;
+    	int xSize= data1.length;
     	for (int i: data1){
       	   	 p1Series.add(count, i);
       	   	 count++;
@@ -68,7 +70,9 @@ public class LineGraph {
     	
     	XYSeriesRenderer renderer1 = new XYSeriesRenderer();
     	renderer1.setColor(Color.BLUE);
+    	renderer1.setPointStyle(PointStyle.DIAMOND);
     	mRenderer.addSeriesRenderer(renderer1);
+    	
     	
     	XYSeriesRenderer renderer2 = new XYSeriesRenderer();
     	renderer2.setColor(Color.RED);
@@ -76,10 +80,12 @@ public class LineGraph {
     	
     	XYSeriesRenderer renderer3 = new XYSeriesRenderer();
     	renderer3.setColor(Color.YELLOW);
+    	renderer3.setPointStyle(PointStyle.POINT);
     	mRenderer.addSeriesRenderer(renderer3);
-    	
+
     	XYSeriesRenderer renderer4 = new XYSeriesRenderer();
     	renderer4.setColor(Color.GREEN);
+    	renderer4.setPointStyle(PointStyle.CIRCLE);
     	mRenderer.addSeriesRenderer(renderer4);
     	
     	mRenderer.setXTitle("Round");

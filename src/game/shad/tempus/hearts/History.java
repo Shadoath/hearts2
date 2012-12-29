@@ -309,8 +309,24 @@ public class History extends Activity{
 		}
 		Log.d(TAG, out.length()+out);
 		winnerString=out;
-		bottomText.setText("Winner file:"+winnerCount);
-		bottomText2.setText("loaded file="+out);
+
+		if(parseData()){
+			bottomText2.setText("");
+			int lastSpot = fileArrayString.length-1;
+			
+			if(winningPlayer.equals("nobody")){
+				bottomText2.append("No Winner");
+			}
+			else{
+				bottomText2.append(winningPlayer);
+			}
+			bottomText2.append("Total Tricks="+lastSpot);
+
+		}
+		else{
+			bottomText.setText("Winner file:"+winnerCount);
+			bottomText2.setText("loaded file="+out);
+		}
     }
         
     public void loadNextSave(View v){

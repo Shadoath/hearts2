@@ -621,6 +621,7 @@ public class Game extends Activity {
 		tableHolder.addCard(nextCard);
 		bottomText2.append("Round Started!"+eol+curPlayer.getRealName()+" had the "+ nextCard.name+eol);
 		nextPlayer();	
+		update();
 		Log.d(TAG, "0101010--0101010--0101010--0101010--0101010");
 	}
 	
@@ -869,10 +870,7 @@ public class Game extends Activity {
 				Log.d(TAG, "New Round needed, games is not over yet.");
 				newRound();
 			}
-			else{
-				return;
-			}
-
+			
 		}
 		else{
 			setState(highSeat);		//Used by AI for picking next card.
@@ -884,6 +882,7 @@ public class Game extends Activity {
 			public void run() {
 				if(justPickedUpPile){
 					clearTableCards();			
+					tableTrick.clearALL();
 					update();					
 					justPickedUpPile=false;
 				}
@@ -1111,7 +1110,7 @@ public class Game extends Activity {
 	
 ///////////////////////////////////////////////////////////////////////////////GAMEVIEW ////////////////////////////////////
     public void findViewsById() {
-    	Log.d(TAG, "firstStart()");
+    	Log.d(TAG, "findViewsById()");
     	roundView = (TextView) main.findViewById(R.id.roundView);
     	bottomText = (TextView) main.findViewById(R.id.bottomTV);
     	bottomText2 = (TextView) main.findViewById(R.id.bottomTV2);
@@ -1393,6 +1392,7 @@ public class Game extends Activity {
 	
 	/**
 	 * Takes the curPlayer and updates to the nextPlayer.
+	 * Sets bottom Text 1
 	 * 
 	 */
 	public void nextPlayer(){

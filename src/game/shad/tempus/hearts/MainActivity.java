@@ -8,14 +8,18 @@ import game.shad.tempus.hearts.GameThread.AutoRunState;
 import game.shad.tempus.hearts.GameThread.State;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.database.CursorJoiner.Result;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -39,6 +43,7 @@ public class MainActivity extends Activity {
 	public Game game;
 	public GameThread gt;
     private Toast myToast;
+    private ProgressDialog progressDialog;  
 
 	public Handler handler; //Handler to UI thread to post tasks to.
 	private WakeLock mWakeLock;
@@ -52,6 +57,21 @@ public class MainActivity extends Activity {
         Intent gameIntent = getIntent();
         gameBundle = gameIntent.getExtras();
         Log.d(TAG, "onCreate");
+        myContext = this.getApplicationContext();
+    	main= this;
+    	if(gameBundle.getBoolean("screenMode", true)){
+        	Log.d(TAG, "Portait Mode");
+        	
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            setContentView(R.layout.tableportrait);
+
+        }
+        else{
+        	Log.d(TAG, "LandScape Mode");
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        	setContentView(R.layout.tablelandscape);
+        }
+
         //TODO create option for landscape mode.
         if(gameBundle.getBoolean("screenMode", true)){
         	Log.d(TAG, "Portait Mode");
@@ -67,28 +87,33 @@ public class MainActivity extends Activity {
         }
         myContext = getBaseContext();
     	main= this;
+
+    	
+    	
     	game = new Game(gameBundle, myContext, main);
 		myToast  = Toast.makeText(getBaseContext(), "", Toast.LENGTH_SHORT);
 		gt = new GameThread(myContext, main, game, gameBundle.getInt("aiTime"));
     	game.createDeckTableViews();
         Log.d(TAG, "created Views");
-        game.heartsMe();
-        gt.start();
-   	
+
+
     }
     
-    
+
 	@Override
     protected void onStart(){
     	super.onStart();
     	Log.d(TAG, "onStart");       
-        handler= new Handler();
-        if(gt==null){
-        	return;
-        }
-//        if(gt.state.compareAndSet(State.PAUSED, State.RUNNING)){
-//	        gt.interrupt();
-//      	}
+        game.heartsMe();
+        gt.start();
+
+//        if(gt==null){
+//        	return;
+//        }
+        if(gt.state.compareAndSet(State.PAUSED, State.RUNNING)){
+	        gt.interrupt();
+      	}
+        gt.autoRunState.compareAndSet(AutoRunState.PAUSED,  AutoRunState.RUNNING);
 
 
   	}
@@ -108,13 +133,10 @@ public class MainActivity extends Activity {
     protected void onResume() {
     	Log.d(TAG, "onResume");
     	super.onResume();
-		if(gt.state.compareAndSet(State.PAUSED, State.RUNNING)) {
-			gt.interrupt();
-      		Log.d(TAG, "Restarting game thread in start");
-      		gt.autoRunState.compareAndSet(AutoRunState.PAUSED,  AutoRunState.RUNNING);
+        handler= new Handler();
 
 
-		}
+		
 
 
     }
@@ -145,6 +167,7 @@ public class MainActivity extends Activity {
     @Override 
     public void onBackPressed(){
     	super.onBackPressed();
+    	super.finish();
     	//TODO save the game state.
     }
     

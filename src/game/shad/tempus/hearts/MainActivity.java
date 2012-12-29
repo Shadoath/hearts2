@@ -85,10 +85,9 @@ public class MainActivity extends Activity {
         if(gt==null){
         	return;
         }
-        if(gt.state.compareAndSet(State.PAUSED, State.RUNNING)){
-      		Log.d(TAG, "Restarting game thread in start");
-	        gt.interrupt();
-      	}
+//        if(gt.state.compareAndSet(State.PAUSED, State.RUNNING)){
+//	        gt.interrupt();
+//      	}
 
 
   	}
@@ -110,6 +109,9 @@ public class MainActivity extends Activity {
     	super.onResume();
 		if(gt.state.compareAndSet(State.PAUSED, State.RUNNING)) {
 			gt.interrupt();
+      		Log.d(TAG, "Restarting game thread in start");
+      		gt.autoRunState.compareAndSet(AutoRunState.PAUSED,  AutoRunState.RUNNING);
+
 
 		}
 
@@ -188,7 +190,7 @@ public class MainActivity extends Activity {
     	case R.id.normalRun:
     		Log.d(TAG, "Normal Run");
     		if(gt.fullAutoRun){
-    			gt.fullAutoRun=!gt.fullAutoRun;
+    			gt.fullAutoRun=false;
     		}
     		if(!gt.autoRunState.compareAndSet(AutoRunState.PAUSED,  AutoRunState.RUNNING))
     			gt.autoRunState.compareAndSet(AutoRunState.RUNNING,  AutoRunState.PAUSED);

@@ -477,10 +477,21 @@ public class Game extends Activity {
 	/**
 	 * Called when player has picked all his cards.
 	 */
-	public synchronized void tradeCards(){
+	public void tradeCards(){
+		Log.d(TAG, "Start of Trading cards are:");
+		displayPlayerCards(p1);
+		displayPlayerCards(p2);
+		displayPlayerCards(p3);
+		displayPlayerCards(p4);
+		Log.d(TAG, "Getting cards to trade:");
+
 		p2.getCardsToTrade();
 		p3.getCardsToTrade();
 		p4.getCardsToTrade();
+		displayPlayerCards(p1);
+		displayPlayerCards(p2);
+		displayPlayerCards(p3);
+		displayPlayerCards(p4);
 		switch (session){
 		case 1:	
 			Log.d(TAG, "Trading Left");
@@ -523,7 +534,14 @@ public class Game extends Activity {
 			Log.d(TAG, "Error there should not be trading now!");
 		break;
 		}
-
+		if(!p1.tradingCardsRemoved){	//Self picked cards.
+			p1.removeCardsFromDeck(p1.cardsToTrade);
+		}
+		Log.d(TAG, "cards should be traded...");
+		displayPlayerCards(p1);
+		displayPlayerCards(p2);
+		displayPlayerCards(p3);
+		displayPlayerCards(p4);
 		p1.cardsToTrade.clear();
 		p2.cardsToTrade.clear();
 		p3.cardsToTrade.clear();
@@ -533,12 +551,11 @@ public class Game extends Activity {
 		p2.sortHandFromDeck();
 		p3.sortHandFromDeck();
 		p4.sortHandFromDeck();
-        voidCheckAllPlayers();	//Run this before doing player logic 
 		this.trading=false;
-		this.slidingDeckHolder.addDeck(p1.getDeck());
+		slidingDeckHolder.addDeck(p1.getDeck());
 		playCard.setEnabled(true);
 		checkForTwoMethod();
-		update();
+//		update();
 
 	}
 	
@@ -547,7 +564,7 @@ public class Game extends Activity {
 	 * Finds who has the 2 of clubs and forces them to play it
 	 * Sets the states for the next round
 	 * Then advances the curPlayer
-	 * Checks all players for queen of Spades
+	 * Checks all players for Voids and the queen of Spades
 	 */
 	public void checkForTwoMethod(){
 		Log.d(TAG, "checkForTwoMethod() called");
@@ -643,6 +660,7 @@ public class Game extends Activity {
 				}
 				else{
 					p1.removeCardsFromDeck(p1.cardsToTrade);
+					p1.tradingCardsRemoved=true;
 				}
 				tradeCards();
 				return;
@@ -1448,6 +1466,7 @@ public class Game extends Activity {
 		jackFoundP4 = false;		
 		jackFound 	= false;
 		queenFound	= false;
+		p1.tradingCardsRemoved = false;
 		p1.claimedDeck= false;
 		p2.claimedDeck= false;
 		p3.claimedDeck= false;
@@ -1460,7 +1479,7 @@ public class Game extends Activity {
 			heartsPlayed.setText("H="+heartsPlayedInt);
 		}
 		resetPlayerHolderCards();
-		update();
+		//update();
 	}
 	
 	/**

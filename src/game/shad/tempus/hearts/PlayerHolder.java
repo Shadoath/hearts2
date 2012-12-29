@@ -70,7 +70,7 @@ public class PlayerHolder extends SurfaceView implements Callback, OnTouchListen
     @Override
     protected void onDraw(Canvas canvas){
     	super.onDraw(canvas);
-        Log.d(TAG, "onDraw, PH for "+player.getRealName());
+//        Log.d(TAG, "onDraw, PH for "+player.getRealName());
         card.draw(canvas);
         paint.setColor(player.colorInt);
      	canvas.drawText(player.getRealName(), textWidth, 15, paint);

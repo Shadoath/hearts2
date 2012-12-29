@@ -71,7 +71,12 @@ public class MainMenu extends Activity{
 		CheckBox cardCounter = (CheckBox) findViewById(R.id.cardCounterCheckBox);
 		boolean cC = cardCounter.isChecked();
 		gameBundle.putBoolean("cardCounter", cC);
-        Display display = getWindowManager().getDefaultDisplay(); 
+
+		CheckBox screenMode = (CheckBox) findViewById(R.id.PortaitMode);
+		boolean sMode = screenMode.isChecked();
+		gameBundle.putBoolean("screenMode", sMode);
+
+		Display display = getWindowManager().getDefaultDisplay(); 
         int width = display.getWidth();
         int height = display.getHeight();
         gameBundle.putInt("height", height);

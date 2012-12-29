@@ -78,7 +78,7 @@ public class Game extends Activity {
 	private boolean jackFoundP2 	= false;
 	private boolean jackFoundP3 	= false;
 	private boolean jackFoundP4 	= false;
-	private boolean portaitMode 	= false;
+	private boolean screenMode 	= false;
 	
 	public int playerHelperInt=0;
 	public int playerHelperIntTotal=0;
@@ -165,7 +165,8 @@ public class Game extends Activity {
         Log.d(TAG, "shuffle type= "+shuffleType);
 
         Log.d(TAG, "difficulty= "+difficulty);
-        portaitMode = b.getBoolean("portaitMode", true);
+        screenMode = b.getBoolean("screenMode", true);
+        Log.d(TAG, "screenMode ="+screenMode);
         this.restart = (Boolean) b.get("restart");
 //        createBlankHand();
         myToast  = Toast.makeText(context, "", Toast.LENGTH_SHORT);
@@ -207,7 +208,7 @@ public class Game extends Activity {
         	playCard.setEnabled(false);
         	trading=true;
 	        bottomText.setText("Choose three cards to trade");
-	        bottomText2.setText("Trading..."+eol);
+			updateBottomTextWithTradingCards(true, p1.cardsToTrade);
         }
         else{	//NO trading  
         	playCard.setText("Play Card");
@@ -493,6 +494,7 @@ public class Game extends Activity {
 		displayPlayerCards(p4);
 		switch (session){
 		case 1:	
+			Log.d(TAG, "Trading Left");
 			//Trade Left p4->p3->p2->p1
 			p4.addCardsToDeck(p1.cardsToTrade);
 			
@@ -504,6 +506,7 @@ public class Game extends Activity {
 			updateBottomTextWithTradingCards(false, p2.cardsToTrade);
 		break;
 		case 2:
+			Log.d(TAG, "Trading Right");
 			//Trade right p1->p2->p3->p4
 			p2.addCardsToDeck(p1.cardsToTrade);
 			
@@ -515,6 +518,7 @@ public class Game extends Activity {
 			p3.addCardsToDeck(p2.cardsToTrade);
 		break;
 		case 3:
+			Log.d(TAG, "Trading Across");
 			//across p2 to p4
 			p4.addCardsToDeck(p2.cardsToTrade);
 			
@@ -548,8 +552,6 @@ public class Game extends Activity {
 		p3.sortHandFromDeck();
 		p4.sortHandFromDeck();
 		this.trading=false;
-		slidingDeckHolder.addDeck(p1.getDeck());
-		
 		slidingDeckHolder.addDeck(p1.getDeck());
 		playCard.setEnabled(true);
 		checkForTwoMethod();
@@ -650,11 +652,15 @@ public class Game extends Activity {
 	 * Checks trading  // Only for round 1 but 
 	 * If on auto run cards will be picked for you.
 	 */
-	public void GO(){
+	public synchronized void GO(){
 		Log.d(TAG,  "!!!GO!!!  round="+round);
 			if(trading){//
 				if(p1.cardsToTrade.size()!=3){
 					p1.getCardsToTrade();
+				}
+				else{
+					p1.removeCardsFromDeck(p1.cardsToTrade);
+					p1.tradingCardsRemoved=true;
 				}
 				tradeCards();
 				return;
@@ -863,6 +869,9 @@ public class Game extends Activity {
 				Log.d(TAG, "New Round needed, games is not over yet.");
 				newRound();
 			}
+			else{
+				return;
+			}
 
 		}
 		else{
@@ -876,7 +885,6 @@ public class Game extends Activity {
 				if(justPickedUpPile){
 					clearTableCards();			
 					update();					
-					tableTrick.clearALL();
 					justPickedUpPile=false;
 				}
 			}
@@ -964,8 +972,14 @@ public class Game extends Activity {
 		else
 			Log.d(TAG, "Direct Hit!");
 			if(endGameCheck()){
-				bottomText2.append("GAME ENDING SHOT!");
-				Log.d(TAG, "game ending shot");
+				bottomText2.append("\nGAME ENDING SHOT!");
+				Log.d(TAG, "game ending shot, adding points to stats.");
+				roundWinnerAndPoints.add(new TrickStats(-26, p1, tableTrick));  
+				roundWinnerAndPoints.add(new TrickStats(-26, p2, tableTrick));  
+				roundWinnerAndPoints.add(new TrickStats(-26, p3, tableTrick));  
+				roundWinnerAndPoints.add(new TrickStats(-26, p4, tableTrick));  
+
+				
 				gameOver();
 				return true;
 			}
@@ -1117,12 +1131,12 @@ public class Game extends Activity {
     	playCard = (Button) main.findViewById(R.id.playCard);
 //    	leftButton = (Button) main.findViewById(R.id.left);
 //    	rightButton = (Button) main.findViewById(R.id.right);
-    	if(portaitMode){
+    	if(screenMode){
     		playCard.setWidth(screenWidth/4);
     	}
 
     	else{
-    		playCard.setWidth(screenWidth/4);
+    		playCard.setWidth(screenWidth/6);
 
     	}
     	//    		rightButton.setWidth(screenWidth/4);

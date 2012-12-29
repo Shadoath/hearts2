@@ -53,15 +53,6 @@
                 android:focusable="false" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/playCard"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight=".1"
-            android:onClick="onPlayCardPressed"
-            android:text="@string/playcard" />
-
         <LinearLayout
             android:id="@+id/TableRightView"
             android:layout_width="wrap_content"
@@ -71,24 +62,21 @@
             android:onClick="roundStatsPressed"
             android:orientation="vertical" >
 
-            <EditText
-                android:id="@+id/bottomTV"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="false"
-                android:ems="10"
-                android:focusable="false"
-                android:singleLine="true" >
-
-                <requestFocus />
-            </EditText>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <Button
+                    android:id="@+id/playCard"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".1"
+                    android:onClick="onPlayCardPressed"
+                    android:text="@string/playcard" />
+
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="right"
                     android:orientation="vertical" >
@@ -128,7 +116,18 @@
                         android:text="@string/unknown"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
                 </LinearLayout>
+
             </LinearLayout>
+
+            <EditText
+                android:id="@+id/bottomTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:ems="10"
+                android:focusable="false"
+                android:singleLine="true" />
+
         </LinearLayout>
 
     </LinearLayout>

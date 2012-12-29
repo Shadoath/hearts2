@@ -886,6 +886,7 @@ public class Player {
 	
 	/**
 	 * Grabs three cards from the biggest suits.  And queen if we have it.
+	 * clears cards to trade to make sure extras dont get traded.
 	 */
 	public void getCardsToTrade(){
 		this.cardsToTrade.clear();
@@ -896,6 +897,7 @@ public class Player {
 			worstCards.add(getQueen());
 		}
 		else{
+			Log.d(TAG+this.getRealName()+"-Trading", "no Queen");			
 			worstCards.add(getTradingCard());
 
 		}
@@ -933,7 +935,9 @@ public class Player {
 		}
 		c.setTouched(false);
 		this.deck.removeCard(c);
-		Log.d(TAG+this.getRealName(), "card to trade ===="+c.toString());
+		Log.d(TAG+this.getRealName()+"-Trading", "Trading the Queen");
+
+		Log.d(TAG+this.getRealName()+"-Trading", "CardPicked ===="+c.toString());
 		return c;
 				
 	}

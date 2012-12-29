@@ -53,8 +53,9 @@ public class MainActivity extends Activity {
         gameBundle = gameIntent.getExtras();
         Log.d(TAG, "onCreate");
         //TODO create option for landscape mode.
-        if(gameBundle.getBoolean("portaitMode", true)){
+        if(gameBundle.getBoolean("screenMode", true)){
         	Log.d(TAG, "Portait Mode");
+        	
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             setContentView(R.layout.tableportrait);
 

@@ -17,14 +17,6 @@
             android:layout_height="wrap_content"
             android:onClick="onPrevPressed"
             android:text="@string/prev" />
-
-        <Button
-            android:id="@+id/parseData"
-            android:onClick="parseData"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/parse" />
         
         <Button
             android:id="@+id/next"

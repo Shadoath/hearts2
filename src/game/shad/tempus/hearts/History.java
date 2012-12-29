@@ -64,7 +64,7 @@ public class History extends Activity{
     	 
     }
    
-    public void parseData(View view){
+    public boolean parseData(){
 		if(winnerString==null||winnerString.length()==0){
 			loadFile();
 		}
@@ -76,7 +76,7 @@ public class History extends Activity{
 		if(size<5){
 			Log.d(TAG, "Not enough data to build a graph");
 			bottomText.setText("Not enough data to Parse.");
-			return;
+			return false;
 		}
 		size++;
 		data1 = new int[size];
@@ -88,7 +88,7 @@ public class History extends Activity{
 		data3[0] = 0;
 		data4[0] = 0;
 		setNewData(fileArrayString);
-  
+		return true;
     }
     
     public void setNewData(String[] data){
@@ -174,15 +174,16 @@ public class History extends Activity{
     }
     
     public void makeNewLineGraph(String title){
- 	   LineGraph line = new LineGraph();
- 	   Log.d(TAG, "data1.length="+data1.length);
- 	   Log.d(TAG, "data1.data="+data1.toString());
- 	   if(data1.length>7 && data2.length==data3.length){	//could also check length of 2 and 4
-	 	   Intent lineIntent = line.getInent(this, data1, data2, data3, data4, title);
-	 	   startActivity(lineIntent); 
- 	   }
- 	   else
- 	   {
+    	if (parseData()){
+	 	   if(data1.length>7 && data2.length==data3.length){	//could also check length of 2 and 4
+	 		  LineGraph line = new LineGraph();
+		 	   Log.d(TAG, "data1.length="+data1.length);
+		 	   Log.d(TAG, "data1.data="+data1.toString());
+	 		   Intent lineIntent = line.getInent(this, data1, data2, data3, data4, title);
+		 	   startActivity(lineIntent); 
+	 	   }
+    	}
+ 	   else{
 			bottomText.setText("Not enough data to build a graph");
  	   }
     }
@@ -345,8 +346,5 @@ public class History extends Activity{
     	lineGraphButton = (Button) findViewById(R.id.lineGraphButton);
     	
     }
-   
-    
-
-    
+      
 }

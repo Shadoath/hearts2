@@ -78,8 +78,16 @@ public class GameThread extends Thread
 
 							}
 						}
+						main.handler.post(new Runnable() {
+							@Override
+							public void run() {
+								game.update();								
+							}
+						});
 						updateLastTime();
 					}
+					
+					
 				}
   
             } catch(InterruptedException e){

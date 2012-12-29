@@ -287,6 +287,7 @@ public class History extends Activity{
      */
     public void loadFile(){
 		String out=""; 
+		winningPlayer="nobody";
     	try
     	  {
     	     FileReader fro = new FileReader(loadPath);
@@ -314,13 +315,13 @@ public class History extends Activity{
 			bottomText2.setText("");
 			int lastSpot = fileArrayString.length-1;
 			
-			if(winningPlayer.equals("nobody")){
+			if(winningPlayer=="nobody"){
 				bottomText2.append("No Winner");
 			}
 			else{
 				bottomText2.append(winningPlayer);
 			}
-			bottomText2.append("Total Tricks="+lastSpot);
+			bottomText2.append("\nTotal Tricks="+lastSpot);
 
 		}
 		else{

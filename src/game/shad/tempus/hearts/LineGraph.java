@@ -1,6 +1,7 @@
 package game.shad.tempus.hearts;
 
 import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
 import org.achartengine.chart.LineChart;
 import org.achartengine.chart.PointStyle;
 import org.achartengine.model.XYMultipleSeriesDataset;
@@ -38,6 +39,15 @@ public class LineGraph {
 
 	}
 	
+	public GraphicalView getView(Context context, int[] data1, int[] data2, int[] data3, int[] data4){
+		
+		graphPointData(data1, data2, data3, data4);
+		
+		return ChartFactory.getLineChartView(context, dataset, mRenderer);
+		
+		
+
+	}
 	public synchronized void graphPointData(int[] data1, int[] data2, int[] data3, int[] data4){
     	int count=0;
     	int xSize= data1.length;

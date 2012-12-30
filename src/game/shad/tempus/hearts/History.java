@@ -328,6 +328,7 @@ public class History extends Activity{
 		}
 		Log.d(TAG, out.length()+out);
 		winnerString=out;
+		bottomText.setText("Winner file:"+winnerCount);
 
 		if(drawGraphInView()){
 			bottomText2.setText("");
@@ -335,16 +336,12 @@ public class History extends Activity{
 			
 			if(winningPlayer=="nobody"){
 				bottomText2.append("No Winner");
+	
 			}
+		
 			else{
-				bottomText2.append(winningPlayer);
+				bottomText2.setText("loaded file="+out);
 			}
-			bottomText2.append("\nTotal Tricks="+lastSpot);
-
-		}
-		else{
-			bottomText.setText("Winner file:"+winnerCount);
-			bottomText2.setText("loaded file="+out);
 		}
     }
         

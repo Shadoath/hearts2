@@ -21,6 +21,7 @@ public class Player {
 	public String realName = "";
 	public String shortName = "";
 	public int colorInt = 0;
+	public int AISmarts = 1;	//1 dumb, 2 normal, 3 smart, 11 dog
 	public int state = 0;   //using 1-4
 	public int score = 0;
 	public int totalScore=0;
@@ -56,11 +57,11 @@ public class Player {
 	public View textEntryView;
 	public Card twoOfClubs = null;
 	
-	public Player(MainActivity main, Game game, Deck deck, int score, int seat, String name, int color){
+	public Player(MainActivity main, Game game, Deck deck, int AISmarts, int seat, String name, int color){
 		this.main =main;
 		this.game = game;
 		this.deck = deck;
-		this.score = score;
+		this.AISmarts = AISmarts;
 		this.seat = seat;
 		setShortName();
 		this.realName = name;
@@ -93,6 +94,28 @@ public class Player {
 		
 	}
 	
+	/**
+	 * Basic call to get a card from the player.
+	 * Runs a simple switch on AISmarts to run correct go.
+	 * @param round Current round in the game.
+	 * @param trick the current trick.
+	 * @return Card to play.
+	 */
+	public Card go(int round, Trick trick){
+		switch (AISmarts){
+		case 1: 
+			return goDumb(round, trick);
+		case 2:
+			return goNormal(round, trick);
+		case 3:
+			return goNormal(round, trick);
+
+		case 11:
+			return goNormal(round, trick);
+		}
+		return goNormal(round, trick);
+
+	}
 	
 	/**
 	 * Picks the next card from Player's suit
@@ -100,7 +123,118 @@ public class Player {
 	 * @param trick
 	 * @return
 	 */
-	public Card go(int round, Trick trick){
+	public Card goDumb(int round, Trick trick){
+		Log.d(TAG+this.getRealName(), "player.go ="+this.realName);
+		
+		if(trick.getSize()==0){	
+			Log.d(TAG+this.getRealName(), "First Card of Pile");
+			return playLow(getLargestSuit(), 0);
+		}
+		
+		int startSuit=trick.getCard(0).getSuit();
+		Log.d(TAG+this.getRealName(), "Start suit is "+startSuit);
+		if(checkVoid(startSuit)){//This is the void CODE
+			if(hasQueen){
+				Log.d(TAG+this.getRealName(), "Queencheck = true");
+				if(game.round!=1){
+					return getQueen();
+				}
+			}
+			else{
+				Log.d(TAG+this.getRealName(), "hasQueen = false");
+			}
+			Log.d(TAG+this.getRealName(), "void--PlayHigh(getLargestSuit)");
+			if(game.round==1){
+				playHighDontBreakHearts(); //Play a high card but no points!
+			}
+			return playHighSimple(getLargestSuit(), 0);
+		}
+		boolean trickHasPoints = trick.hasPoints();
+		boolean trickNegativePoints = trick.hasNegativePoints();
+		switch (state){  //Set at the start of each round. Basically says where in the rotation does this player sit.
+		//No case 1: that is for picking start card.  Taken care of above.
+		case 2:
+			Log.d(TAG+this.getRealName(), "Seat 2!");
+
+			switch (round){
+			case 1: 
+				return playHighSimple(0, 0);
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+				Log.d(TAG+this.getRealName(), "round 2-7 --PlayLow("+startSuit+")");
+				return playLowSimple(startSuit, 0);
+			case 8:
+			case 9:
+			case 10:
+			case 11:
+			case 12:			
+			case 13:
+
+				Log.d(TAG+this.getRealName(), "round 8-13 --PlayLow("+startSuit+")");
+				return playLowSimple(startSuit, 0);
+			}
+		case 3:
+			Log.d(TAG+this.getRealName(), "Seat 3!");
+			switch (round){
+			case 1: 
+				return playHighSimple(0, 0);
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+			case 11:
+			case 12:
+			case 13:
+				if(trickHasPoints){
+					Log.d(TAG+this.getRealName(), "Play low/CardBelow--POINTS in pile!!");
+					return getDeckCardBelow(trick.getHighCard(), false);
+				}
+				if(trickNegativePoints)
+					playHighSimple(startSuit, 0);
+				else {
+					return getDeckCardBelow(trick.getHighCard(), false);
+				}
+			}
+		case 4:
+			if(round==1){
+				playHighSimple(0, 0);
+			}
+			Log.d(TAG+this.getRealName(), "Seat 4!");
+			if(trickHasPoints){
+				Log.d(TAG+this.getRealName(), "Play below highest in pile --POINTS in pile!!");
+				return getDeckCardBelow(trick.getHighCard(), true);
+			}
+			if(trickNegativePoints){
+				playHighSimple(startSuit, 0);
+			}
+			else if(startSuit==2 && hasQueen){
+				if(checkForCardsHigher(trick.TrickToDeck(), 12)){
+					return getQueen();
+				}
+			}
+			//take high
+			return playHighSimple(startSuit, 0);
+		}
+			
+		Log.d(TAG+this.getRealName(), "++++++Out of all Loops !!SHOULD NOT HAPPEN!!--PlayHigh("+startSuit+")");
+		Log.d(TAG+this.getRealName(), "++++++retuning 3 0 to not crash CODE!");
+
+		Toast.makeText(main, "OUT OF CARDS!!", Toast.LENGTH_SHORT).show();
+		Card oddBall = new Card(3, 0, game);
+		oddBall.setOwner(this);
+		return oddBall;
+	}
+	
+	public Card goNormal(int round, Trick trick){
 		Log.d(TAG+this.getRealName(), "player.go ="+this.realName);
 		
 		if(trick.getSize()==0){	
@@ -489,7 +623,8 @@ public class Player {
 	/**
 	 * Get the card that is just below the card sent for a value.
 	 * Use to keep low cards longer.
-	 * @param c
+	 * @param c Card to be lower than
+	 * @param lastPlayer if we are the last player of the trick, if true and we have no cards lower just play highest card.
 	 */
 	private Card getDeckCardBelow(Card c, boolean lastPlayer){
 		Log.d(TAG+this.getRealName(), "Checking for a card below "+c.toString());

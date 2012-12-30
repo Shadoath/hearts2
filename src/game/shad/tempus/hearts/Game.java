@@ -78,7 +78,7 @@ public class Game extends Activity {
 	private boolean jackFoundP2 	= false;
 	private boolean jackFoundP3 	= false;
 	private boolean jackFoundP4 	= false;
-	private boolean screenMode 	= false;
+	private boolean screenModePortrait 	= false;
 	
 	public int playerHelperInt=0;
 	public int playerHelperIntTotal=0;
@@ -165,8 +165,8 @@ public class Game extends Activity {
         Log.d(TAG, "shuffle type= "+shuffleType);
 
         Log.d(TAG, "difficulty= "+difficulty);
-        screenMode = b.getBoolean("screenMode", true);
-        Log.d(TAG, "screenMode ="+screenMode);
+        screenModePortrait = b.getBoolean("screenMode", true);
+        Log.d(TAG, "screenMode ="+screenModePortrait);
         this.restart = (Boolean) b.get("restart");
 //        createBlankHand();
         myToast  = Toast.makeText(context, "", Toast.LENGTH_SHORT);
@@ -453,9 +453,9 @@ public class Game extends Activity {
 			int color1 = Color.parseColor("#FF7711");
 			int color2 = Color.rgb(0, 50 , 200);
 			p1 = new Player(main, this, hand1, 0, 1, name, Color.GREEN); 
-			p2 = new Player(main, this, hand2, 0, 2, "(P2)", color1);
-			p3 = new Player(main, this, hand3, 0, 3, "(P3)", color2);
-			p4 = new Player(main, this, hand4, 0, 4, "(P4)", Color.RED);
+			p2 = new Player(main, this, hand2, difficulty, 2, "(P2)", color1);
+			p3 = new Player(main, this, hand3, difficulty, 3, "(P3)", color2);
+			p4 = new Player(main, this, hand4, difficulty, 4, "(P4)", Color.RED);
 			slidingDeckHolder.addDeck(hand1);
 			
 			createPlayerViews();
@@ -1130,8 +1130,8 @@ public class Game extends Activity {
     	playCard = (Button) main.findViewById(R.id.playCard);
 //    	leftButton = (Button) main.findViewById(R.id.left);
 //    	rightButton = (Button) main.findViewById(R.id.right);
-    	if(screenMode){
-    		playCard.setWidth(screenWidth/4);
+    	if(screenModePortrait){
+    		playCard.setWidth(screenWidth/3);
     	}
 
     	else{
@@ -1342,16 +1342,16 @@ public class Game extends Activity {
 		String spades = "";
 		String hearts = "";
 		for(int i=0; i<c.getSize();i++){
-			clubs+=c.getCard(i).getValue()+", ";
+			clubs+=c.getCard(i).getShortReadableValue()+", ";
 		}
 		for(int i=0; i<d.getSize();i++){
-			diamonds+=d.getCard(i).getValue()+", ";
+			diamonds+=d.getCard(i).getShortReadableValue()+", ";
 		}
 		for(int i=0; i<s.getSize();i++){
-			spades+=s.getCard(i).getValue()+", ";
+			spades+=s.getCard(i).getShortReadableValue()+", ";
 		}
 		for(int i=0; i<h.getSize();i++){
-			hearts+=h.getCard(i).getValue()+", ";
+			hearts+=h.getCard(i).getShortReadableValue()+", ";
 		}
 		Log.d(TAG, "clubs=" + clubs);
 		Log.d(TAG, "diamonds=" + diamonds);

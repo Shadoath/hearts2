@@ -61,11 +61,19 @@
         <EditText
             android:id="@+id/bottomTV2"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:clickable="false"
-            android:scrollbars="vertical"
             android:ems="10"
-            android:focusable="false" />
+            android:focusable="false"
+            android:scrollbars="vertical" />
+
+        <LinearLayout
+            android:id="@+id/graphLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.achartengine.GraphicalView;
 import org.achartengine.chart.LineChart;
 import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.model.XYSeries;
@@ -32,7 +33,7 @@ public class History extends Activity{
 
     public TextView bottomText;
     public TextView bottomText2;
-    public LinearLayout graphLayout;
+    public LinearLayout graphView;
     public Button lineGraphButton;
     public String loadPath = "";
     public File path;
@@ -168,7 +169,7 @@ public class History extends Activity{
 			
 			
     	}
-		bottomText.setText("Data Parsed! Press 'graph'");
+		bottomText.setText("Loaded winner file:" + winnerCount);
     	//makeNewLineGraph();
     	
     }
@@ -186,6 +187,23 @@ public class History extends Activity{
  	   else{
 			bottomText.setText("Not enough data to build a graph");
  	   }
+    }
+    public boolean drawGraphInView(){
+		if (parseData()){
+    		graphView.removeAllViews();
+			LineGraph line = new LineGraph();
+	 	    Log.d(TAG, "data1.length="+data1.length);
+	 	    Log.d(TAG, "data1.data="+data1.toString());
+	 	    GraphicalView gView = line.getView(this, data1, data2, data3, data4);
+	 	    
+	 	    graphView.addView(gView);
+	 	    return true;
+		}
+		else{
+			bottomText.setText("Not enough data to build a graph");
+			
+		}
+		return false;
     }
     
     
@@ -311,7 +329,7 @@ public class History extends Activity{
 		Log.d(TAG, out.length()+out);
 		winnerString=out;
 
-		if(parseData()){
+		if(drawGraphInView()){
 			bottomText2.setText("");
 			int lastSpot = fileArrayString.length-1;
 			
@@ -359,7 +377,7 @@ public class History extends Activity{
     public void findViewsByID(){
     	bottomText = (TextView) findViewById(R.id.bottomTV);
     	bottomText2 = (TextView) findViewById(R.id.bottomTV2);
-    	graphLayout = (LinearLayout) findViewById(R.id.graphLayout);
+    	graphView = (LinearLayout) findViewById(R.id.graphLayout);
     	lineGraphButton = (Button) findViewById(R.id.lineGraphButton);
     	
     }

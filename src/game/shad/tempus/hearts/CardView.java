@@ -22,5 +22,12 @@ public class CardView extends ImageView{
 	public Card getCard(){
 		return card;
 	}
+	
+	public void setCard(Card card){
+		this.card=card;
+	}
 
+	public void setCardSelected(boolean b){
+		card.setTouched(b);
+	}
 }

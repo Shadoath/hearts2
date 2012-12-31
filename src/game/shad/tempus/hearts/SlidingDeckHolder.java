@@ -27,10 +27,10 @@ public class SlidingDeckHolder extends LinearLayout
 
 	
     private Deck deck;
-    private ArrayList<View> cardViewSelected;
-    private ArrayList<View> tradingViews;
-    private View viewSelected;
-    private ImageView cardImageView;
+    private ArrayList<CardView> cardViewSelected;
+    private ArrayList<CardView> tradingViews;
+    private CardView viewSelected;
+    private CardView cardImageView;
     private Card Card;
     private Card firstCardTouched;
     private LinearLayout.LayoutParams params;
@@ -59,8 +59,8 @@ public class SlidingDeckHolder extends LinearLayout
        	
        	this.deck = new Deck();
         
-        cardViewSelected= new ArrayList<View>();
-        tradingViews= new ArrayList<View>();
+        cardViewSelected= new ArrayList<CardView>();
+        tradingViews= new ArrayList<CardView>();
         //addBlankCards();
         //this.addCardViews(cardView);
 
@@ -110,7 +110,7 @@ public class SlidingDeckHolder extends LinearLayout
 	 */
 	public void addDeck(Deck deck){
     	removeAllViews();
-		cardViewSelected= new ArrayList<View>();
+		cardViewSelected= new ArrayList<CardView>();
 		for(Card c: deck.getDeck()){
 			CardView cView= new CardView(mContext, c, params);
 			cView.setTag(c.toString());
@@ -119,7 +119,8 @@ public class SlidingDeckHolder extends LinearLayout
 				@Override
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
-					String t = v.getTag().toString();
+					CardView cv = (CardView) v;
+					String t = cv.getTag().toString();
 					Log.d(TAG, "tag="+t);
 					for(Card c: self.deck.getDeck()){
 						Log.d(TAG, "card Tag="+c.toString());
@@ -130,8 +131,10 @@ public class SlidingDeckHolder extends LinearLayout
 								if(tradingViews.size()>0){
 									int cardInt = 0;
 					    			for(View view : tradingViews){
-										if(view.equals(v)){
+										if(view.equals(cv)){
 											tradingViews.get(cardInt).setBackgroundColor(Color.BLACK);
+											tradingViews.get(cardInt).setCardSelected(false);
+											
 											tradingViews.remove(cardInt);
 											done=true;	//Already picked that one. Now it is unselected.
 											break;
@@ -144,35 +147,39 @@ public class SlidingDeckHolder extends LinearLayout
 										return;
 					    			}
 								}
-								v.setSelected(true);
-								v.setBackgroundColor(Color.YELLOW);
+								cv.setSelected(true);
+								cv.setBackgroundColor(Color.YELLOW);
 								int size = tradingViews.size();
 								if(size<3){//Nothing picked yet
-									tradingViews.add(v);
+									tradingViews.add(cv);
 									
 								}
 								else {
 									tradingViews.get(0).setBackgroundColor(Color.BLACK);
 									tradingViews.get(0).setSelected(false);
+									tradingViews.get(0).setCardSelected(false);
 									tradingViews.remove(0);
-									tradingViews.add(v);
+									tradingViews.add(cv);
 								}
 
 								return;
 							}
 							if(game.checkPlayability(c)){
 								if(viewSelected==null){
-									v.setSelected(true);
-									v.setBackgroundColor(Color.YELLOW);
-									viewSelected=v;
+									cv.setSelected(true);
+									cv.setCardSelected(true);
+									cv.setBackgroundColor(Color.YELLOW);
+									viewSelected=(CardView) cv;
 								}
 								else{
 									viewSelected.setSelected(false);
+									viewSelected.setCardSelected(false);
 									
 									viewSelected.setBackgroundColor(Color.BLACK);
-									v.setBackgroundColor(Color.YELLOW);
-									v.setSelected(true);
-									viewSelected=v;
+									cv.setBackgroundColor(Color.YELLOW);
+									cv.setSelected(true);
+									cv.setCardSelected(true);
+									viewSelected=(CardView) cv;
 									
 								}
 							}
@@ -210,16 +217,16 @@ public class SlidingDeckHolder extends LinearLayout
     	this.deck.addCard(c);
     }
     public void removeAll(){
-		this.cardViewSelected= new ArrayList<View>();
+		this.cardViewSelected= new ArrayList<CardView>();
     }
             
     public void setSelectedCard(Card c){
     	int count=getChildCount();
     	int i=0;
-    	View toHighLightView = null;
+    	CardView toHighLightView = null;
     	while(i<count){
 	    	if(c.toString().equals(getChildAt(i).getTag())){
-	    		toHighLightView=getChildAt(i);
+	    		toHighLightView=(CardView) getChildAt(i);
 	    		Log.d(TAG, "view found, Setting background yellow");
 	    		break;
 	    	}
@@ -232,16 +239,18 @@ public class SlidingDeckHolder extends LinearLayout
     	
     	if(viewSelected==null){
     		toHighLightView.setSelected(true);
+    		toHighLightView.setCardSelected(true);
     		toHighLightView.setBackgroundColor(Color.YELLOW);
-			viewSelected=toHighLightView;
+			viewSelected=(CardView) toHighLightView;
 		}
 		else{
 			viewSelected.setSelected(false);
-			
+			viewSelected.setCardSelected(false);
 			viewSelected.setBackgroundColor(Color.BLACK);
 			toHighLightView.setBackgroundColor(Color.YELLOW);
 			toHighLightView.setSelected(true);
-			viewSelected=toHighLightView;
+			toHighLightView.setCardSelected(true);
+			viewSelected=(CardView) toHighLightView;
 			
 		}
     }

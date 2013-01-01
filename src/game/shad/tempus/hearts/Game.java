@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -24,11 +25,9 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -145,7 +144,10 @@ public class Game extends Activity {
     private Paint paint = new Paint(); // public paint to be passed to drawable objects
 	private Toast myToast;
    
-		
+	public Card[][] cardDartBoard;	
+	public int boardX =3;
+	public int boardY =7;
+	public ArrayList<Card> floorCards = new ArrayList<Card>();
 	
     public Game(Bundle gameBundle, Context context, MainActivity main) {
         Bundle b = gameBundle;
@@ -210,7 +212,8 @@ public class Game extends Activity {
 	        bottomText.setText("Choose three cards to trade");
 			updateBottomTextWithTradingCards(true, p1.cardsToTrade);
         }
-        else{	//NO trading  
+        else{	//NO trading 
+            bottomText.setText("No Trading!");	
         	playCard.setText("Play Card");
         	playCard.setEnabled(true);
         	checkForTwoMethod();	//This more or less starts the game.
@@ -345,12 +348,14 @@ public class Game extends Activity {
 					
 				}
 			}
+			
 			else{
 				//TODO finish.
 				Log.d(TAG, "shuffle type 3");
 				int x = 0;
 				int z = 50;
 				int total =0;
+				
 				ArrayList<Deck> decks= new ArrayList<Deck>();
 				Deck deck2 = new Deck();
 				deck2.addAllCards(cardDeck);
@@ -365,6 +370,58 @@ public class Game extends Activity {
 			}
 		}
 	
+	
+	public void dartBoardShuffle(){
+		cardDartBoard= new Card[boardX][boardY];
+		int mixRounds =50;
+		int counter =0;
+		ArrayList<Card> cardPile = cardDeck.getDeck();
+		Deck newDeck = new Deck();
+		while(counter<mixRounds){
+			counter++;
+			dartShuffle(cardPile);
+			cardPile.clear();
+			cardPile.addAll(floorCards);
+			floorCards.clear();
+			//stuff
+			
+		}
+		cardDeck.clearALL();
+		cardDeck.addCards(cardPile);
+		
+
+	}
+	public void dartShuffle(ArrayList<Card> startDeck){
+		floorCards.clear();
+		int randx = (int) (Math.random()*boardX);
+		int randy = (int) (Math.random()*boardY);
+		for(Card card : startDeck){
+			randx = (int) (Math.random()*boardX);
+			randy = (int) (Math.random()*boardY);
+
+			tossCard(card, randx, randy);
+		}
+		clearDartBoard();
+		
+	}
+	
+	public void tossCard(Card card, int x, int y){
+		if(cardDartBoard[x][y]!=null){
+			cardDartBoard[x][y]=card;
+		}
+		else{
+			floorCards.add(cardDartBoard[x][y]);
+			cardDartBoard[x][y]=card;			
+		}
+	}
+	
+	public void clearDartBoard(){
+		for(int i=0; i<boardX;i++){
+			for(int j=0; j<boardY;j++){
+				floorCards.add(cardDartBoard[i][j]);
+			}
+		}
+	}
 	/**
 	 * Takes a Deck and returns an array of decks, 11 of them 5 per array and 2 in the last one.
 	 * @param a The Deck to be split
@@ -422,8 +479,7 @@ public class Game extends Activity {
 		}
 		return b;
 	}
-	
-	
+
 	
 	/**
 	* Create the and deals them out and then finds the two

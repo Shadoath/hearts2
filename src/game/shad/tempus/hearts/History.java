@@ -2,10 +2,8 @@ package game.shad.tempus.hearts;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.LineChart;
@@ -13,14 +11,10 @@ import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import android.R.integer;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract.Contacts.Data;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -206,7 +200,6 @@ public class History extends Activity{
 		return false;
     }
     
-    
     public void addToData(int hand, int trick, int winnerSeat, int points){
     	int count = (hand-1)*13+trick;
     	int countMinusOne = count-1; 
@@ -270,12 +263,10 @@ public class History extends Activity{
     public void showLineGraph (View view){
 	   makeNewLineGraph(winningPlayer);
     }
-    
-    
+        
     protected void setDatasetRenderer(XYMultipleSeriesDataset dataset, XYMultipleSeriesRenderer renderer){
  
     }
-
 	
 	private void setupSettings(){
     	switch(2){

@@ -11,7 +11,6 @@ import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.widget.HorizontalScrollView;
 
 public class DeckHolder extends SurfaceView  implements Callback, OnTouchListener
 {

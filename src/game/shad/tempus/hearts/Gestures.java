@@ -1,7 +1,5 @@
 package game.shad.tempus.hearts;
 
-import java.util.ArrayList;
-
 import android.graphics.Rect;
 import android.view.GestureDetector;
 import android.view.MotionEvent;

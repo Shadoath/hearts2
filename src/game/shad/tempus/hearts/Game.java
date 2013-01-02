@@ -352,26 +352,13 @@ public class Game extends Activity {
 			else{
 				//TODO finish.
 				Log.d(TAG, "shuffle type 3");
-				int x = 0;
-				int z = 50;
-				int total =0;
-				
-				ArrayList<Deck> decks= new ArrayList<Deck>();
-				Deck deck2 = new Deck();
-				deck2.addAllCards(cardDeck);
-				while(x<z){
-					decks=(splitDeck(deck2));
-					Log.d(TAG, "the deck is "+decks.size());
-					deck2.clearALL();
-					deck2 = (mixOutIn(decks));
-					decks.clear();
-					x++;
-				}	
+				dartBoardShuffle();
 			}
 		}
 	
 	
 	public void dartBoardShuffle(){
+		Log.d(TAG, "DartBoard Shuffle");
 		cardDartBoard= new Card[boardX][boardY];
 		int mixRounds =50;
 		int counter =0;
@@ -387,7 +374,8 @@ public class Game extends Activity {
 			
 		}
 		cardDeck.clearALL();
-		cardDeck.addCards(cardPile);
+		newDeck.addCards(cardPile);
+		cardDeck=newDeck;
 		
 
 	}

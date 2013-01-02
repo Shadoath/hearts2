@@ -368,7 +368,11 @@ public class Game extends Activity {
 			counter++;
 			dartShuffle(cardPile);
 			cardPile.clear();
+			newDeck.clearALL();
+			floorCards.
 			cardPile.addAll(floorCards);
+			newDeck.addCards(cardPile);
+			displayDeckCards(newDeck);
 			floorCards.clear();
 			//stuff
 			
@@ -381,8 +385,8 @@ public class Game extends Activity {
 	}
 	public void dartShuffle(ArrayList<Card> startDeck){
 		floorCards.clear();
-		int randx = (int) (Math.random()*boardX);
-		int randy = (int) (Math.random()*boardY);
+		int randx = 0;
+		int randy = 0;
 		for(Card card : startDeck){
 			randx = (int) (Math.random()*boardX);
 			randy = (int) (Math.random()*boardY);
@@ -394,7 +398,7 @@ public class Game extends Activity {
 	}
 	
 	public void tossCard(Card card, int x, int y){
-		if(cardDartBoard[x][y]!=null){
+		if(cardDartBoard[x][y]==null){
 			cardDartBoard[x][y]=card;
 		}
 		else{
@@ -406,7 +410,8 @@ public class Game extends Activity {
 	public void clearDartBoard(){
 		for(int i=0; i<boardX;i++){
 			for(int j=0; j<boardY;j++){
-				floorCards.add(cardDartBoard[i][j]);
+				if(cardDartBoard[i][j]!=null)
+					floorCards.add(cardDartBoard[i][j]);
 			}
 		}
 	}

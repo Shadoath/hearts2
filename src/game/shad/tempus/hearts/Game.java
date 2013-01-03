@@ -359,7 +359,6 @@ public class Game extends Activity {
 	
 	public void dartBoardShuffle(){
 		Log.d(TAG, "DartBoard Shuffle");
-		cardDartBoard= new Card[boardX][boardY];
 		int mixRounds =50;
 		int counter =0;
 		ArrayList<Card> cardPile = cardDeck.getDeck();
@@ -369,22 +368,20 @@ public class Game extends Activity {
 			dartShuffle(cardPile);
 			cardPile.clear();
 			newDeck.clearALL();
-			floorCards.
-			cardPile.addAll(floorCards);
+			cardPile=(ArrayList<Card>) (floorCards.clone());
 			newDeck.addCards(cardPile);
 			displayDeckCards(newDeck);
-			floorCards.clear();
 			//stuff
 			
 		}
 		cardDeck.clearALL();
-		newDeck.addCards(cardPile);
 		cardDeck=newDeck;
 		
 
 	}
 	public void dartShuffle(ArrayList<Card> startDeck){
 		floorCards.clear();
+		cardDartBoard= new Card[boardX][boardY];
 		int randx = 0;
 		int randy = 0;
 		for(Card card : startDeck){
@@ -394,6 +391,7 @@ public class Game extends Activity {
 			tossCard(card, randx, randy);
 		}
 		clearDartBoard();
+		
 		
 	}
 	
@@ -410,10 +408,13 @@ public class Game extends Activity {
 	public void clearDartBoard(){
 		for(int i=0; i<boardX;i++){
 			for(int j=0; j<boardY;j++){
-				if(cardDartBoard[i][j]!=null)
+				if(cardDartBoard[i][j]!=null){
 					floorCards.add(cardDartBoard[i][j]);
+				}
 			}
 		}
+		Log.d(TAG, "floorCard count="+floorCards.size());
+
 	}
 	/**
 	 * Takes a Deck and returns an array of decks, 11 of them 5 per array and 2 in the last one.
@@ -1423,7 +1424,7 @@ public class Game extends Activity {
 		Log.d(TAG, "displayTable cards");
 		String sDeck= "";
 		for(int i=0; i<deck.getSize();i++){
-			sDeck += (1+i)+". "+deck.getCard(i).getOwner().getRealName()+" : "+deck.getCard(i).name+"\n";
+			sDeck += " : "+deck.getCard(i).name+"\n";
 		}
 		return sDeck;
 		//TODO update gameView in thread.

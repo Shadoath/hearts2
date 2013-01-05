@@ -8,7 +8,7 @@
           android:title="Debug" />
     <item android:id="@+id/normalRun" 
         android:checked="false" 
-        android:title="Normal Run"
+        android:title="Pause/Play"
         android:checkable="true">
     </item>
     

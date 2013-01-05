@@ -92,4 +92,5 @@
         <string name="linegraph">Graph</string>
         <string name="parse">ParseData</string>
         <string name="history">Game History</string>
+        <string name="darttoss">Dart Toss</string>
 </resources>

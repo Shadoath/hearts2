@@ -113,7 +113,7 @@ public class PlayerHolder extends SurfaceView implements Callback, OnTouchListen
 		Log.d(TAG, "Touching at x="+event.getX()+", y="+event.getY()+" For "+player.getRealName());
 
 		if(event.getAction()==MotionEvent.ACTION_UP){
-			main.displayPlayerInfo(this.player.getRealName()+" Points= "+player.getScore(), game.displayPlayerCards(this.player), player.sneakPeak);
+			main.displayPlayerInfo(this.player, game.displayPlayerCards(this.player), player.sneakPeak);
 			if(player.seat!=1){
 				player.sneakPeak=true;
 			}

@@ -1236,7 +1236,12 @@ public class Player {
 	public int getSeat() {
 		return seat;
 	}
-
+	public void setAISmarts(int s) {
+		AISmarts=s;
+	}
+	public int getAISmarts() {
+		return AISmarts;
+	}
 	public int getState() {
 		return state;
 	}

@@ -66,7 +66,7 @@ public class Deck {
 	
 	public void addCards(ArrayList<Card> cards){
 		for(Card c : cards){
-			Log.d(TAG, "card added="+c.toString());
+//			Log.d(TAG, "card added="+c.toString());
 			this.deck.add(c);
 		}
 	}

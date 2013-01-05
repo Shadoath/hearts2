@@ -89,12 +89,10 @@ public class History extends Activity{
     public void setNewData(String[] data){
     	//TODO dont error out when reading who WON!!
     	Log.d(TAG, "Setting new Graph Data, size ="+data.length);
-    	int count = -1;
     	
     	for(String d : data){
     		if(d.charAt(0)=='H'){
 	    		boolean negativePoints=false;
-	    		count++;
 	        	int plusSpot=0;
 	
 	    		Log.d(TAG, "data="+d);
@@ -203,27 +201,49 @@ public class History extends Activity{
     public void addToData(int hand, int trick, int winnerSeat, int points){
     	int count = (hand-1)*13+trick;
     	int countMinusOne = count-1; 
-    	data1[count]=data1[countMinusOne];
-    	data2[count]=data2[countMinusOne];
-		data3[count]=data3[countMinusOne];
-		data4[count]=data4[countMinusOne];
-    	switch(winnerSeat){
-    	case 1:
-    		points += data1[countMinusOne];
-    		data1[count]=points;
-    		break;
-    	case 2:
-    		points += data2[countMinusOne];
-    		data2[count]=points;
-    		break;
-    	case 3:
-    		points += data3[countMinusOne];
-  		    data3[count]=points;
-    		break;
-    	case 4:
-    		points += data4[countMinusOne];
-    		data4[count]=points;
-    		break;
+    	if(points==26||points==-26){//Don't copy old data, Points for moon being shot.
+    		switch(winnerSeat){
+        	case 1:
+        		points += data1[count];
+        		data1[count]=points;
+        		break;
+        	case 2:
+        		points += data2[count];
+        		data2[count]=points;
+        		break;
+        	case 3:
+        		points += data3[count];
+      		    data3[count]=points;
+        		break;
+        	case 4:
+        		points += data4[count];
+        		data4[count]=points;
+        		break;
+        	}
+    	}
+    	else{
+	    	data1[count]=data1[countMinusOne];
+	    	data2[count]=data2[countMinusOne];
+			data3[count]=data3[countMinusOne];
+			data4[count]=data4[countMinusOne];
+	    	switch(winnerSeat){
+	    	case 1:
+	    		points += data1[countMinusOne];
+	    		data1[count]=points;
+	    		break;
+	    	case 2:
+	    		points += data2[countMinusOne];
+	    		data2[count]=points;
+	    		break;
+	    	case 3:
+	    		points += data3[countMinusOne];
+	  		    data3[count]=points;
+	    		break;
+	    	case 4:
+	    		points += data4[countMinusOne];
+	    		data4[count]=points;
+	    		break;
+	    	}
     	}
     	Log.d(TAG, "P:"+winnerSeat+" Added data at:"+count+" points:"+points);
     }

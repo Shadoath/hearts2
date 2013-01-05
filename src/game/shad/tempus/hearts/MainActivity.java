@@ -326,7 +326,7 @@ public class MainActivity extends Activity {
     }
     
     public void roundStatsPressed(View v){
-    	new AlertDialog.Builder(this).setTitle("Cards played this round").setMessage("Jack found ="+game.jackFound+"\nQueen found ="+game.queenFound+"\nPoints ="+game.roundScore+"\n\n"+game.roundCardString)
+    	new AlertDialog.Builder(this).setTitle("Cards played this round").setMessage("Jack played ="+game.jackFound+"\nQueen played ="+game.queenFound+"\nRound Points ="+game.roundScore+"\n\n"+game.roundCardString)
     	.setNeutralButton("Ok", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
@@ -334,7 +334,7 @@ public class MainActivity extends Activity {
 		}).show();
     }
     
-    public void displayPlayerInfo(final String player, final String info, final boolean sneakPeak){
+    public void displayPlayerInfo(final Player player, final String info, final boolean sneakPeak){
 	//TODO add boolean to not open.
     handler.post(new Runnable() {
     		public void run() {
@@ -343,17 +343,18 @@ public class MainActivity extends Activity {
     	});
     }
      
-    private void showPlayerInfo(String player, String info, final boolean sneakPeak) {
+    private void showPlayerInfo(Player player, String info, final boolean sneakPeak) {
+    	String PlayerInfo = player.getRealName()+" Points= "+player.getScore()+" AI lvl="+player.getAISmarts();
     	
     	if(!sneakPeak){	//Or Player 1
-	    	new AlertDialog.Builder(this).setTitle(player).setMessage(info).setPositiveButton("Oops!", new OnClickListener() {
+	    	new AlertDialog.Builder(this).setTitle(PlayerInfo).setMessage(info).setPositiveButton("Oops!", new OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 				}
 			}).show();
     	}
     	else{    	
-    		new AlertDialog.Builder(this).setTitle(player).setMessage(info).setNegativeButton("+10 Points for peeking!!", new OnClickListener() {
+    		new AlertDialog.Builder(this).setTitle(PlayerInfo).setMessage(info).setNegativeButton("+10 Points for peeking!!", new OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					game.p1.addToScore(10);
 					dialog.dismiss();

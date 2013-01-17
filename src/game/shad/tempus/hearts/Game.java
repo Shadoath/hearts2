@@ -944,7 +944,7 @@ public class Game extends Activity {
 					justPickedUpPile=false;
 				}
 			}
-		}, main.gt.getAutoRunTimeinMilli()/2);
+		}, main.gt.getAutoRunTimeinMilli());
 		//;
 
 				
@@ -1060,8 +1060,7 @@ public class Game extends Activity {
 			}
 		}
 		return false;
-	}
-	
+	}	
 	
 	/**
 	 * Check to see if anyone broke the point limit till end of game
@@ -1941,8 +1940,6 @@ public class Game extends Activity {
 
 	}
     	
-
-	
 	/**
 	 * 
 	 * @param sentRecieved true if picking cards false if received them
@@ -2042,6 +2039,7 @@ public class Game extends Activity {
 	}
 			
 	public void findCardBitmaps(){
+
 		BitmapFactory.Options cardOptions = new BitmapFactory.Options();
 		cardOptions.outHeight=screenHeight/4;
 		cardOptions.outWidth=screenWidth/4;

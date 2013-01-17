@@ -16,7 +16,7 @@ public class Player {
 	ArrayList<Card> hand;
     public ArrayList<Card> cardsToTrade=new ArrayList<Card>();
 
-	private Deck deck =new Deck();
+	private SuperDeck deck;
 	public int seat=0; //position
 	public String realName = "";
 	public String shortName = "";
@@ -24,18 +24,19 @@ public class Player {
 	public int AISmarts = 1;	//1 dumb, 2 normal, 3 smart, 11 dog
 	public int state = 0;   //using 1-4
 	public int score = 0;
-	public int totalScore=0;
+	public int highScore=0;
 	public int passTo = 0;
-	public Deck clubs = new Deck();     //0
+	
+	public oldDeck clubs = new oldDeck();     //0
 	int highClub = 0;
 	int lowClub = 0;
-	public Deck diamonds = new Deck();  //1
+	public oldDeck diamonds = new oldDeck();  //1
 	int highDiamonds = 0;
 	int lowDiamonds = 0;
-	public Deck spades = new Deck();	   //2
+	public oldDeck spades = new oldDeck();	   //2
 	int highSpades = 0;
 	int lowSpades = 0;
-	public Deck hearts = new Deck();    //3
+	public oldDeck hearts = new oldDeck();    //3
 	int highHearts = 0;
 	int lowHearts = 0;
 	boolean winner = false;
@@ -47,7 +48,6 @@ public class Player {
 	boolean playingVoid=false;
 	boolean tradingCardsRemoved=false;
 	
-	public boolean claimedDeck = false;
 	public boolean sneakPeak = false;
 	
 	private int IQ;	//Then just a simple slider to change it and easy greater than if statments to do bot AI.
@@ -57,18 +57,17 @@ public class Player {
 	public View textEntryView;
 	public Card twoOfClubs = null;
 	
-	public Player(MainActivity main, Game game, Deck deck, int AISmarts, int seat, String name, int color){
+	public Player(MainActivity main, Game game, SuperDeck deck, int AISmarts, int seat, String name, int color){
 		this.main =main;
 		this.game = game;
+		this.deck = new SuperDeck(game);	//may be obsolete
 		this.deck = deck;
 		this.AISmarts = AISmarts;
 		this.seat = seat;
 		setShortName();
 		this.realName = name;
 		this.colorInt = color;
-		sortHandFromDeck();
-		claimedDeck=false;	//Set after sort hand so that after trading cards can be claimed.
-		//TODO add playerholder link here.
+		
 		
 	}
 	/**
@@ -128,7 +127,7 @@ public class Player {
 		
 		if(trick.getSize()==0){	
 			Log.d(TAG+this.getRealName(), "First Card of Pile");
-			return playLow(getLargestSuit(), 0);
+			return playLow(deck.getLargestSuit(), 0);
 		}
 		
 		int startSuit=trick.getCard(0).getSuit();
@@ -147,7 +146,7 @@ public class Player {
 			if(game.round==1){
 				playHighDontBreakHearts(); //Play a high card but no points!
 			}
-			return playHighSimple(getLargestSuit(), 0);
+			return playHighSimple(deck.getLargestSuit(), 0);
 		}
 		boolean trickHasPoints = trick.hasPoints();
 		boolean trickNegativePoints = trick.hasNegativePoints();
@@ -230,7 +229,7 @@ public class Player {
 
 		Toast.makeText(main, "OUT OF CARDS!!", Toast.LENGTH_SHORT).show();
 		Card oddBall = new Card(3, 0, game);
-		oddBall.setOwner(this);
+//		oddBall.setOwner(this);
 		return oddBall;
 	}
 	
@@ -240,7 +239,7 @@ public class Player {
 		if(trick.getSize()==0){	
 			Log.d(TAG+this.getRealName(), "First Card of Pile");
 			//TODO add more AI smarts here
-			return playLow(getLargestSuit(), 0);
+			return playLow(deck.getLargestSuit(), 0);
 		}
 		
 		int startSuit=trick.getCard(0).getSuit();
@@ -264,7 +263,7 @@ public class Player {
 			if(game.round==1){
 				playHighDontBreakHearts(); //Play a high card but no points!
 			}
-			return playHighSimple(getLargestSuit(), 0);
+			return playHighSimple(deck.getLargestSuit(), 0);
 			//TODO better code for voids
 		}
 		boolean trickHasPoints = trick.hasPoints();
@@ -348,7 +347,7 @@ public class Player {
 
 		Toast.makeText(main, "OUT OF CARDS!!", Toast.LENGTH_SHORT).show();
 		Card oddBall = new Card(3, 0, game);
-		oddBall.setOwner(this);
+//		oddBall.setOwner(this);
 		return oddBall;
 	}
 	
@@ -512,7 +511,6 @@ public class Player {
 				break;
 			}
 		}
-//		spades.removeCard(card);	//remove it from the suit deck
 		if(card==null){
 			Log.d(TAG+this.getRealName(), "Returning Null, no Queen in DECK!  Should have done a QueenCheck");
 		}
@@ -525,7 +523,7 @@ public class Player {
 	 */
 	private Card playHighDontBreakHearts(){
 		Log.d(TAG+this.getRealName(), "voidPlayHighHearts");
-		switch(getLargestSuit()){
+		switch(deck.getLargestSuit()){
 		case 0:
 			return playHigh(0, 0);
 		case 1:
@@ -553,7 +551,7 @@ public class Player {
 	 */
 	private Card playLowDontBreakHearts(){
 		Log.d(TAG+this.getRealName(), "voidPlayHighHearts");
-		switch(getLargestSuit()){
+		switch(deck.getLargestSuit()){
 		case 0:
 			return playLow(0, 0);
 		case 1:
@@ -573,7 +571,7 @@ public class Player {
 	
 	private Card playLargestSuitAndPlay(){
 		Log.d(TAG+this.getRealName(), "voidPlayHighHearts");
-		switch(getLargestSuit()){
+		switch(deck.getLargestSuit()){
 			case 0:
 				return playHigh(0, 0);
 			case 1:
@@ -590,34 +588,7 @@ public class Player {
 	}
 			
 	
-	/**
-	 * Finds the largest suit deck in hand
-	 * @return int as suit; 
-	 * 0=clubs
-	 * 1=diamonds
-	 * 2=spades
-	 * 3=hearts
-	 */
-	private synchronized int getLargestSuit(){
-		Log.d(TAG+this.getRealName(), "getLargestSuit");
-		int c = this.clubs.getSize();
-		int d = this.diamonds.getSize();
-		int s = this.spades.getSize();
-		int h = this.hearts.getSize();
-		int[] test = {c, d, s, h};
-		int position = 0;
-		int high = 0;
-		for(int i=0; i<test.length;i++){
-			if(test[i]>high){
-				position = i;
-				high = test[i];
-			}
-
-		}
-		Log.d(TAG+this.getRealName(), "Largest suit position is ="+position);
-		return position;
-			
-	}
+	
 	//TODO dont play last card of a suit
 	//TODO Play queen if there is a higher club.
 	/**
@@ -628,61 +599,11 @@ public class Player {
 	 */
 	private Card getDeckCardBelow(Card c, boolean lastPlayer){
 		Log.d(TAG+this.getRealName(), "Checking for a card below "+c.toString());
-		int top = c.getValue();
 		Card bestPick = new Card(0, -1, game);
-		switch (c.getSuit()){
-		case 0:
-			for(Card card: clubs.getDeck()){
-				if(card.getValue()<top){
-					if(card.getValue()>bestPick.getValue()){
-						bestPick=card;
-					}
-				}
-			}
-			break;
-		case 1:
-			for(Card card: diamonds.getDeck()){
-				if(card.getValue()<top){
-					if(card.getValue()>bestPick.getValue()){
-						bestPick=card;
-					}
-				}
-			}
-			break;
-		case 2:
-			for(Card card: spades.getDeck()){
-				if(card.getValue()<top){
-					if(card.getValue()>bestPick.getValue()){
-						bestPick=card;
-					}
-				}
-			}
-			break;
-		case 3:
-			for(Card card: hearts.getDeck()){
-				if(card.getValue()<top){
-					if(card.getValue()>bestPick.getValue()){
-						bestPick=card;
-					}
-				}
-			}
-			break;
-			
-		}
-		if(bestPick.getSuit()==-1)
-			if(lastPlayer){
-				Log.d(TAG+this.getRealName(), "No card found, Last Card in trick sooo, play high and save lower cards for later");
-				return playHigh(c.getSuit(), 0);
-			}
-			else{
-				Log.d(TAG+this.getRealName(), "No card found, Playing next best");
-				return playLow(c.getSuit(), 0);
-			}
-		return bestPick;
+		return deck.getDeckCardBelow(c, lastPlayer, bestPick);
 		
 	}
-	
-	
+		
 	
 	/////////////////////////ODD  METHODS/////////////////////////////////////////////////////////////////
 	
@@ -695,7 +616,7 @@ public class Player {
 	 * @param cardToCheck
 	 * @return
 	 */
-	public boolean checkForCardsHigher(Deck cards, int valueToCheck){
+	public boolean checkForCardsHigher(oldDeck cards, int valueToCheck){
 		Log.d(TAG+this.getRealName(), "Checking for higher cards than " + valueToCheck + " for "+this.getRealName());
 		int suitToCheck = cards.getCard(0).getSuit();
 		for(Card c :cards.getDeck()){
@@ -708,7 +629,7 @@ public class Player {
 		return false;
 	}
 	
-	public Card getLargestCardInTrick(Deck cards){
+	public Card getLargestCardInTrick(oldDeck cards){
 		Card highestCard = cards.getCard(0);
 		int startValue= highestCard.getValue();
 		int startSuit = highestCard.getSuit();
@@ -726,173 +647,6 @@ public class Player {
 	}
 	
 	
-	/**
-	 * Called from onCreate of Player OR when getting a new Deck
-	 * ASSUMES a new deck was just set to this.deck! 
-	 * assigns all cards to the player
-	 * then sorts them into suits
-	 * and updates the DeckHolder.
-	 * Claims Cards for owner.
-	 */
-	public void sortHandFromDeck() {
-		Log.d(TAG+this.getRealName(), "Sorting hand from deck");
-		sortSuitsFromDeck();	
-        updateDeckFromSuits();	//to rearrange deck nicely
-	}
-	
-	/**
-	 * Sets the clubs/diamonds/spades/hearts from this.deck
-	 * Also sorts the suit decks.
-	 */
-	public void sortSuitsFromDeck(){
-		Deck thand = new Deck();
-		thand.addAllCards(deck);
-		Log.d(TAG+this.getRealName(), "sorting hand for "+this.realName);
-		Log.d(TAG+this.getRealName(), "deck size is "+thand.getSize());
-		int hc = 0;  //high club
-        int hd = 0;  //high diamond
-        int hs = 0;  //high spade
-        int hh = 0;  //high heart/
-		int clubsCounter = 0;
-		int diamondsCounter = 0;
-		int spadesCounter = 0;
-		int heartsCounter = 0;
-		int cc2 = 0; //(clubs counter 2) keep track of counters when rearranging deck
-		int dc2 = 0;
-		int sc2 = 0;
-		int hc2 = 0;
-        Deck c = new Deck();  
-        Deck d = new Deck();
-        Deck s = new Deck();
-        Deck h = new Deck();
-        for(int i=0;i<thand.getSize();i++){
-        	int ncard=thand.getCard(i).getValue();
-        	switch(thand.getCard(i).getSuit()){
-	        	case 0:	
-	        		cc2=clubsCounter;
-	        		if(hc>ncard){	        			
-	        			while(clubsCounter>0&&ncard<c.getCard(clubsCounter-1).getValue()){
-	        				clubsCounter--;
-	        			}     					
-
-	        		}
-	        		c.addCardAtIndex(clubsCounter, thand.getCard(i));	 
-	        		hc=c.getCard(c.getSize()-1).getValue(); 
-	        		clubsCounter=cc2;
-	        		clubsCounter++;
-
-	        		break;
-		    	case 1:
-
-		    		dc2=diamondsCounter;
-	        		if(hd>ncard){	   
-	        			while(diamondsCounter>0&&ncard<d.getCard(diamondsCounter-1).getValue()){
-	        				diamondsCounter--;
-	        			}     					
-
-	        		}        			  
-	        		d.addCardAtIndex(diamondsCounter, thand.getCard(i));	
-	        		hd=d.getCard(d.getSize()-1).getValue();
-	        		diamondsCounter=dc2;
-	        		diamondsCounter++;
-
-		    		break;
-		    	case 2:
-
-	        		sc2=spadesCounter;
-	        		if(hs>ncard){	        			
-	        			while(spadesCounter>0&&ncard<s.getCard(spadesCounter-1).getValue()){
-	        				spadesCounter--;
-	        			}     					
-
-	        		}			  
-	        		s.addCardAtIndex(spadesCounter, thand.getCard(i));	
-	        		hs=s.getCard(s.getSize()-1).getValue();
-	        		spadesCounter=sc2;
-	        		spadesCounter++;
-
-		    		break;
-		    	case 3:
-
-		    		hc2=heartsCounter;
-	        		if(hh>ncard){	   
-	        			while(heartsCounter>0&&ncard<h.getCard(heartsCounter-1).getValue()){
-	        				heartsCounter--;
-	        			}     					
-
-	        		} 			  
-	        		h.addCardAtIndex(heartsCounter, thand.getCard(i));	
-	        		hh=h.getCard(h.getSize()-1).getValue();
-	        		heartsCounter=hc2;
-	        		heartsCounter++;
-		    		break;
-        	}
-        }
-        setClubs(c);
-        setDiamonds(d);
-        setSpades(s);
-        setHearts(h);
-	}
-	
-	/**
-	 * Clears deck and replaces it with a new Deck from the suit arrays.
-	 */
-	public void updateDeckFromSuits(){
-		Log.d(TAG+this.getRealName(), "updateDeckfromSuits for "+this.realName);
-		this.deck.clearALL();
-        Deck newDeck = new  Deck();
-        newDeck.addAllCards(this.clubs);
-        newDeck.addAllCards(this.diamonds);
-        newDeck.addAllCards(this.spades);
-        newDeck.addAllCards(this.hearts);
-        this.deck.addAllCards(newDeck);
-		Log.d(TAG+this.getRealName(), "deck size= "+deck.getSize());
-
-        
-	}
-	 
-	/**
-	 * Updates deck with new cards then calls sortSuitsFromDeck()
-	 * @param Deck of cards
-	 */
-	public void updateDeckCards(Deck cards){
-		Log.d(TAG+this.getRealName(), "updateDeckCards for "+this.realName);
-		deck.clearALL();
-		for(int i = 0; i<cards.getSize();i++){
-			this.deck.addCard(cards.getCard(i));
-		}
-		sortHandFromDeck();
-	}
-	
-	/**
-	 * Fast update of Suit decks from this.deck
-	 * This method is called after updateDeckCards(Deck)
-	 *  
-	 */
-	public synchronized void updateSuitsFast(){
-		Log.d(TAG+this.getRealName(), "updateSuits for "+this.realName);
-		clubs.clearALL();
-		diamonds.clearALL();
-		spades.clearALL();
-		hearts.clearALL();
-		for(Card card : deck.getDeck()){
-			switch(card.getSuit()){
-			case Card.CLUBS:
-				clubs.addCard(card);
-				break;
-			case Card.DIAMONDS:
-				diamonds.addCard(card);
-				break;
-			case Card.SPADES:
-				spades.addCard(card);
-				break;
-			case Card.HEARTS:
-				hearts.addCard(card);
-				break;
-			}
-		}
-
-	}
 	
 	/**
 	 * Use on a deck to see if it contains points
@@ -933,55 +687,17 @@ public class Player {
 	public boolean checkForTwo(){
 		Log.d(TAG+this.getRealName(), "checkForTwo for "+this.realName);
 		Log.d(TAG+this.getRealName(), "Deck Size is="+this.deck.getSize());
-		for (int i=0;i<3;i++){//Should only need to check the first two the rest is overkill.
-			if(this.deck.getCard(i).getValue()==(2)&&this.deck.getCard(i).getSuit()==(0)){	
-				twoOfClubs = this.deck.getCard(i);
-				return true;				
-			}
+		if(deck.checkForTwo()){
+			return true;				
 		}
 		return false;
 	}
 	
-	/**
-	 * Call this to check size of suits and set boolean voids.
-	 */
-	public void checkForVoids(){ 	
-		Log.d(TAG+this.getRealName(), "checkForVoids for "+this.realName);
-		int empty =0;
-		if(clubs.getSize()==0){
-			empty++;
-			this.voidClubs=true;
-		}
-		else
-			this.voidClubs=false;
-
-		if(spades.getSize()==0){
-			empty++;
-			this.voidSpades = true;
-		}
-		else
-			this.voidSpades = false;
-
-		if(diamonds.getSize()==0){
-			empty++;
-			this.voidDiamonds = true;
-		}
-		else
-			this.voidDiamonds = false;
-
-		if(hearts.getSize()==0){
-			empty++;
-			this.voidHearts = true;
-		}
-		else
-			this.voidHearts = false;
-		if(empty==4){
-			Log.d(TAG+this.getRealName(), "The ship is SINKING!!, we are out of cards");
-		}
-		
-
+	public Card getTwoOfClubs(){
+		return deck.getTwoOfClubs();
 	}
-		
+	
+			
 	/**
 	 * Checks for Queen of Spades
 	 * Sets hasQueen boolean.
@@ -996,23 +712,12 @@ public class Player {
 		this.hasQueen = false;
 	}
 	
-	/**Checks if void in said suit.....Should be redone.
-	 * Does not Check size just checks BOOLEAN
-	 * @param i the suit value.
+	/**Checks if void in said suit
+	 * @param suit the suit value.
 	 * @return true if void in that suit.
 	 */	
-	public boolean checkVoid(int i){;
-	switch(i){
-		case 0:
-			return voidClubs;
-		case 1:
-			return voidDiamonds;
-		case 2:
-			return voidSpades;
-		case 3: 
-			return voidHearts;
-		}
-		return false;
+	public boolean checkVoid(int suit){;
+		return deck.checkVoid(suit);
 	}
 	
 	/////////////////////////////////////Trading Methods///////////////////////////////////////////////////////
@@ -1050,7 +755,7 @@ public class Player {
 	private synchronized Card getTradingCard(){
 		Log.d(TAG+this.getRealName(), "");
 		Card c = null;
-		switch(getLargestSuit()){
+		switch(deck.getLargestSuit()){
 			case 0:
 				c = playHigh(0, 0);
 				this.clubs.removeCard(c);
@@ -1250,7 +955,7 @@ public class Player {
 	}
 		
 	public Deck getDeck(){
-		return this.deck;
+		return deck.getFullDeck();
 	}
 	public void removeCardFromDeck(Card card){
 		this.deck.removeCard(card);
@@ -1260,22 +965,13 @@ public class Player {
 		Log.d(TAG+this.getRealName(), "Adding to score ="+score);
 		this.score += score;
 	}
-	public void addToTotalScore(int i){
-		totalScore+=i;
+	public void addToHighScore(int points){
+		highScore+=points;
 	}
 	public int getScore(){
 		return score;
 	}
 
-	/**Updates the players Deck with a new one.
-	 * Then Sorts the Ha
-	 * 
-	 * @param deck1
-	 */
-	public void sethand(Deck deck1) {
-		this.deck = deck1;
-		sortHandFromDeck();
-	}
 	public int getPass() {
 		return passTo;
 	}
@@ -1283,58 +979,5 @@ public class Player {
 		this.passTo=passTo;
 	}
     
-	/**
-	 * Clears the deck then sets it
-	 * Out puts log of how many cards were in the new deck
-	 * @param c Deck to be added
-	 */
-	public void setClubs(Deck c){
-		this.clubs.clearALL();
-		this.clubs.addAllCards(c);
-		Log.d(TAG+this.getRealName(), "clubs.size="+clubs.getSize());
-	}
-	/**
-	 * Clears the deck then sets it
-	 * Out puts log of how many cards were in the new deck
-	 * @param d Deck to be added
-	 */
-	public void setDiamonds(Deck d){
-		this.diamonds.clearALL();
-		this.diamonds.addAllCards(d);
-		Log.d(TAG+this.getRealName(), "Diamonds.size="+diamonds.getSize());
-	}
-	/**
-	 * Clears the deck then sets it
-	 * Out puts log of how many cards were in the new deck
-	 * @param s Deck to be added
-	 */
-	public void setSpades(Deck s){
-		this.spades.clearALL();
-		this.spades.addAllCards(s);
-		Log.d(TAG+this.getRealName(), "Spades.size="+spades.getSize());
-	}
-	/**
-	 * Clears the deck then sets it
-	 * Out puts log of how many cards were in the new deck
-	 * @param h Deck to be added
-	 */
-	public void setHearts(Deck h){
-		this.hearts.clearALL();
-		this.hearts.addAllCards(h);
-		Log.d(TAG+this.getRealName(), "Hearts.size="+hearts.getSize());
-	}
-	
-	public Deck getClubs(){
-		return clubs;
-	}
-	public Deck getDiamonds(){
-		return diamonds;
-	}
-	public Deck getSpades(){
-		return spades;
-	}
-	public Deck getHearts(){
-		return hearts;
-	}
-	
+		
 }

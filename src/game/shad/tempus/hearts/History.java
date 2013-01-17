@@ -33,6 +33,7 @@ public class History extends Activity{
     public File path;
     public int winnerCount = 1;
     public int totalWins =10;
+    public boolean graphable = false;
     XYSeries p1Series;
     XYSeries p2Series;
     XYSeries p3Series;
@@ -71,6 +72,7 @@ public class History extends Activity{
 		if(size<5){
 			Log.d(TAG, "Not enough data to build a graph");
 			bottomText.setText("Not enough data to Parse.");
+			graphable = false;
 			return false;
 		}
 		size++;
@@ -83,6 +85,7 @@ public class History extends Activity{
 		data3[0] = 0;
 		data4[0] = 0;
 		setNewData(fileArrayString);
+		graphable =true;
 		return true;
     }
     
@@ -91,6 +94,7 @@ public class History extends Activity{
     	Log.d(TAG, "Setting new Graph Data, size ="+data.length);
     	
     	for(String d : data){
+    		if(d!=null)
     		if(d.charAt(0)=='H'){
 	    		boolean negativePoints=false;
 	        	int plusSpot=0;
@@ -161,13 +165,16 @@ public class History extends Activity{
 			
 			
     	}
-		bottomText.setText("Loaded winner file:" + winnerCount);
-    	//makeNewLineGraph();
+//		bottomText.setText("Loaded winner file:" + winnerCount);
     	
     }
     
+    /**
+     * Starts a new intent with a graph as the view.
+     * @param title
+     */
     public void makeNewLineGraph(String title){
-    	if (parseData()){
+    	if (graphable){
 	 	   if(data1.length>7 && data2.length==data3.length){	//could also check length of 2 and 4
 	 		  LineGraph line = new LineGraph();
 		 	   Log.d(TAG, "data1.length="+data1.length);
@@ -181,7 +188,7 @@ public class History extends Activity{
  	   }
     }
     public boolean drawGraphInView(){
-		if (parseData()){
+		if (graphable){
     		graphView.removeAllViews();
 			LineGraph line = new LineGraph();
 	 	    Log.d(TAG, "data1.length="+data1.length);
@@ -281,7 +288,7 @@ public class History extends Activity{
     	Log.d(TAG, "P:"+winnerSeat+" Added data at:"+count+" points:-"+points);
     }
     public void showLineGraph (View view){
-	   makeNewLineGraph(winningPlayer);
+    	drawGraphInView();
     }
         
     protected void setDatasetRenderer(XYMultipleSeriesDataset dataset, XYMultipleSeriesRenderer renderer){
@@ -340,20 +347,21 @@ public class History extends Activity{
 		Log.d(TAG, out.length()+out);
 		winnerString=out;
 		bottomText.setText("Winner file:"+winnerCount);
-
-		if(drawGraphInView()){
-			bottomText2.setText("");
-			int lastSpot = fileArrayString.length-1;
-			
-			if(winningPlayer=="nobody"){
-				bottomText2.append("No Winner");
-	
-			}
-		
-			else{
-				bottomText2.setText("loaded file="+out);
-			}
-		}
+		parseData();
+		drawGraphInView();
+//		if(drawGraphInView()){
+//			bottomText2.setText("");
+//			int lastSpot = fileArrayString.length-1;
+//			
+//			if(winningPlayer=="nobody"){
+//				bottomText2.append("No Winner");
+//	
+//			}
+//		
+//			else{
+//				bottomText2.setText("loaded file="+out);
+//			}
+//		}
     }
         
     public void loadNextSave(View v){

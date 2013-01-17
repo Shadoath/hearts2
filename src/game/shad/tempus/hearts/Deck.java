@@ -9,102 +9,180 @@ public class Deck {
 	public static final String TAG = "Hearts--Deck";
 
 	private ArrayList<Card> deck;
+	/**
+	 * Low Card Point Value 
+	 * Cards 2-7
+	 * Max points 21
+	 */
+	private int lowCPV = 0;
+	/**
+	 * High Card Point Value 
+	 * Cards 9-14
+	 * Max points 21
+	 */
+	private int highCPV = 0;
+	private int deckSuit = 4;
+	
 	public Deck(){
 		deck = new ArrayList<Card>();
 	}
 	
 	/**
-	 * Use on a deck to see if it contains points
-	 * Does not check for the jack of Diamonds.
-	 * @param deck
-	 * @return true if has points
+	 * Adds a card to this deck in a ordered fashion.
+	 * TEST ME
+	 * @param card
 	 */
-	public int checkForPoints() {
-		Log.d(TAG, "checkForPoints ");
-		int points=0;
-		for(int i=0; i<deck.size();i++){
-			int curCard = deck.get(i).getValue();
-			int curSuit = deck.get(i).getSuit();
-			if(curSuit==1){ //Diamonds  check for jack.
-				if(curCard==11){
-					points-=10;
-
+	public void addCard(Card card){
+		int cardValue =card.getValue();
+		int cardSuit =card.getSuit();
+		int cardPointValue = card.getValue()-8;
+		if(deckSuit==4){//not set
+			Log.d(TAG, "Setting DeckSuit!");
+			deckSuit=cardSuit;
+		}
+		else if(deckSuit!=cardSuit){
+			Log.d(TAG, "!!!!!Adding Card S:"+cardSuit+" V:"+cardValue+" which is different than original="+deckSuit);
+			return;
+		}
+		Log.d(TAG, "Adding card to Deck. Card = S:"+cardSuit+" V:"+cardValue);
+		boolean added=false;
+		if(deck.size()>0){
+			if(cardPointValue<0){//Start from bottom of deck
+				Log.d(TAG, "Going from bottom of the deck. CPV="+cardPointValue);
+				lowCPV += cardPointValue;
+				for(int i=0; i<deck.size();i++){
+					if(deck.get(i).getValue()>cardValue){
+						Log.d(TAG, "Adding at i="+i);
+						this.deck.add(i, card);
+						added=true;
+						break;
+					}
 				}
 			}
-			if(curSuit==2){//Spades   check for queen
-				if(curCard==12){
-					points+=13;
+			else{//start from top of deck
+				Log.d(TAG, "Going from top of the deck. CPV="+cardPointValue);
+				highCPV += cardPointValue;
 
+				for(int i=deck.size()-1; i>=0;i--){
+					if(deck.get(i).getValue()<cardValue){
+						Log.d(TAG, "Adding at i="+i);
+						this.deck.add(i+1, card);
+						added=true;
+						break;
+					}
 				}
-			}
-			if(curSuit==3){//heart--add points
-				points++;
 			}
 		}
-		Log.d(TAG, "Points found= "+points);
-		return points;
+		if(!added)
+			Log.d(TAG, "Deck has no cards");
+			this.deck.add(card);
 	}
-
 	
-	public void createDeck(ArrayList<Card> deck){
-		this.deck = deck;
+	/**
+	 * Adds a card to this deck in a ordered fashion.
+	 * TEST ME
+	 * @param card
+	 */
+	public void removeCard(Card card){
+		int cardValue =card.getValue();
+		int cardPointValue = card.getValue()-8;
+		Log.d(TAG, "Removing card from Deck. Card = S:"+card.getSuit()+" V:"+cardValue);
+		if(deck.size()>0){
+			if(cardPointValue<0){//Start from bottom of deck
+				Log.d(TAG, "lowCPV="+cardPointValue);
+				lowCPV -= cardPointValue;
+				this.deck.remove(card);
+			}
+			
+			else{//start from top of deck
+				Log.d(TAG, "highCPV="+cardPointValue);
+				highCPV -= cardPointValue;
+				this.deck.remove(card);
+			}
+		}
+		else{
+			Log.d(TAG, "Deck has no cards");
+		}
+	}
+	
+	public Card getLowCard(){
+		Log.d(TAG, "Get Low Card");
+		if(deck.size()>0)
+			return deck.get(0);
+		else
+			Log.d(TAG, "No Cards left");
+			return null;
+	}
+	public Card getHighCard(){
+		Log.d(TAG, "Get High Card");
+		if(deck.size()>0)
+			return deck.get(deck.size()-1);
+		else
+			Log.d(TAG, "No Cards left");
+			return null;
+	}
+	
+	public Card getCardBelow(Card card, Card nextBest){
+		int value =card.getValue();
+		Log.d(TAG, "Looking for card below Value:"+value);
+		for(int i=deck.size()-1; i>=0;i--){
+			Card c =deck.get(i);
+			if(c.getValue()<value){
+				Log.d(TAG, "Found! Card="+c.toString());
+				return c;
+			}
+			nextBest = c;
+		}
+		Log.d(TAG, "No card Found! NextBest="+nextBest.toString());
+		return nextBest;		
+	}
+	
+	public int getLowCPV(){
+		return lowCPV;
 	}
 
-	public void addCard(Card card){
-		this.deck.add(card);
+	public int getHighCPV(){
+		return highCPV;
 	}
-
+	
+	public int getTotalCPV(){
+		return lowCPV+highCPV;
+	}
+	
 	public ArrayList<Card> getDeck(){
 		return this.deck;
 	}
 	
-	public void addAllCards(Deck cards){
+	public void addDeckCards(Deck cards){
 		for(int i = 0; i<cards.getSize();i++){
-			this.deck.add(cards.getCard(i));
+			addCard(cards.getCard(i));
 		}
 	}
 	
 	public void addCards(ArrayList<Card> cards){
 		for(Card c : cards){
-//			Log.d(TAG, "card added="+c.toString());
-			this.deck.add(c);
+			addCard(c);
 		}
 	}
 	
 	public void removeCards(ArrayList<Card> cards){
 		for(Card c : cards){
-			Log.d(TAG, "card removed="+c.toString());
-			c.setTouched(false);
-			this.deck.remove(c);
+			removeCard(c);
 		}
-	}
-	public void removeCard(Card card){
-		this.deck.remove(card);
 	}
 
 	public void removeCardAtIndex(int i){
 		this.deck.remove(i);
 	}
 	
-	public void addCardAtIndex(int index, Card card) {
-		this.deck.add(index, card);
-		
-	}
-	public void clearALL(){
+	public void clear(){
+		lowCPV  = 0;
+		highCPV = 0;
+		deckSuit= 4;
 		this.deck.clear();
 	}
-	/**
-	 * Clears the deck then updates it with new cards.
-	 * @param deck2
-	 */
-	public void updateDeck(Deck deck2){
-		this.deck.clear();
-		for(int i=0;i<deck.size();i++){
-			this.deck.add(deck2.getCard(i));
-		}
-	}
+
 	public int getIndex(Card card){
-		
 		return this.deck.indexOf(card);
 	}
 	
@@ -112,32 +190,16 @@ public class Deck {
 		return this.deck.size();
 	}
 	
-	//returns a card at an index
 	public Card getCard(int index){
 		return this.deck.get(index);
 	}
+	/**
+	 * Sets a new deck without attempting to order.
+	 * @param deck
+	 */
 	public void setDeck(ArrayList<Card> deck) {
 		this.deck = deck;
 	}
 	
 
-	//////////////////////////////////////////////////added from game class
-
-	
-	public void addLowHigh(ArrayList<Card> fromDeck){
-		for(int i=0;i<fromDeck.size();i++){
-			deck.add(fromDeck.get(i));
-		}
-	}
-	
-	public void addHighLow(ArrayList<Card> fromDeck){
-		for(int i=fromDeck.size()-1;i>=0;i--){
-			deck.add(fromDeck.get(i));
-		}
-		
-	}
-	
-
-	
-	
 }

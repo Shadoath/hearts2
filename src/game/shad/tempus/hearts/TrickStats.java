@@ -14,7 +14,7 @@ public class TrickStats {
 	public JSONObject jsonWinnerString;
 	public JSONArray cardsPileJson;
 	
-	public TrickStats(int points, Player winner, Trick pile){
+	public TrickStats(int points, OldPlayer winner, Trick pile){
 		jsonWinnerString = new JSONObject();
 		cardsPileJson = new JSONArray();
 		winnerString="Points="+points+" Won by="+winner.shortName;

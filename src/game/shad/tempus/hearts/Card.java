@@ -12,7 +12,7 @@ public class Card {
     public int Rid;
     private boolean touched;
     public boolean inView=false;
-    private Player owner = null;
+    private OldPlayer owner = null;
     public boolean played = false;
 	final static int CLUBS = 0;
 	final static int DIAMONDS = 1;
@@ -351,6 +351,9 @@ public class Card {
 		String sValue = "";
 		String sSuit="";
 		switch(suit){
+		case -1:
+			sSuit="Test";
+			break;
 		case 0:
 			sSuit="Clubs";
 			break;
@@ -366,6 +369,12 @@ public class Card {
 		}
 		
 		switch (value){
+			case 0: 
+				sValue="Zero";
+				break;
+			case 1: 
+				sValue="One";
+				break;
 			case 2: 
 				sValue="Two";
 				break;
@@ -443,10 +452,10 @@ public class Card {
         return y - (bitmap.getHeight() /2);
     }
     
-    public void setOwner(Player p){
+    public void setOwner(OldPlayer p){
     		owner=p;
     }
-    public Player getOwner(){
+    public OldPlayer getOwner(){
 		return owner;
 }
  

@@ -16,7 +16,7 @@ public class Player {
 	ArrayList<Card> hand;
     public ArrayList<Card> cardsToTrade=new ArrayList<Card>();
 
-	private SuperDeck deck;
+	private PlayerDeck deck;
 	public int seat=0; //position
 	public String realName = "";
 	public String shortName = "";
@@ -27,18 +27,6 @@ public class Player {
 	public int highScore=0;
 	public int passTo = 0;
 	
-	public oldDeck clubs = new oldDeck();     //0
-	int highClub = 0;
-	int lowClub = 0;
-	public oldDeck diamonds = new oldDeck();  //1
-	int highDiamonds = 0;
-	int lowDiamonds = 0;
-	public oldDeck spades = new oldDeck();	   //2
-	int highSpades = 0;
-	int lowSpades = 0;
-	public oldDeck hearts = new oldDeck();    //3
-	int highHearts = 0;
-	int lowHearts = 0;
 	boolean winner = false;
 	boolean voidClubs;
 	boolean voidDiamonds;
@@ -57,10 +45,10 @@ public class Player {
 	public View textEntryView;
 	public Card twoOfClubs = null;
 	
-	public Player(MainActivity main, Game game, SuperDeck deck, int AISmarts, int seat, String name, int color){
+	public Player(MainActivity main, Game game, PlayerDeck deck, int AISmarts, int seat, String name, int color){
 		this.main =main;
 		this.game = game;
-		this.deck = new SuperDeck(game);	//may be obsolete
+		this.deck = new PlayerDeck(game);	//may be obsolete
 		this.deck = deck;
 		this.AISmarts = AISmarts;
 		this.seat = seat;
@@ -133,8 +121,9 @@ public class Player {
 		int startSuit=trick.getCard(0).getSuit();
 		Log.d(TAG+this.getRealName(), "Start suit is "+startSuit);
 		if(checkVoid(startSuit)){//This is the void CODE
+			Log.d(TAG+this.getRealName(), "Void!");
 			if(hasQueen){
-				Log.d(TAG+this.getRealName(), "Queencheck = true");
+				Log.d(TAG+this.getRealName(), "hasQueen = true");
 				if(game.round!=1){
 					return getQueen();
 				}
@@ -359,67 +348,7 @@ public class Player {
 	 * @return Card to play
 	 */
 	public Card playLow(int suit, int count){
-		Log.d(TAG+this.getRealName(), "Play Low");
-		Card nextCard = null;
-
-		if(count>6){
-			Log.d(TAG+this.getRealName(), "PlayLow is Out of cards!!!");
-			return new Card(3, 0, game);	//Red back card
-		}
-		switch(suit){
-			case 0:
-				if(clubs.getSize()==0){
-					Log.d(TAG+this.getRealName(), "out of Clubs");
-	
-					return playLow(++suit, ++count);
-				}
-				Log.d(TAG+this.getRealName(), "Playing Club");
-				nextCard = this.clubs.getCard(0);
-				return nextCard;
-			case 1:
-				if(diamonds.getSize()==0){
-					Log.d(TAG+this.getRealName(), "out of Diamonds");
-	
-					return playLow(++suit, ++count);
-				}
-				Log.d(TAG+this.getRealName(), "Playing Diamond");
-				nextCard=diamonds.getCard(0);
-				return nextCard;
-			case 2:
-				if(spades.getSize()==0){			
-					Log.d(TAG+this.getRealName(), "out of Spades");
-					return playLow(++suit, ++count);
-				}
-				Log.d(TAG+this.getRealName(), "Playing Spade");
-	
-				nextCard=spades.getCard(0);
-				if(spades.getSize()>1 && nextCard.getValue()==12){	//This should fix dropping queen on self
-					Log.d(TAG+this.getRealName(), "play low, trying to playing queen");
-					nextCard=spades.getCard(1);
-					return nextCard;
-				}
-				return nextCard;
-			case 3: 
-				if(hearts.getSize()==0){
-					Log.d(TAG+this.getRealName(), "out of Hearts");
-					return playLow(0, ++count);
-				}
-				else if(game.heartsBroken||game.trading){
-					Log.d(TAG+this.getRealName(), "Playing Hearts");
-					nextCard=hearts.getCard(0);
-					this.playingVoid=false;
-					return nextCard;
-				}
-				else{
-					Log.d(TAG+this.getRealName(), "hearts not broken!");
-					return playLow(0, ++count);
-				}
-			case 4:
-				Log.d(TAG+this.getRealName(), "Error no suit 4!");
-			}	
-		Log.d(TAG+this.getRealName(), "count="+count);
-		
-		return new Card(3, 0, game);
+		return deck.playLowSimple(suit, count);
 	}
 	
 	/**
@@ -430,68 +359,8 @@ public class Player {
 	 * @return Card to play
 	 */
 	public Card playHigh(int suit, int count){
-		Log.d(TAG+this.getRealName(), "Play High");
-		Card nextCard = null;
-		if(count>6){
-			Log.d(TAG+this.getRealName(), "Out of cards!!!");
-			return new Card(3, 0, game); //Red back card
-		}
-		switch(suit){
-		case 0:
-			if(clubs.getSize()==0){  //if suit is empty just recall this method with a higher suit.
-				Log.d(TAG+this.getRealName(), "out of Clubs");
-				return playHigh(++suit, ++count);
-			}
-			else{
-				Log.d(TAG+this.getRealName(), "Playing Club");
-				nextCard = clubs.getCard(clubs.getSize()-1);
-				Log.d(TAG+this.getRealName(), nextCard.toString());
-				return nextCard;
-			}	
-		case 1:
-			if(diamonds.getSize()==0){
-				Log.d(TAG+this.getRealName(), "out of Diamonds");
-				return playHigh(++suit, ++count);
-			}
-			else{
-				Log.d(TAG+this.getRealName(), "Playing Diamond");
-				nextCard=diamonds.getCard(diamonds.getSize()-1);
-				Log.d(TAG+this.getRealName(), nextCard.toString());
-				return nextCard;
-			}
-		case 2:
-			if(spades.getSize()==0){
-				Log.d(TAG+this.getRealName(), "out of Spades");
-				return playHigh(++suit, ++count);
-			}else{
-				Log.d(TAG+this.getRealName(), "Playing Spade");
-				nextCard=spades.getCard(spades.getSize()-1);
-				if(spades.getSize()>1 && nextCard.getValue()==12 && !game.trading){	//This should fix dropping queen on self
-					Log.d(TAG+this.getRealName(), "play high, trying to playing queen");
-					nextCard=spades.getCard(spades.getSize()-2);
-					return nextCard;
-				}
-				spades.removeCardAtIndex(spades.getSize()-1);
-				Log.d(TAG+this.getRealName(), nextCard.toString());
-				return nextCard;
-			}
-		case 3: 
-			if(hearts.getSize()==0){
-				Log.d(TAG+this.getRealName(), "out of Hearts");
-				return playHigh(0, ++count);
-			}else if(game.heartsBroken||playingVoid||game.trading){
-				Log.d(TAG+this.getRealName(), "Playing heart");
-				nextCard=hearts.getCard(hearts.getSize()-1);
-				Log.d(TAG+this.getRealName(), nextCard.toString());
-				this.playingVoid=false;
-				return nextCard;
-			}
-			else{
-				Log.d(TAG+this.getRealName(), "hearts not broken!");
-				playHigh(0, ++count);
-			}
-		}
-		return nextCard;
+		return deck.playHighSimple(suit, count);
+
 	}
 
 	/**
@@ -501,20 +370,7 @@ public class Player {
 	 * if not in deck returns NULL
 	 */
 	public Card getQueen(){
-	    Card card = null;
-		for(Card c : spades.getDeck()){
-			if(c.getValue()==12){
-				card = c;
-				
-				Log.d(TAG+this.getRealName(), "PLAYING queen from deck for "+this.getRealName());
-				hasQueen = false;
-				break;
-			}
-		}
-		if(card==null){
-			Log.d(TAG+this.getRealName(), "Returning Null, no Queen in DECK!  Should have done a QueenCheck");
-		}
-		return card;
+	    return deck.getQueenOfSpades();
 	}
 	/**
 	 * Get rid of bad cards but don't play hearts
@@ -553,36 +409,36 @@ public class Player {
 		Log.d(TAG+this.getRealName(), "voidPlayHighHearts");
 		switch(deck.getLargestSuit()){
 		case 0:
-			return playLow(0, 0);
+			return deck.playLowSimple(0, 0);
 		case 1:
-			return playLow(1, 0);
+			return deck.playLowSimple(1, 0);
 		case 2:
-			return playLow(2, 0);
+			return deck.playLowSimple(2, 0);
 		case 3:
 			Log.d(TAG+this.getRealName(), "Trying to play hearts on void, Attempting next best... playLow(clubs).");
-			return playLow(0, 0);
+			return deck.playLowSimple(0, 0);
 		default:
 			Log.d(TAG+this.getRealName(), "out of loop, playing  clubs.");
-			return playHigh(0, 0);
+			return deck.playLowSimple(0, 0);
 
 		}
 	
 	}
 	
 	private Card playLargestSuitAndPlay(){
-		Log.d(TAG+this.getRealName(), "voidPlayHighHearts");
+		Log.d(TAG+this.getRealName(), "Play largest suit");
 		switch(deck.getLargestSuit()){
 			case 0:
-				return playHigh(0, 0);
+				return deck.playHighSimple(0, 0);
 			case 1:
-				return playHigh(1, 0);
+				return deck.playHighSimple(1, 0);
 			case 2:
-				return playHigh(2, 0);
+				return deck.playHighSimple(2, 0);
 			case 3:
-				return playHigh(3, 0);
+				return deck.playHighSimple(3, 0);
 			default:
 				Log.d(TAG+this.getRealName(), "out of loop");
-				return playHigh(0, 0);
+				return deck.playHighSimple(0, 0);
 	
 		}
 	}

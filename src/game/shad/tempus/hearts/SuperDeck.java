@@ -6,15 +6,15 @@ import java.util.ArrayList;
 import android.R.integer;
 import android.util.Log;
 
-public class SuperDeck {
+public abstract class SuperDeck {
 	public static final String TAG = "Hearts--Deck";
 
-	private Deck clubCards;
-	private Deck diamondCards;
-	private Deck spadeCards;
-	private Deck heartCards;
-	private Card twoOfClubs;
-	private Game game;
+	public Deck clubCards;
+	public Deck diamondCards;
+	public Deck spadeCards;
+	public Deck heartCards;
+
+	public Game game;
 	
 	
 	public SuperDeck(Game game){
@@ -77,8 +77,7 @@ public class SuperDeck {
 		
 		return new Card(3, 0, game);
 	}
-	
-	
+		
 	/**
 	 * Recursive method to get the highest card of a suit OR roll-over to the next suit.
 	 * @param suit we want to get
@@ -134,23 +133,6 @@ public class SuperDeck {
 		return nextCard;
 	}
 	
-	
-	public boolean checkForTwo(){
-		for (int i=0;i<3;i++){//Should only need to check the first two the rest is overkill.
-			if(this.clubCards.getCard(i).getValue()==(2))
-				twoOfClubs=this.clubCards.getCard(i);
-				return true;
-		}
-			return false;
-	}
-	
-	public Card getTwoOfClubs(){
-		if(twoOfClubs!=null){
-			return twoOfClubs;
-		}
-		Log.d(TAG, "twoOfClubs Null, Run check first!");
-		return new Card(3, 0, game);
-	}
 	
 	/**
 	 * Use on a deck to see if it contains points
@@ -221,8 +203,7 @@ public class SuperDeck {
 		}
 	}
 	
-	
-	public void addAllCards(Deck cards){
+		public void addAllCards(Deck cards){
 		for(int i = 0; i<cards.getSize();i++){
 			addCard(cards.getCard(i));
 		}
@@ -275,6 +256,9 @@ public class SuperDeck {
 			
 	}
 	
+	/**
+	 * Returns the whole SuperDeck as a Deck
+	 */
 	public Deck getFullDeck(){
 		Deck fullDeck = new Deck();
 		fullDeck.addCards(clubCards.getDeck());
@@ -283,7 +267,49 @@ public class SuperDeck {
 		fullDeck.addCards(heartCards.getDeck());
 		return fullDeck;
 	}
+	public int getWorstCPVSuit(){
+		Log.d(TAG, "find worst CPV Suit");
+		int c = this.clubCards.getTotalCPV();
+		int d = this.diamondCards.getTotalCPV();
+		int s = this.spadeCards.getTotalCPV();
+		int h = this.heartCards.getTotalCPV();
+		int[] test = {c, d, s, h};
+		int position = 0;
+		int high = 0;
+		for(int i=0; i<test.length;i++){
+			if(test[i]>high){
+				position = i;
+				high = test[i];
+			}
+
+		}
+		Log.d(TAG, "Largest CPV suit is ="+position);
+		return position;
+			
+	}
 	
+	public Card getWorstCPVCard(int suit){
+		Log.d(TAG, "find worst CPV card in suit="+suit);
+		Card worstCard=null;
+		switch(suit){
+			case 0:	
+				worstCard = clubCards.getCard(clubCards.getSize()-1);
+				break;
+			case 1:
+				//Never give a high diamond
+				worstCard = diamondCards.getCard(0);
+				break;
+			case 2:
+				worstCard = spadeCards.getCard(spadeCards.getSize()-1);
+				break;
+			case 3:
+				worstCard = heartCards.getCard(heartCards.getSize()-1);
+				break;
+		}
+		Log.d(TAG, "Worst CPV card is ="+worstCard.toString());
+		return worstCard;
+			
+	}
 
 	public int getTotalCPV(int suit){
 		int total=0;
@@ -340,99 +366,6 @@ public class SuperDeck {
 	return total;
 	}
 	
-	/**
-	 * Get the card that is just below the card sent for a value.
-	 * Use to keep low cards longer.
-	 * @param cardToBeat Card to be lower than
-	 * @param lastPlayer if we are the last player of the trick, if true and we have no cards lower just play highest card.
-	 */
-	public Card getDeckCardBelow(Card cardToBeat, boolean lastPlayer, Card startCard){
-		Card bestPick = null;
-		switch (cardToBeat.getSuit()){
-		case 0:
-			bestPick = clubCards.getCardBelow(cardToBeat, startCard);
-			break;
-		case 1:
-			bestPick = diamondCards.getCardBelow(cardToBeat, startCard);
-			break;
-		case 2:
-			bestPick = spadeCards.getCardBelow(cardToBeat, startCard);
-			break;
-		case 3:
-			bestPick = heartCards.getCardBelow(cardToBeat, startCard);
-			break;
-		}
-		if(bestPick.getSuit()==-1){
-			Log.d(TAG, "No card found, Deck was empty.  Returning 3 of clubs");
-			Log.d(TAG, "Bad call to get CardBelow!!");
-			bestPick.setSuit(0);
-			bestPick.setValue(3);
-			return bestPick;
-		}
-		if(bestPick.getValue()>cardToBeat.getValue()){
-			Log.d(TAG, "!Card is above!");
-			if(lastPlayer){
-				Log.d(TAG, "Last Player, getting highest Card of Suit(");
-				Card highCard = null;
-				switch(cardToBeat.getSuit()){
-					case 0:
-						highCard = clubCards.getHighCard();
-						break;
-					case 1:
-						highCard = diamondCards.getHighCard();
-						break;
-					case 2:
-						highCard = spadeCards.getHighCard();
-						break;
-					case 3:
-						highCard = heartCards.getHighCard();
-						break;
-					}
-				if (highCard!=null){
-					Log.d(TAG, "highcard Found");
-					bestPick=highCard;
-				}
-			}
-			else{
-				Log.d(TAG, "Not last Player");
-			}
-		}
-		Log.d(TAG, "Playing Best Pick");
-		return bestPick;
-		
-	}
-
-	/**
-	 * Check deck to see if that suit is out of cards
-	 * @param suit
-	 * @return true if out of cards.
-	 */
-	public boolean checkVoid(int suit){
-		switch(suit){
-		case 0:
-			if(clubCards.getSize()==0){
-				return true;
-			}
-		break;
-			case 1:
-			if(spadeCards.getSize()==0){
-				return true;
-			}
-		break;
-		case 2:
-			if(diamondCards.getSize()==0){
-				return  true;
-			}
-		break;
-		case 3:
-			if(heartCards.getSize()==0){
-				return true;
-			}
-		break;
-		}
-		return false;
-		
-	}
 	public void clear(){
 		this.clubCards.clear();
 		this.diamondCards.clear();

@@ -45,15 +45,15 @@ public class Game extends Activity {
 	public String eol = System.getProperty("line.separator");
 	public String name;
 	
-	private Deck cardDeck=new Deck();
+	private oldDeck cardDeck=new oldDeck();
 	public Trick tableTrick=new Trick();
 
 	
-    public Player p1;
-	public Player p2;
-	public Player p3;
-	public Player p4;
-	public Player curPlayer;
+    public OldPlayer p1;
+	public OldPlayer p2;
+	public OldPlayer p3;
+	public OldPlayer p4;
+	public OldPlayer curPlayer;
 	
 	public Card cardToPlay;
 	public Canvas canvas = new Canvas();
@@ -228,7 +228,7 @@ public class Game extends Activity {
 	 */
 	public void makeDeck() { 
 		Log.d(TAG, "make Deck");
-		this.cardDeck = new Deck();
+		this.cardDeck = new oldDeck();
 
 		for(int suit=0;suit<4;suit++){			
 			for(int value=2;value<15;value++){
@@ -255,9 +255,9 @@ public class Game extends Activity {
 				int x = 0;
 				int z = 50;
 				
-				Deck deck2 = new Deck();
-				Deck deck3 = new Deck();
-				Deck deck4 = new Deck();
+				oldDeck deck2 = new oldDeck();
+				oldDeck deck3 = new oldDeck();
+				oldDeck deck4 = new oldDeck();
 				deck2.addAllCards(cardDeck);
 				int j=0;
 				int a=(int)  (Math.random()*7)+1;
@@ -309,7 +309,7 @@ public class Game extends Activity {
 				int z=50;//times to loop the deck and 'randomly' switch cards.
 				int r = 51;
 				boolean stop=false;
-				Deck deck2 = new Deck();
+				oldDeck deck2 = new oldDeck();
 		
 				while(x<z){
 					x++;
@@ -363,7 +363,7 @@ public class Game extends Activity {
 		int mixRounds =50;
 		int counter =0;
 		ArrayList<Card> cardPile = cardDeck.getDeck();
-		Deck newDeck = new Deck();
+		oldDeck newDeck = new oldDeck();
 		while(counter<mixRounds){
 			counter++;
 			Log.d(TAG, "counter="+counter);
@@ -423,10 +423,10 @@ public class Game extends Activity {
 	 * @param a The Deck to be split
 	 * @return	ArrayList<Deck>(size = 11)
 	 */
-	private ArrayList<Deck> splitDeck(Deck a) {
-		ArrayList<Deck> decks = new ArrayList<Deck>();
+	private ArrayList<oldDeck> splitDeck(oldDeck a) {
+		ArrayList<oldDeck> decks = new ArrayList<oldDeck>();
 		for(int i =0; i<10;i++){
-			Deck deck2 = new Deck();
+			oldDeck deck2 = new oldDeck();
 	
 			int t=0;
 			while(t<5){
@@ -453,14 +453,14 @@ public class Game extends Activity {
 	 * @param a
 	 * @return
 	 */
-	private Deck mixOutIn(ArrayList<Deck> a){
+	private oldDeck mixOutIn(ArrayList<oldDeck> a){
 		int size = a.size();
 		boolean extra=false;
 		if(size%2==1){
 			size--;
 			extra=true;
 		}
-		Deck d= new Deck();
+		oldDeck d= new oldDeck();
 		for(int i =0;i<size/2;i++){
 			d.addAllCards(mixDecks(a.get(i), a.get(size-i-1)));
 		}
@@ -469,7 +469,7 @@ public class Game extends Activity {
 		return d;
 	}
 	
-	public Deck mixDecks(Deck a, Deck b){
+	public oldDeck mixDecks(oldDeck a, oldDeck b){
 		for(int i=0; i<a.getSize();i++){
 			b.addCardAtIndex(i+i, a.getCard(i));
 		}
@@ -484,10 +484,10 @@ public class Game extends Activity {
 	public void dealing() {
 		Log.d(TAG, "dealing");
 		Log.d(TAG, "Deck size="+this.cardDeck.getSize());
-		Deck hand1 = new Deck();
-		Deck hand2 = new Deck();
-		Deck hand3 = new Deck();
-		Deck hand4 = new Deck();
+		oldDeck hand1 = new oldDeck();
+		oldDeck hand2 = new oldDeck();
+		oldDeck hand3 = new oldDeck();
+		oldDeck hand4 = new oldDeck();
 		for(int i=0;i<cardDeck.getSize();i+=4){
 			int d1=i;
 			int d2=i+1;
@@ -504,10 +504,10 @@ public class Game extends Activity {
 			Log.d(TAG, "Creating new players and giving each person a hand.");
 			int color1 = Color.parseColor("#FF7711");
 			int color2 = Color.rgb(0, 50 , 200);
-			p1 = new Player(main, this, hand1, 0, 1, name, Color.GREEN); 
-			p2 = new Player(main, this, hand2, difficulty, 2, "(P2)", color1);
-			p3 = new Player(main, this, hand3, difficulty, 3, "(P3)", color2);
-			p4 = new Player(main, this, hand4, difficulty, 4, "(P4)", Color.RED);
+			p1 = new OldPlayer(main, this, hand1, 0, 1, name, Color.GREEN); 
+			p2 = new OldPlayer(main, this, hand2, difficulty, 2, "(P2)", color1);
+			p3 = new OldPlayer(main, this, hand3, difficulty, 3, "(P3)", color2);
+			p4 = new OldPlayer(main, this, hand4, difficulty, 4, "(P4)", Color.RED);
 			slidingDeckHolder.addDeck(hand1);
 			
 			createPlayerViews();
@@ -1404,13 +1404,13 @@ public class Game extends Activity {
 	/**
 	 * @param p the player who's deck is about to be printed
 	 */
-	public String displayPlayerCards(Player p){ 
+	public String displayPlayerCards(OldPlayer p){ 
 		Log.d(TAG, "displayCards for "+p.getRealName());
 		Log.d(TAG, "points="+p.getScore());
-		Deck c = p.getClubs();
-		Deck d = p.getDiamonds();
-		Deck s = p.getSpades();
-		Deck h = p.getHearts();
+		oldDeck c = p.getClubs();
+		oldDeck d = p.getDiamonds();
+		oldDeck s = p.getSpades();
+		oldDeck h = p.getHearts();
 		int deckSize = p.getDeck().getSize();
 		int totalSize=c.getSize()+d.getSize()+s.getSize()+h.getSize();
 		String clubs = "";
@@ -1446,7 +1446,7 @@ public class Game extends Activity {
 	/**
 	 * @param deck the Deck of cards to be returned in a string list.
 	 */
-	public String displayDeckCards(Deck deck){ 
+	public String displayDeckCards(oldDeck deck){ 
 		Log.d(TAG, "displayTable cards");
 		String sDeck= "";
 		for(int i=0; i<deck.getSize();i++){

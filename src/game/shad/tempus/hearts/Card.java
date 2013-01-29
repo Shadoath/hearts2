@@ -12,7 +12,7 @@ public class Card {
     public int Rid;
     private boolean touched;
     public boolean inView=false;
-    private OldPlayer owner = null;
+    private Player owner = null;
     public boolean played = false;
 	final static int CLUBS = 0;
 	final static int DIAMONDS = 1;
@@ -452,10 +452,10 @@ public class Card {
         return y - (bitmap.getHeight() /2);
     }
     
-    public void setOwner(OldPlayer p){
-    		owner=p;
+    public void setOwner(Player curPlayer){
+    		owner=curPlayer;
     }
-    public OldPlayer getOwner(){
+    public Player getOwner(){
 		return owner;
 }
  

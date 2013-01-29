@@ -7,7 +7,7 @@ import android.R.integer;
 import android.util.Log;
 
 public abstract class SuperDeck {
-	public static final String TAG = "Hearts--Deck";
+	public static final String TAG = "Hearts--SuperDeck";
 
 	public Deck clubCards;
 	public Deck diamondCards;
@@ -133,7 +133,6 @@ public abstract class SuperDeck {
 		return nextCard;
 	}
 	
-	
 	/**
 	 * Use on a deck to see if it contains points
 	 * Does not check for the jack of Diamonds.
@@ -162,11 +161,6 @@ public abstract class SuperDeck {
 		}
 		Log.d(TAG, "Points found= "+points);
 		return points;
-	}
-
-	
-	public void addNewDeck(ArrayList<Card> deck){
-		//TODO
 	}
 
 	public void addCard(Card card){
@@ -203,7 +197,7 @@ public abstract class SuperDeck {
 		}
 	}
 	
-		public void addAllCards(Deck cards){
+	public void addAllCards(Deck cards){
 		for(int i = 0; i<cards.getSize();i++){
 			addCard(cards.getCard(i));
 		}
@@ -265,6 +259,18 @@ public abstract class SuperDeck {
 		fullDeck.addCards(diamondCards.getDeck());
 		fullDeck.addCards(spadeCards.getDeck());
 		fullDeck.addCards(heartCards.getDeck());
+		return fullDeck;
+	}
+	
+	/**
+	 * Returns the whole SuperDeck as a Deck
+	 */
+	public ArrayList<Card> getDeck(){
+		ArrayList<Card> fullDeck = new ArrayList<Card>();
+		fullDeck.addAll(clubCards.getDeck());
+		fullDeck.addAll(diamondCards.getDeck());
+		fullDeck.addAll(spadeCards.getDeck());
+		fullDeck.addAll(heartCards.getDeck());
 		return fullDeck;
 	}
 	public int getWorstCPVSuit(){
@@ -375,6 +381,19 @@ public abstract class SuperDeck {
 				
 	public int getSize(){
 		return this.clubCards.getSize()+this.diamondCards.getSize()+this.spadeCards.getSize()+this.heartCards.getSize();
+	}
+	
+	public Deck getClubs(){
+		return clubCards;
+	}
+	public Deck getDiamonds(){
+		return diamondCards;
+	}
+	public Deck getSpades(){
+		return spadeCards;
+	}
+	public Deck getHearts(){
+		return heartCards;
 	}
 	
 		

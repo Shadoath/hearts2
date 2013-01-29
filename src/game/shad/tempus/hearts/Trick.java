@@ -19,8 +19,8 @@ public class Trick{
 		trick = new ArrayList<Card>();
 	}
 	
-	public oldDeck TrickToDeck(){
-		oldDeck deck= new oldDeck();
+	public Deck TrickToDeck(){
+		Deck deck= new Deck();
 		deck.setDeck(trick);
 		return deck;
 	}

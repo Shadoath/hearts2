@@ -41,13 +41,13 @@ public class Deck {
 			deckSuit=cardSuit;
 		}
 		else if(deckSuit!=cardSuit){
-			Log.d(TAG, "!!!!!Adding Card S:"+cardSuit+" V:"+cardValue+" which is different than original="+deckSuit);
+			Log.d(TAG, "!!!!!Trying to add Card S:"+cardSuit+" V:"+cardValue+" which is different than original="+deckSuit);
 			return;
 		}
-		Log.d(TAG, "Adding card to Deck. Card = S:"+cardSuit+" V:"+cardValue);
+		Log.d(TAG, "Adding card to Deck. Card = Suit:"+cardSuit+" Value:"+cardValue);
 		boolean added=false;
 		if(deck.size()>0){
-			if(cardPointValue<0){//Start from bottom of deck
+			if(cardPointValue<=0){//Start from bottom of deck
 				Log.d(TAG, "Going from bottom of the deck. CPV="+cardPointValue);
 				lowCPV += cardPointValue;
 				for(int i=0; i<deck.size();i++){
@@ -74,7 +74,8 @@ public class Deck {
 			}
 		}
 		if(!added)
-			Log.d(TAG, "Deck has no cards");
+			Log.d(TAG, "Adding card to end of deck");
+
 			this.deck.add(card);
 	}
 	
@@ -174,7 +175,9 @@ public class Deck {
 	public void removeCardAtIndex(int i){
 		this.deck.remove(i);
 	}
-	
+	/**
+	 * clears the deck and sets CPV values to 0
+	 */
 	public void clear(){
 		lowCPV  = 0;
 		highCPV = 0;

@@ -15,8 +15,8 @@ import android.view.View.OnTouchListener;
 public class PlayerHolder extends SurfaceView implements Callback, OnTouchListener{
 	public static final String TAG = "Hearts--PlayerHolder--";
 
-    private oldDeck deck;
-    private OldPlayer player;
+    private Deck deck;
+    private Player player;
     private MainActivity main;
     private Card card;
     private int screenWidth;
@@ -35,12 +35,12 @@ public class PlayerHolder extends SurfaceView implements Callback, OnTouchListen
 
     //Holds players deck, class to call for updates about deck and drawing the deck
    
-    public PlayerHolder(Context context, MainActivity main, Game game, int sW, int sH, OldPlayer player){
+    public PlayerHolder(Context context, MainActivity main, Game game, int sW, int sH, Player p1){
     	super(context);
         this.mContext=context;
         this.main= main;
         this.game = game;
-        this.player = player;
+        this.player = p1;
         surfaceHolder = this.getHolder();
         surfaceHolder.addCallback(this);
         this.screenWidth = sW;

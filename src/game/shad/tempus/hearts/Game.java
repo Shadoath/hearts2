@@ -45,16 +45,16 @@ public class Game extends Activity {
 	public String eol = System.getProperty("line.separator");
 	public String name;
 	
-	private oldDeck cardDeck=new oldDeck();
+	private GameDeck gameDeck;
 	public Trick tableTrick=new Trick();
-
 	
-    public OldPlayer p1;
-	public OldPlayer p2;
-	public OldPlayer p3;
-	public OldPlayer p4;
-	public OldPlayer curPlayer;
+    public Player p1;
+	public Player p2;
+	public Player p3;
+	public Player p4;
+	public Player curPlayer;
 	
+//	public GameDeck gameDeck;
 	public Card cardToPlay;
 	public Canvas canvas = new Canvas();
 	private ArrayList<TrickStats> roundWinnerAndPoints= new ArrayList<TrickStats>(); 
@@ -86,7 +86,6 @@ public class Game extends Activity {
 	public int selectedCard=0;
 	public int selectedCardSuit=-1;
     public int roundScore = 0;
-
 	
 	private int clubsPlayedInt=0;
 	private int diamondsPlayedInt=0;
@@ -103,7 +102,6 @@ public class Game extends Activity {
 	private int screenWidth;
     private int screenHeight;
 
-	
 	private Canvas tableHolderCanvas = null;
 	private Canvas p1HolderCanvas = null;
 	private Canvas p2HolderCanvas = null;
@@ -117,7 +115,6 @@ public class Game extends Activity {
     private LinearLayout middleLayout;
     private LinearLayout tableRightView;
     private LinearLayout bottomTVlayout;
-
     
     private Button playCard;
     
@@ -175,7 +172,6 @@ public class Game extends Activity {
         myToast  = Toast.makeText(context, "", Toast.LENGTH_SHORT);
         setupSaveSettings();
         findViewsById();
-        
 
 	}
     
@@ -227,13 +223,14 @@ public class Game extends Activity {
 	 * creates 52 cards 13 of each suit.
 	 */
 	public void makeDeck() { 
+		Log.d(TAG, "Making new deck");
 		Log.d(TAG, "make Deck");
-		this.cardDeck = new oldDeck();
+		this.gameDeck = new GameDeck(this);
 
 		for(int suit=0;suit<4;suit++){			
 			for(int value=2;value<15;value++){
 				Card cd = new Card(value, suit, this);
-				cardDeck.addCard(cd);
+				gameDeck.addCard(cd);
 			}
 	
 		}
@@ -245,269 +242,35 @@ public class Game extends Activity {
 	 * Probably a very uneven shuffle.
 	 */
 	public void shuffle(){
-		Log.d(TAG, "shuffle");
-		Log.d(TAG, "Deck size="+this.cardDeck.getSize());
+		Log.d(TAG, "Game shuffle");
+//		gameDeck.shuffle(shuffleType);
+		}
 		
-			if(shuffleType==1){
-				Log.d(TAG, "shuffle type 1");
-	
-				//New shuffle going in 8/16
-				int x = 0;
-				int z = 50;
-				
-				oldDeck deck2 = new oldDeck();
-				oldDeck deck3 = new oldDeck();
-				oldDeck deck4 = new oldDeck();
-				deck2.addAllCards(cardDeck);
-				int j=0;
-				int a=(int)  (Math.random()*7)+1;
-				int dLength=0;;
-				boolean stop = false;
-				while(x<z&&!stop){
-					x++;
-					dLength=deck2.getSize();
-					while(dLength>0){
-						if(dLength<=a){
-							Log.d(TAG, "STOP, too Small. "+dLength);
-							deck3.addAllCards(deck2);
-							deck2.clearALL();
-							a=-1;	//must be negative or it will go into the while loop
-							stop=true;
-							//maybe just break and drop all cards.
-						}		
-						//print ("a="+a, 449);
-						while(a>=0){
-							deck3.addCard(deck2.getCard(a));
-							deck2.removeCardAtIndex(a);
-							a--;	//goes to -1, but thats ok
-							j++;	//seemed like it adds an extra but a>=0 is why.
-						}
-						
-						deck4.addAllCards(deck3);
-						deck3.clearALL();
-						
-						a=(int) (Math.random()*7)+1;
-						dLength=deck2.getSize();
-						//Log.d(TAG, "deck2= "+dLength, 461);
-						//Log.d(TAG, "deck3= "+deck3.getSize(), 462);
-						//Log.d(TAG, "deck4= "+deck4.getSize(), 463);
-					}
-					//deck2.clearALL();  should be empty
-					stop=false;
-					deck2.addAllCards(deck4);  //dont use = it makes them clones of each other
-					deck4.clearALL();
-					Log.d(TAG, "x="+x+"  z="+z);
-					
-				}
-				Log.d(TAG, "j is "+j);
-				cardDeck.clearALL();
-				cardDeck.addAllCards(deck2);
-			}
-			else if(shuffleType==2){	//this shuffle may not work after changing everything to Deck...
-				Log.d(TAG, "shuffle type 2");
-				int x=0;
-				int z=50;//times to loop the deck and 'randomly' switch cards.
-				int r = 51;
-				boolean stop=false;
-				oldDeck deck2 = new oldDeck();
-		
-				while(x<z){
-					x++;
-					int j=0;
-					int a=(int) (Math.random()*r);
-					for(int i=52; i>0&&!stop; i--){
-						int loop=0;
-						while(cardDeck.getCard(a)!=null&&!stop){
-							loop++;
-							a=(int) (Math.random()*r);
-							if(loop>15&&!stop){ //careful on this Set loop to 15 from 10.
-								r = 0;
-								for(int q=0; q<cardDeck.getSize();q++){//Random math not finding cards, Empty rest and start again.
-									if(cardDeck.getCard(q)!=null){
-										deck2.addCardAtIndex(q, cardDeck.getCard(q));
-										r++;
-										j++;
-									}
-									
-									
-								}
-								stop=true;
-								
-								
-							}
-						}
-						if(!stop){
-							deck2.addCardAtIndex(a, cardDeck.getCard(a));
-							cardDeck.addCardAtIndex(a, null);			
-							j++;
-						}
-					}
-					
-					cardDeck=deck2;
-					
-					
-					
-				}
-			}
-			
-			else{
-				//TODO finish.
-				Log.d(TAG, "shuffle type 3");
-				dartBoardShuffle();
-			}
-		}
-	
-	
-	public void dartBoardShuffle(){
-		Log.d(TAG, "DartBoard Shuffle");
-		int mixRounds =50;
-		int counter =0;
-		ArrayList<Card> cardPile = cardDeck.getDeck();
-		oldDeck newDeck = new oldDeck();
-		while(counter<mixRounds){
-			counter++;
-			Log.d(TAG, "counter="+counter);
-			dartShuffle(cardPile);
-			cardPile.clear();
-			newDeck.clearALL();
-			cardPile=(ArrayList<Card>) (floorCards.clone());
-			newDeck.addCards(cardPile);
-//			displayDeckCards(newDeck);
-			//stuff
-			
-		}
-		cardDeck.clearALL();
-		cardDeck=newDeck;
-		
-
-	}
-	public void dartShuffle(ArrayList<Card> startDeck){
-		floorCards.clear();
-		cardDartBoard= new Card[boardX][boardY];
-		int randx = 0;
-		int randy = 0;
-		for(Card card : startDeck){
-			randx = (int) (Math.random()*boardX);
-			randy = (int) (Math.random()*boardY);
-
-			tossCard(card, randx, randy);
-		}
-		clearDartBoard();
-		
-		
-	}
-	
-	public void tossCard(Card card, int x, int y){
-		if(cardDartBoard[x][y]==null){
-			cardDartBoard[x][y]=card;
-		}
-		else{
-			floorCards.add(cardDartBoard[x][y]);
-			cardDartBoard[x][y]=card;			
-		}
-	}
-	
-	public void clearDartBoard(){
-		for(int i=0; i<boardX;i++){
-			for(int j=0; j<boardY;j++){
-				if(cardDartBoard[i][j]!=null){
-					floorCards.add(cardDartBoard[i][j]);
-				}
-			}
-		}
-//		Log.d(TAG, "floorCard count="+floorCards.size());
-
-	}
-	/**
-	 * Takes a Deck and returns an array of decks, 11 of them 5 per array and 2 in the last one.
-	 * @param a The Deck to be split
-	 * @return	ArrayList<Deck>(size = 11)
-	 */
-	private ArrayList<oldDeck> splitDeck(oldDeck a) {
-		ArrayList<oldDeck> decks = new ArrayList<oldDeck>();
-		for(int i =0; i<10;i++){
-			oldDeck deck2 = new oldDeck();
-	
-			int t=0;
-			while(t<5){
-				deck2.addCard(a.getCard(t));
-				t++;
-			}
-			t--;
-			while(t>=0){
-				a.removeCardAtIndex(t);
-				t--;
-			}
-			decks.add(deck2);
-			Log.d(TAG, "deck size="+ deck2.getSize());
-
-		}
-		Log.d(TAG, "final cards size="+ a.getSize());
-		decks.add(a);
-		return decks;
-	}
-	
-	
-	/**
-	 * Mix an ArrayList<Deck> into 
-	 * @param a
-	 * @return
-	 */
-	private oldDeck mixOutIn(ArrayList<oldDeck> a){
-		int size = a.size();
-		boolean extra=false;
-		if(size%2==1){
-			size--;
-			extra=true;
-		}
-		oldDeck d= new oldDeck();
-		for(int i =0;i<size/2;i++){
-			d.addAllCards(mixDecks(a.get(i), a.get(size-i-1)));
-		}
-		d.addAllCards(a.get(size/2));
-		
-		return d;
-	}
-	
-	public oldDeck mixDecks(oldDeck a, oldDeck b){
-		for(int i=0; i<a.getSize();i++){
-			b.addCardAtIndex(i+i, a.getCard(i));
-		}
-		return b;
-	}
-
 	
 	/**
 	* Create the and deals them out and then finds the two
 	* NEEDS SHUFFLE.
 	*/
 	public void dealing() {
-		Log.d(TAG, "dealing");
-		Log.d(TAG, "Deck size="+this.cardDeck.getSize());
-		oldDeck hand1 = new oldDeck();
-		oldDeck hand2 = new oldDeck();
-		oldDeck hand3 = new oldDeck();
-		oldDeck hand4 = new oldDeck();
-		for(int i=0;i<cardDeck.getSize();i+=4){
-			int d1=i;
-			int d2=i+1;
-			int d3=i+2;
-			int d4=i+3;
-			hand1.addCard(cardDeck.getCard(d1));
-			hand2.addCard(cardDeck.getCard(d2));
-			hand3.addCard(cardDeck.getCard(d3));
-			hand4.addCard(cardDeck.getCard(d4));
-			
-			
-		}
+		Log.d(TAG, "Game dealing");
+		ArrayList<ArrayList<Card>> playerDecks=gameDeck.deal();
+		Deck hand1 = new Deck();
+		Deck hand2 = new Deck();
+		Deck hand3 = new Deck();
+		Deck hand4 = new Deck();
+		hand1.addCards(playerDecks.get(0));
+		hand2.addCards(playerDecks.get(1));
+		hand3.addCards(playerDecks.get(2));
+		hand4.addCards(playerDecks.get(3));
+		displayDeckCards(hand1);
 		if(p1==null){//first Start 
 			Log.d(TAG, "Creating new players and giving each person a hand.");
 			int color1 = Color.parseColor("#FF7711");
 			int color2 = Color.rgb(0, 50 , 200);
-			p1 = new OldPlayer(main, this, hand1, 0, 1, name, Color.GREEN); 
-			p2 = new OldPlayer(main, this, hand2, difficulty, 2, "(P2)", color1);
-			p3 = new OldPlayer(main, this, hand3, difficulty, 3, "(P3)", color2);
-			p4 = new OldPlayer(main, this, hand4, difficulty, 4, "(P4)", Color.RED);
+			p1 = new Player(main, this, hand1, 0, 1, name, Color.GREEN); 
+			p2 = new Player(main, this, hand2, difficulty, 2, "(P2)", color1);
+			p3 = new Player(main, this, hand3, difficulty, 3, "(P3)", color2);
+			p4 = new Player(main, this, hand4, difficulty, 4, "(P4)", Color.RED);
 			slidingDeckHolder.addDeck(hand1);
 			
 			createPlayerViews();
@@ -515,10 +278,10 @@ public class Game extends Activity {
 		}
 		else {//else new round and New cards are dealt
 			Log.d(TAG, "new round being delt");
-			p1.sethand(hand1);
-			p2.sethand(hand2);
-			p3.sethand(hand3);
-			p4.sethand(hand4);
+			p1.setDeck(hand1);
+			p2.setDeck(hand2);
+			p3.setDeck(hand3);
+			p4.setDeck(hand4);
 			slidingDeckHolder.addDeck(p1.getDeck());
 			logPlayerPoints();
 		}			
@@ -599,10 +362,10 @@ public class Game extends Activity {
 		p3.cardsToTrade.clear();
 		p4.cardsToTrade.clear();
 
-		p1.sortHandFromDeck();
-		p2.sortHandFromDeck();
-		p3.sortHandFromDeck();
-		p4.sortHandFromDeck();
+//		p1.sortHandFromDeck();//Should never need to sort MU HA HAHA
+//		p2.sortHandFromDeck();
+//		p3.sortHandFromDeck();
+//		p4.sortHandFromDeck();
 		this.trading=false;
 		slidingDeckHolder.addDeck(p1.getDeck());
 		playCard.setEnabled(true);
@@ -664,7 +427,7 @@ public class Game extends Activity {
 		Card nextCard = curPlayer.twoOfClubs;
 		nextCard.setOwner(curPlayer);
 		curPlayer.removeCardFromDeck(nextCard);
-		curPlayer.updateSuitsFast();
+//		curPlayer.updateSuitsFast();//TODO make sure call to deck is clean.
 		if(curPlayer==p1){
 			slidingDeckHolder.addDeck(p1.getDeck());
 		}
@@ -766,7 +529,7 @@ public class Game extends Activity {
 		playCardBottomText(nextCard);
 		curPlayer.removeCardFromDeck(nextCard);
 
-		curPlayer.updateSuitsFast();
+//		curPlayer.updateSuitsFast(); //Should not need to
 		if(curPlayer==p1){
 			slidingDeckHolder.addDeck(p1.getDeck());
 		}
@@ -1402,16 +1165,17 @@ public class Game extends Activity {
 	}
 	
 	/**
-	 * @param p the player who's deck is about to be printed
+	 * @param p12 the player who's deck is about to be printed
 	 */
-	public String displayPlayerCards(OldPlayer p){ 
-		Log.d(TAG, "displayCards for "+p.getRealName());
-		Log.d(TAG, "points="+p.getScore());
-		oldDeck c = p.getClubs();
-		oldDeck d = p.getDiamonds();
-		oldDeck s = p.getSpades();
-		oldDeck h = p.getHearts();
-		int deckSize = p.getDeck().getSize();
+	public String displayPlayerCards(Player p12){ 
+		Log.d(TAG, "displayCards for "+p12.getRealName());
+		Log.d(TAG, "points="+p12.getScore());
+		PlayerDeck playerDeck = p12.getPlayerDeck();
+		Deck c = playerDeck.getClubs();
+		Deck d = playerDeck.getDiamonds();
+		Deck s = playerDeck.getSpades();
+		Deck h = playerDeck.getHearts();
+		int deckSize = p12.getDeck().getSize();
 		int totalSize=c.getSize()+d.getSize()+s.getSize()+h.getSize();
 		String clubs = "";
 		String diamonds = "";
@@ -1434,7 +1198,7 @@ public class Game extends Activity {
 		Log.d(TAG, "spades=" + spades);
 		Log.d(TAG, "hearts=" + hearts);
 		Log.d(TAG, "Size=" + totalSize+" Deck Size ="+deckSize);
-		String sDeck= "The deck of "+p.getRealName()+"\n";
+		String sDeck= "The deck of "+p12.getRealName()+"\n";
 		sDeck+="clubs=" + clubs+"\n";
 		sDeck+="diamonds=" + diamonds+"\n";
 		sDeck+="spades=" + spades+"\n";
@@ -1446,7 +1210,7 @@ public class Game extends Activity {
 	/**
 	 * @param deck the Deck of cards to be returned in a string list.
 	 */
-	public String displayDeckCards(oldDeck deck){ 
+	public String displayDeckCards(Deck deck){ 
 		Log.d(TAG, "displayTable cards");
 		String sDeck= "";
 		for(int i=0; i<deck.getSize();i++){
@@ -1547,10 +1311,6 @@ public class Game extends Activity {
 		jackFound 	= false;
 		queenFound	= false;
 		p1.tradingCardsRemoved = false;
-		p1.claimedDeck= false;
-		p2.claimedDeck= false;
-		p3.claimedDeck= false;
-		p4.claimedDeck= false;
 		roundView.setText("Round="+round);
 		if(cardCounterB){
 			clubsPlayed.setText("C="+clubsPlayedInt);

@@ -51,7 +51,7 @@ public class OldPlayer {
 	public boolean sneakPeak = false;
 	
 	private int IQ;	//Then just a simple slider to change it and easy greater than if statments to do bot AI.
-	//This will let the IQ be changed in game. just Pust a slider around the AI portrait.
+	//This will let the IQ be changed in game. just Put a slider around the AI portrait.
 	public LayoutInflater factory;
 
 	public View textEntryView;
@@ -230,7 +230,7 @@ public class OldPlayer {
 
 		Toast.makeText(main, "OUT OF CARDS!!", Toast.LENGTH_SHORT).show();
 		Card oddBall = new Card(3, 0, game);
-		oddBall.setOwner(this);
+//		oddBall.setOwner(this);
 		return oddBall;
 	}
 	
@@ -348,7 +348,7 @@ public class OldPlayer {
 
 		Toast.makeText(main, "OUT OF CARDS!!", Toast.LENGTH_SHORT).show();
 		Card oddBall = new Card(3, 0, game);
-		oddBall.setOwner(this);
+//		oddBall.setOwner(this);
 		return oddBall;
 	}
 	
@@ -695,7 +695,7 @@ public class OldPlayer {
 	 * @param cardToCheck
 	 * @return
 	 */
-	public boolean checkForCardsHigher(oldDeck cards, int valueToCheck){
+	public boolean checkForCardsHigher(Deck cards, int valueToCheck){
 		Log.d(TAG+this.getRealName(), "Checking for higher cards than " + valueToCheck + " for "+this.getRealName());
 		int suitToCheck = cards.getCard(0).getSuit();
 		for(Card c :cards.getDeck()){
@@ -708,7 +708,7 @@ public class OldPlayer {
 		return false;
 	}
 	
-	public Card getLargestCardInTrick(oldDeck cards){
+	public Card getLargestCardInTrick(Deck cards){
 		Card highestCard = cards.getCard(0);
 		int startValue= highestCard.getValue();
 		int startSuit = highestCard.getSuit();

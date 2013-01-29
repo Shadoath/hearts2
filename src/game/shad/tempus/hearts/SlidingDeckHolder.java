@@ -18,7 +18,7 @@ public class SlidingDeckHolder extends LinearLayout
     private static final int SWIPE_THRESHOLD_VELOCITY = 300;
 
 	
-    private oldDeck deck;
+    private Deck deck;
     private ArrayList<CardView> cardViewSelected;
     private ArrayList<CardView> tradingViews;
     private CardView viewSelected;
@@ -49,7 +49,7 @@ public class SlidingDeckHolder extends LinearLayout
        	params = new LinearLayout.LayoutParams(cardWidth, screenHeight);
        	params.setMargins(0, 0, 0, 0);
        	
-       	this.deck = new oldDeck();
+       	this.deck = new Deck();
         
         cardViewSelected= new ArrayList<CardView>();
         tradingViews= new ArrayList<CardView>();
@@ -60,7 +60,7 @@ public class SlidingDeckHolder extends LinearLayout
     }
         
     public void addBlankCards(){
-    	this.deck.clearALL();
+    	this.deck.clear();
     	int i = 0;
     	while(i  < 12){
     		ImageView cView= new ImageView(mContext);
@@ -100,7 +100,7 @@ public class SlidingDeckHolder extends LinearLayout
 	 * Clears the deck then adds a new one.
 	 * @param deck: new deck to be drawn in this view.
 	 */
-	public void addDeck(oldDeck deck){
+	public void addDeck(Deck deck){
     	removeAllViews();
 		cardViewSelected= new ArrayList<CardView>();
 		for(Card c: deck.getDeck()){
@@ -247,7 +247,7 @@ public class SlidingDeckHolder extends LinearLayout
 		}
     }
     	
-    public oldDeck getDeck(){
+    public Deck getDeck(){
         return this.deck;
     }
     

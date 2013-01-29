@@ -20,7 +20,7 @@ public class DeckHolder extends SurfaceView  implements Callback, OnTouchListene
     private static final int SWIPE_THRESHOLD_VELOCITY = 300;
 
 	
-    private oldDeck deck;
+    private Deck deck;
     private Card Card;
     private Card firstCardTouched;
     private int screenWidth;
@@ -45,7 +45,7 @@ public class DeckHolder extends SurfaceView  implements Callback, OnTouchListene
         surfaceHolder.addCallback(this);
 	    this.screenWidth = sW;
         this.screenHeight = sH;
-        this.deck = new oldDeck();
+        this.deck = new Deck();
         addBlankCards();
         
 
@@ -53,7 +53,7 @@ public class DeckHolder extends SurfaceView  implements Callback, OnTouchListene
 
     
     public void addBlankCards(){
-    	this.deck.clearALL();
+    	this.deck.clear();
     	this.position=0;
     	int i = 0;
     	while(i  < 12){
@@ -81,8 +81,8 @@ public class DeckHolder extends SurfaceView  implements Callback, OnTouchListene
 	 * Clears the deck then adds a new one.
 	 * @param deck: new deck to be drawn in this view.
 	 */
-	public void addDeck(oldDeck deck){
-		this.deck.clearALL();
+	public void addDeck(Deck deck){
+		this.deck.clear();
         this.deck = deck;
     }
  
@@ -105,7 +105,7 @@ public class DeckHolder extends SurfaceView  implements Callback, OnTouchListene
     	this.deck.addCard(c);
     }
     public void removeAll(){
-    	this.deck.clearALL();
+    	this.deck.clear();
     }
     
     @Override
@@ -168,12 +168,12 @@ public class DeckHolder extends SurfaceView  implements Callback, OnTouchListene
     	}
    
     }
-    public void updateDeck(oldDeck deck){
+    public void updateDeck(Deck deck){
         this.deck = deck;
         refreshDrawableState();
     }
     
-    public oldDeck getDeck(){
+    public Deck getDeck(){
         return this.deck;
     }
     

@@ -7,6 +7,7 @@ import android.R.integer;
 import android.util.Log;
 
 public class PlayerDeck extends SuperDeck{
+	public static final String TAG = "Hearts--PlayerDeck";
 
 	public Card twoOfClubs;
 	public Card queenOfSpades;

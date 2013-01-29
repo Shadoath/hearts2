@@ -44,7 +44,6 @@ public class oldDeck {
 		Log.d(TAG, "Points found= "+points);
 		return points;
 	}
-
 	
 	public void createDeck(ArrayList<Card> deck){
 		this.deck = deck;

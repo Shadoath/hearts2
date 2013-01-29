@@ -334,7 +334,7 @@ public class MainActivity extends Activity {
 		}).show();
     }
     
-    public void displayPlayerInfo(final OldPlayer player, final String info, final boolean sneakPeak){
+    public void displayPlayerInfo(final Player player, final String info, final boolean sneakPeak){
 	//TODO add boolean to not open.
     handler.post(new Runnable() {
     		public void run() {
@@ -343,7 +343,7 @@ public class MainActivity extends Activity {
     	});
     }
      
-    private void showPlayerInfo(OldPlayer player, String info, final boolean sneakPeak) {
+    private void showPlayerInfo(Player player, String info, final boolean sneakPeak) {
     	String PlayerInfo = player.getRealName()+" Points= "+player.getScore()+" AI lvl="+player.getAISmarts();
     	
     	if(!sneakPeak){	//Or Player 1

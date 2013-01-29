@@ -14,12 +14,12 @@ public class TrickStats {
 	public JSONObject jsonWinnerString;
 	public JSONArray cardsPileJson;
 	
-	public TrickStats(int points, OldPlayer winner, Trick pile){
+	public TrickStats(int points, Player curPlayer, Trick pile){
 		jsonWinnerString = new JSONObject();
 		cardsPileJson = new JSONArray();
-		winnerString="Points="+points+" Won by="+winner.shortName;
+		winnerString="Points="+points+" Won by="+curPlayer.shortName;
 		try {
-			jsonWinnerString.put(winner.shortName, points);
+			jsonWinnerString.put(curPlayer.shortName, points);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

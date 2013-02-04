@@ -39,7 +39,6 @@ public class Card {
 		this.value = value;
 		this.suit = suit;
 		this.name = toString();
-		
 	}
 	 
    public void draw(Canvas canvas) {

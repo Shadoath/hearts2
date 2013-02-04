@@ -156,13 +156,13 @@ public class DeckHolder extends SurfaceView  implements Callback, OnTouchListene
     }
     
     private void setInView(boolean b){
-    	for(Card c :deck.getDeck()){
+    	for(Card c :deck.getArrayListDeck()){
     		c.inView=b;
     	}
     }
     
     private void clearCardCoords(){
-    	for(Card c :deck.getDeck()){
+    	for(Card c :deck.getArrayListDeck()){
     		if(!c.inView)
     			c.setCoords(0, 0, 0, 0);
     	}
@@ -221,7 +221,7 @@ public class DeckHolder extends SurfaceView  implements Callback, OnTouchListene
 				initialX =  (int) t1x;
 				initialY =  (int) t1y;
 				if(firstCardTouched==null){
-					for(Card card : this.deck.getDeck()){
+					for(Card card : this.deck.getArrayListDeck()){
 				    	if(card.getBounds().contains(initialX, initialY)){
 				    		firstCardTouched=card;  //record first touch location
 				    	}

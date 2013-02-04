@@ -698,7 +698,7 @@ public class OldPlayer {
 	public boolean checkForCardsHigher(Deck cards, int valueToCheck){
 		Log.d(TAG+this.getRealName(), "Checking for higher cards than " + valueToCheck + " for "+this.getRealName());
 		int suitToCheck = cards.getCard(0).getSuit();
-		for(Card c :cards.getDeck()){
+		for(Card c :cards.getArrayListDeck()){
 			if(c.getSuit()==suitToCheck){
 				if(c.getValue()>valueToCheck){
 					return true;
@@ -713,7 +713,7 @@ public class OldPlayer {
 		int startValue= highestCard.getValue();
 		int startSuit = highestCard.getSuit();
 		
-		for(Card c :cards.getDeck()){
+		for(Card c :cards.getArrayListDeck()){
 			if(c.getSuit()==startSuit){
 				if(c.getValue()>startValue){
 					startValue = c.getValue();

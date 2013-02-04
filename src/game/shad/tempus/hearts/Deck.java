@@ -22,6 +22,7 @@ public class Deck {
 	 */
 	private int highCPV = 0;
 	private int deckSuit = 4;
+	private boolean singleSuit = true;
 	
 	public Deck(){
 		deck = new ArrayList<Card>();
@@ -36,13 +37,20 @@ public class Deck {
 		int cardValue =card.getValue();
 		int cardSuit =card.getSuit();
 		int cardPointValue = card.getValue()-8;
+		if(!singleSuit){
+			Log.d(TAG, "Single suit is false adding card to deck without order.");
+			deck.add(card);
+			return;
+		}
 		if(deckSuit==4){//not set
 			Log.d(TAG, "Setting DeckSuit!");
 			deckSuit=cardSuit;
 		}
 		else if(deckSuit!=cardSuit){
-			Log.d(TAG, "!!!!!Trying to add Card S:"+cardSuit+" V:"+cardValue+" which is different than original="+deckSuit);
+			Log.d(TAG, "!!!!!Trying to add Card S:"+cardSuit+" V:"+cardValue+" which is different than original deckSuit="+deckSuit);
 			return;
+
+
 		}
 		Log.d(TAG, "Adding card to Deck. Card = Suit:"+cardSuit+" Value:"+cardValue);
 		boolean added=false;
@@ -51,32 +59,51 @@ public class Deck {
 				Log.d(TAG, "Going from bottom of the deck. CPV="+cardPointValue);
 				lowCPV += cardPointValue;
 				for(int i=0; i<deck.size();i++){
-					if(deck.get(i).getValue()>cardValue){
+					int dv = deck.get(i).getValue();//waist of a variable but good to debug
+					if(dv>cardValue){
 						Log.d(TAG, "Adding at i="+i);
 						this.deck.add(i, card);
-						added=true;
-						break;
+						return;
 					}
 				}
 			}
 			else{//start from top of deck
 				Log.d(TAG, "Going from top of the deck. CPV="+cardPointValue);
 				highCPV += cardPointValue;
-
 				for(int i=deck.size()-1; i>=0;i--){
-					if(deck.get(i).getValue()<cardValue){
-						Log.d(TAG, "Adding at i="+i);
-						this.deck.add(i+1, card);
-						added=true;
-						break;
+					int dv = deck.get(i).getValue();
+					if(dv>cardValue){
+						continue;
+						
 					}
+					if(dv==cardValue){
+						Log.d(TAG, "deckValue==CardValue, adding card at i="+i);
+						Log.d(TAG, "This should only occur when singleSingle suit is false");
+						deck.add(i, card);
+						return;
+					}
+					if(dv<cardValue){
+						Log.d(TAG, "i="+i);
+						deck.add(i, card);
+						Log.d(TAG, "deckValue<CardValue, adding card at i="+i);
+						return;
+					}
+							
+					
+					
+//					if(deck.get(i).getValue()<cardValue){
+//						Log.d(TAG, "Adding at i="+i);
+//						this.deck.add(i+1, card);
+//						added=true;
+//						break;
+//					}
 				}
 			}
 		}
-		if(!added)
+		if(!added){
 			Log.d(TAG, "Adding card to end of deck");
-
 			this.deck.add(card);
+		}
 	}
 	
 	/**
@@ -129,12 +156,12 @@ public class Deck {
 		for(int i=deck.size()-1; i>=0;i--){
 			Card c =deck.get(i);
 			if(c.getValue()<value){
-				Log.d(TAG, "Found! Card="+c.toString());
+				Log.d(TAG, "Found! Card="+c.name);
 				return c;
 			}
 			nextBest = c;
 		}
-		Log.d(TAG, "No card Found! NextBest="+nextBest.toString());
+		Log.d(TAG, "No card Found! NextBest="+nextBest.name);
 		return nextBest;		
 	}
 	
@@ -150,7 +177,7 @@ public class Deck {
 		return lowCPV+highCPV;
 	}
 	
-	public ArrayList<Card> getDeck(){
+	public ArrayList<Card> getArrayListDeck(){
 		return this.deck;
 	}
 	
@@ -177,12 +204,14 @@ public class Deck {
 	}
 	/**
 	 * clears the deck and sets CPV values to 0
+	 * does NOT reset Singlesuit.
 	 */
 	public void clear(){
 		lowCPV  = 0;
 		highCPV = 0;
 		deckSuit= 4;
 		this.deck.clear();
+		
 	}
 
 	public int getIndex(Card card){
@@ -204,5 +233,10 @@ public class Deck {
 		this.deck = deck;
 	}
 	
-
+	public void setSingleSuit(boolean b){
+		singleSuit = b;
+	}
+	public boolean getSingleSuit(){
+		return singleSuit;
+	}
 }

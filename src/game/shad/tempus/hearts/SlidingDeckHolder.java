@@ -1,6 +1,7 @@
 package game.shad.tempus.hearts;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -18,7 +19,7 @@ public class SlidingDeckHolder extends LinearLayout
     private static final int SWIPE_THRESHOLD_VELOCITY = 300;
 
 	
-    private Deck deck;
+    private ArrayList<Card> deck;
     private ArrayList<CardView> cardViewSelected;
     private ArrayList<CardView> tradingViews;
     private CardView viewSelected;
@@ -49,7 +50,7 @@ public class SlidingDeckHolder extends LinearLayout
        	params = new LinearLayout.LayoutParams(cardWidth, screenHeight);
        	params.setMargins(0, 0, 0, 0);
        	
-       	this.deck = new Deck();
+       	this.deck = new ArrayList<Card>();
         
         cardViewSelected= new ArrayList<CardView>();
         tradingViews= new ArrayList<CardView>();
@@ -82,7 +83,7 @@ public class SlidingDeckHolder extends LinearLayout
     }
     
     public Card getCard(int i){
-        return this.deck.getCard(i);
+        return this.deck.get(i);
     }
     
     public int getPosition() {
@@ -100,12 +101,15 @@ public class SlidingDeckHolder extends LinearLayout
 	 * Clears the deck then adds a new one.
 	 * @param deck: new deck to be drawn in this view.
 	 */
-	public void addDeck(Deck deck){
+	public void addDeck(ArrayList<Card> deck){
     	removeAllViews();
 		cardViewSelected= new ArrayList<CardView>();
-		for(Card c: deck.getDeck()){
-			CardView cView= new CardView(mContext, c, params);
-			cView.setTag(c.toString());
+		Iterator<Card> it = deck.iterator();
+		while(it.hasNext()){
+			Card card = it.next();
+			Log.d(TAG, "Card added to sliding deckholder="+card.name);
+			CardView cView= new CardView(mContext, card, params);
+			cView.setTag(card.name);
 			cView.setOnClickListener(new OnClickListener() {
 				
 				@Override
@@ -114,9 +118,11 @@ public class SlidingDeckHolder extends LinearLayout
 					CardView cv = (CardView) v;
 					String t = cv.getTag().toString();
 					Log.d(TAG, "tag="+t);
-					for(Card c: self.deck.getDeck()){
-						Log.d(TAG, "card Tag="+c.toString());
-						if(c.toString().equals(t)){
+					Iterator<Card> it = self.deck.iterator();
+					while(it.hasNext()){
+						Card c = it.next();
+						Log.d(TAG, "card Tag="+c.name);
+						if(c.name.equals(t)){
 							game.slidingDeckViewTouched(c);
 							boolean done = false;
 							if(game.trading){//Pick up to three cards
@@ -187,7 +193,7 @@ public class SlidingDeckHolder extends LinearLayout
  
     
     public void swipeRight(){
-    	if(getPosition()<deck.getSize()+1)
+    	if(getPosition()<deck.size()+1)
     		setPosition(getPosition() + 1);
     	else
     		setPosition(0);
@@ -196,17 +202,17 @@ public class SlidingDeckHolder extends LinearLayout
     	if(getPosition()>=1)
     		setPosition(getPosition() - 1);
     	else{
-    		setPosition(deck.getSize()-1);
+    		setPosition(deck.size()-1);
     	}
 
     }
     public void addCard(Card c){
-    	this.deck.addCard(c);
+    	this.deck.add(c);
     }
     
     public void replaceCard(Card c){
-    	this.deck.removeCard(c);
-    	this.deck.addCard(c);
+    	this.deck.remove(c);
+    	this.deck.add(c);
     }
     public void removeAll(){
 		this.cardViewSelected= new ArrayList<CardView>();
@@ -217,7 +223,7 @@ public class SlidingDeckHolder extends LinearLayout
     	int i=0;
     	CardView toHighLightView = null;
     	while(i<count){
-	    	if(c.toString().equals(getChildAt(i).getTag())){
+	    	if(c.name.equals(getChildAt(i).getTag())){
 	    		toHighLightView=(CardView) getChildAt(i);
 	    		Log.d(TAG, "view found, Setting background yellow");
 	    		break;
@@ -247,7 +253,7 @@ public class SlidingDeckHolder extends LinearLayout
 		}
     }
     	
-    public Deck getDeck(){
+    public ArrayList<Card> getDeck(){
         return this.deck;
     }
     

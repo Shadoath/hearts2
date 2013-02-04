@@ -215,7 +215,7 @@ public class Game extends Activity {
         	playCard.setEnabled(true);
         	checkForTwoMethod();	//This more or less starts the game.
         }
-       
+        slidingDeckHolder.addDeck(p1.getArrayListDeck());
         update();
 	}
 		
@@ -230,7 +230,7 @@ public class Game extends Activity {
 		for(int suit=0;suit<4;suit++){			
 			for(int value=2;value<15;value++){
 				Card cd = new Card(value, suit, this);
-				gameDeck.addCard(cd);
+				gameDeck.addGameDeckCard(cd);
 			}
 	
 		}
@@ -243,7 +243,7 @@ public class Game extends Activity {
 	 */
 	public void shuffle(){
 		Log.d(TAG, "Game shuffle");
-//		gameDeck.shuffle(shuffleType);
+		gameDeck.shuffle(shuffleType);
 		}
 		
 	
@@ -254,39 +254,29 @@ public class Game extends Activity {
 	public void dealing() {
 		Log.d(TAG, "Game dealing");
 		ArrayList<ArrayList<Card>> playerDecks=gameDeck.deal();
-		Deck hand1 = new Deck();
-		Deck hand2 = new Deck();
-		Deck hand3 = new Deck();
-		Deck hand4 = new Deck();
-		hand1.addCards(playerDecks.get(0));
-		hand2.addCards(playerDecks.get(1));
-		hand3.addCards(playerDecks.get(2));
-		hand4.addCards(playerDecks.get(3));
-		displayDeckCards(hand1);
+//		displayDeckCards(playerDecks.get(0));	//changed to arraylists
 		if(p1==null){//first Start 
 			Log.d(TAG, "Creating new players and giving each person a hand.");
 			int color1 = Color.parseColor("#FF7711");
 			int color2 = Color.rgb(0, 50 , 200);
-			p1 = new Player(main, this, hand1, 0, 1, name, Color.GREEN); 
-			p2 = new Player(main, this, hand2, difficulty, 2, "(P2)", color1);
-			p3 = new Player(main, this, hand3, difficulty, 3, "(P3)", color2);
-			p4 = new Player(main, this, hand4, difficulty, 4, "(P4)", Color.RED);
-			slidingDeckHolder.addDeck(hand1);
+			p1 = new Player(main, this, playerDecks.get(0), 0, 1, name, Color.GREEN); 
+			p2 = new Player(main, this, playerDecks.get(1), difficulty, 2, "(P2)", color1);
+			p3 = new Player(main, this, playerDecks.get(2), difficulty, 3, "(P3)", color2);
+			p4 = new Player(main, this, playerDecks.get(3), difficulty, 4, "(P4)", Color.RED);
+//			slidingDeckHolder.addDeck(playerDecks.get(0));
 			
 			createPlayerViews();
 			updatePlayerInfo();
 		}
 		else {//else new round and New cards are dealt
 			Log.d(TAG, "new round being delt");
-			p1.setDeck(hand1);
-			p2.setDeck(hand2);
-			p3.setDeck(hand3);
-			p4.setDeck(hand4);
-			slidingDeckHolder.addDeck(p1.getDeck());
+			p1.setArrayListDeck(playerDecks.get(0));
+			p2.setArrayListDeck(playerDecks.get(1));
+			p3.setArrayListDeck(playerDecks.get(2));
+			p4.setArrayListDeck(playerDecks.get(3));
+//			slidingDeckHolder.addDeck(p1.getArrayListDeck());
 			logPlayerPoints();
 		}			
-		
-		
 	}
 	
 	/**
@@ -367,7 +357,7 @@ public class Game extends Activity {
 //		p3.sortHandFromDeck();
 //		p4.sortHandFromDeck();
 		this.trading=false;
-		slidingDeckHolder.addDeck(p1.getDeck());
+		slidingDeckHolder.addDeck(p1.getArrayListDeck());
 		playCard.setEnabled(true);
 		checkForTwoMethod();
 //		update();
@@ -387,34 +377,31 @@ public class Game extends Activity {
 			Log.d(TAG, "p1 played the 2 of clubs");
 			curPlayer=p1;
 			setState(1);
-			playTwoOfClubs();
-	
 		}
 		else if(p2.checkForTwo()){
 			Log.d(TAG, "p2 plays 2 of clubs");
 			curPlayer=p2;
 			setState(2);
-			playTwoOfClubs();
 			}
 		else if(p3.checkForTwo()){
 			Log.d(TAG, "p3 plays 2 of clubs");
 			curPlayer=p3;
 			setState(3);
-			playTwoOfClubs();
 		}
 		else if(p4.checkForTwo()){
 			Log.d(TAG, "p4 plays 2 of clubs");
 			curPlayer=p4;
 			setState(4);
-			playTwoOfClubs();
 		}
 		else{
 			Log.d(TAG, "The game has already started.");
 		}
 		Log.d(TAG, " 2 check done--curPlayer="+curPlayer.getRealName());
-        voidCheckAllPlayers();	//Run this before doing and player logic 
-        queenCheckAllPlayers();	//This should be the only place this needs to be run.
-		}
+	    voidCheckAllPlayers();	//Run this before doing and player logic 
+	    queenCheckAllPlayers();	//This should be the only place this needs to be run.
+		playTwoOfClubs();
+
+	}
 	      
 	/**
 	 * Sets the first round of the game going
@@ -424,12 +411,12 @@ public class Game extends Activity {
 		tableTrick.clearALL();
 		clearTableCards();
 		this.justPickedUpPile=false;
-		Card nextCard = curPlayer.twoOfClubs;
+		Card nextCard = curPlayer.getTwoOfClubs();
 		nextCard.setOwner(curPlayer);
 		curPlayer.removeCardFromDeck(nextCard);
 //		curPlayer.updateSuitsFast();//TODO make sure call to deck is clean.
 		if(curPlayer==p1){
-			slidingDeckHolder.addDeck(p1.getDeck());
+			slidingDeckHolder.addDeck(p1.getArrayListDeck());
 		}
 		Log.d(TAG, "Game started by "+curPlayer.getRealName());
 		tableTrick.addCard(nextCard);
@@ -531,7 +518,7 @@ public class Game extends Activity {
 
 //		curPlayer.updateSuitsFast(); //Should not need to
 		if(curPlayer==p1){
-			slidingDeckHolder.addDeck(p1.getDeck());
+			slidingDeckHolder.addDeck(p1.getArrayListDeck());
 		}
 		if(tableTrick.getSize()>=4){
 			pickUpHand();//This sets the next player
@@ -1218,7 +1205,7 @@ public class Game extends Activity {
 			if(c.getOwner()!=null){
 				sDeck+=c.getOwner()+":";
 			}
-			sDeck += c.name+"\n";
+			sDeck += c.toString()+"\n";
 		}
 		return sDeck;
 		//TODO update gameView in thread.
@@ -1569,7 +1556,7 @@ public class Game extends Activity {
   	///////////////////////////////////////////////////////////////////////Touch Events///////////////////////////////////////////////////////////////////////////
 	public void deckViewTouched(int x, int y) {
 		boolean done =false;
-		for(Card c :deckHolder.getDeck().getDeck()){
+		for(Card c :deckHolder.getDeck().getArrayListDeck()){
 	    	if(c.getBounds().contains(x, y)){
 	    		if(trading){//Pick up to three cards
 	    			if(p1.cardsToTrade.size()>0){

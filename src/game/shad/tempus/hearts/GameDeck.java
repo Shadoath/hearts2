@@ -6,26 +6,25 @@ import java.util.ArrayList;
 import android.graphics.Color;
 import android.util.Log;
 
-public class GameDeck extends SuperDeck{
+public class GameDeck{
 	public static final String TAG = "Hearts--GameDeck";
 
 	public Card twoOfClubs;
 	public Card queenOfSpades;
 	public boolean hasQueen;
-	ArrayList<Card> deck;
+	ArrayList<Card> gameDeck;
 
 	public GameDeck(Game game) {
-		super(game);
-		deck = this.getDeck();
-
+		gameDeck = new ArrayList<Card>();
 		// TODO Auto-generated constructor stub
 	}
 	
 	
 	public void shuffle(int type){
 		Log.d(TAG, "shuffle");
-		deck = this.getDeck();
-		Log.d(TAG, "Deck size="+deck.size());
+		Log.d(TAG, "Deck size="+gameDeck.size());
+//		gameDeck = this.getDeck();
+		Log.d(TAG, "Deck size="+gameDeck.size());
 		boolean stop = false;
 		int x = 0;
 		int z = 50;
@@ -38,7 +37,7 @@ public class GameDeck extends SuperDeck{
 		case 1:
 				Log.d(TAG, "shuffle type 1");
 				//New shuffle going in 8/16
-				deck2.addAll(deck);
+				deck2.addAll(gameDeck);
 
 				int dLength=0;;
 				while(x<z&&!stop){
@@ -78,8 +77,8 @@ public class GameDeck extends SuperDeck{
 					
 				}
 				Log.d(TAG, "j is "+j);
-				deck.clear();
-				deck.addAll(deck2);
+				gameDeck.clear();
+				gameDeck.addAll(deck2);
 			
 		break;
 		case 2:
@@ -97,14 +96,14 @@ public class GameDeck extends SuperDeck{
 				a=(int) (Math.random()*r);
 				for(int i=52; i>0&&!stop; i--){
 					int loop=0;
-					while(deck.get(a)!=null&&!stop){
+					while(gameDeck.get(a)!=null&&!stop){
 						loop++;
 						a=(int) (Math.random()*r);
 						if(loop>15&&!stop){ //careful on this Set loop to 15 from 10.
 							r = 0;
-							for(int q=0; q<deck.size();q++){//Random math not finding cards, Empty rest and start again.
-								if(deck.get(q)!=null){
-									deck2.add(q, deck.get(q));
+							for(int q=0; q<gameDeck.size();q++){//Random math not finding cards, Empty rest and start again.
+								if(gameDeck.get(q)!=null){
+									deck2.add(q, gameDeck.get(q));
 									r++;
 									j++;
 								}
@@ -117,13 +116,13 @@ public class GameDeck extends SuperDeck{
 						}
 					}
 					if(!stop){
-						deck2.add(a, deck.get(a));
-						deck.add(a, null);	//WTF is going on here?		
+						deck2.add(a, gameDeck.get(a));
+						gameDeck.add(a, null);	//WTF is going on here?		
 						j++;
 					}
 				}
 				
-				deck=deck2;
+				gameDeck=deck2;
 				
 				
 				
@@ -131,12 +130,12 @@ public class GameDeck extends SuperDeck{
 		break;
 		case 3:
 				Log.d(TAG, "shuffle type 3");
-				dartBoardShuffle(deck);
+				dartBoardShuffle();
 				break;
 			}
 		}
 		
-	public void dartBoardShuffle(ArrayList<Card> gameDeck){
+	public void dartBoardShuffle(){
 		Log.d(TAG, "DartBoard Shuffle");
 		int mixRounds =50;
 		int counter =0;
@@ -155,8 +154,8 @@ public class GameDeck extends SuperDeck{
 				}
 			}
 		}
-		gameDeck.clear();
-		gameDeck.addAll(cardPile);
+		this.gameDeck.clear();
+		this.gameDeck.addAll(cardPile);
 		
 
 	}
@@ -264,21 +263,21 @@ public class GameDeck extends SuperDeck{
 	*/
 	public ArrayList<ArrayList<Card>> deal() {
 		Log.d(TAG, "dealing");
-		Log.d(TAG, "Deck size="+this.deck.size());
+		Log.d(TAG, "Deck size="+this.gameDeck.size());
 		ArrayList<ArrayList<Card>> playerDecks = new ArrayList<ArrayList<Card>>();
 		ArrayList<Card> hand1 = new ArrayList<Card>();
 		ArrayList<Card> hand2 = new ArrayList<Card>();
 		ArrayList<Card> hand3 = new ArrayList<Card>();
 		ArrayList<Card> hand4 = new ArrayList<Card>();
-		for(int i=0;i<deck.size();i+=4){
+		for(int i=0;i<gameDeck.size();i+=4){
 			int d1=i;
 			int d2=i+1;
 			int d3=i+2;
 			int d4=i+3;
-			hand1.add(deck.get(d1));
-			hand2.add(deck.get(d2));
-			hand3.add(deck.get(d3));
-			hand4.add(deck.get(d4));
+			hand1.add(gameDeck.get(d1));
+			hand2.add(gameDeck.get(d2));
+			hand3.add(gameDeck.get(d3));
+			hand4.add(gameDeck.get(d4));
 		}
 		playerDecks.add(hand1);
 		playerDecks.add(hand2);
@@ -288,6 +287,9 @@ public class GameDeck extends SuperDeck{
 		
 	}
 	
+	public void addGameDeckCard(Card deckCard){
+		gameDeck.add(deckCard);
+	}
 	
 		
 }

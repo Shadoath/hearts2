@@ -16,7 +16,7 @@ public class oldDeck {
 	/**
 	 * Use on a deck to see if it contains points
 	 * Does not check for the jack of Diamonds.
-	 * @param deck
+	 * @param gameDeck
 	 * @return true if has points
 	 */
 	public int checkForPoints() {

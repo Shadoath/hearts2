@@ -25,7 +25,7 @@ public class TrickStats {
 			e.printStackTrace();
 		}
 		for(Card c: pile.getTrick()){
-			cardsPileJson.put(c.getOwner()+":"+c.toString());
+			cardsPileJson.put(c.getOwner()+":"+c.name);
 		}
 		
 	}

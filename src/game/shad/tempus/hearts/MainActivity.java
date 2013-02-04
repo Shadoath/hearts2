@@ -302,7 +302,7 @@ public class MainActivity extends Activity {
 						myToast.cancel();
 						Card cardToChooseCard = game.p1.go(game.round, game.tableTrick);
 						game.slidingDeckHolder.setSelectedCard(cardToChooseCard);
-						myToast.setText("Pick a card, or press 'Play Card' again to let the game play the "+cardToChooseCard.toString());
+						myToast.setText("Pick a card, or press 'Play Card' again to let the game play the "+cardToChooseCard.name);
 				        myToast.setDuration(Toast.LENGTH_LONG);
 						myToast.show();
 				        myToast.setDuration(Toast.LENGTH_SHORT);
@@ -317,6 +317,10 @@ public class MainActivity extends Activity {
 			}
 		}
 
+	public void onFixHandPressed(View v){
+		game.slidingDeckHolder.addDeck(game.p1.getArrayListDeck());
+	}
+	
     private void showHelp() {
     	new AlertDialog.Builder(this).setTitle("Basic Rules of Hearts").setMessage(R.string.howToPlay).setNeutralButton("Ok", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {

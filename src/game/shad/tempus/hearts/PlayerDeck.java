@@ -1,9 +1,7 @@
 package game.shad.tempus.hearts;
 
 
-import java.util.ArrayList;
 
-import android.R.integer;
 import android.util.Log;
 
 public class PlayerDeck extends SuperDeck{

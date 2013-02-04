@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import android.R.integer;
 import android.util.Log;
 
+/**
+ * Super deck to keep track of all the cards in four decks and then extend to other clases/
+ * @author Sky
+ *
+ */
 public abstract class SuperDeck {
 	public static final String TAG = "Hearts--SuperDeck";
 
@@ -210,13 +215,13 @@ public abstract class SuperDeck {
 	
 	public void addCards(ArrayList<Card> cards){
 		for(Card c : cards){
-			Log.d(TAG, "card added="+c.toString());
+			Log.d(TAG, "card added="+c.name);
 			addCard(c);
 		}
 	}
 	public void removeCards(ArrayList<Card> cards){
 		for(Card c : cards){
-			Log.d(TAG, "card removed="+c.toString());
+			Log.d(TAG, "card removed="+c.name);
 			removeCard(c);
 		}
 	}
@@ -255,22 +260,23 @@ public abstract class SuperDeck {
 	 */
 	public Deck getFullDeck(){
 		Deck fullDeck = new Deck();
-		fullDeck.addCards(clubCards.getDeck());
-		fullDeck.addCards(diamondCards.getDeck());
-		fullDeck.addCards(spadeCards.getDeck());
-		fullDeck.addCards(heartCards.getDeck());
+		fullDeck.setSingleSuit(false);
+		fullDeck.addCards(clubCards.getArrayListDeck());
+		fullDeck.addCards(diamondCards.getArrayListDeck());
+		fullDeck.addCards(spadeCards.getArrayListDeck());
+		fullDeck.addCards(heartCards.getArrayListDeck());
 		return fullDeck;
 	}
 	
 	/**
-	 * Returns the whole SuperDeck as a Deck
+	 * Returns the whole SuperDeck as a ArrayList<Card>
 	 */
 	public ArrayList<Card> getDeck(){
 		ArrayList<Card> fullDeck = new ArrayList<Card>();
-		fullDeck.addAll(clubCards.getDeck());
-		fullDeck.addAll(diamondCards.getDeck());
-		fullDeck.addAll(spadeCards.getDeck());
-		fullDeck.addAll(heartCards.getDeck());
+		fullDeck.addAll(clubCards.getArrayListDeck());
+		fullDeck.addAll(diamondCards.getArrayListDeck());
+		fullDeck.addAll(spadeCards.getArrayListDeck());
+		fullDeck.addAll(heartCards.getArrayListDeck());
 		return fullDeck;
 	}
 	public int getWorstCPVSuit(){
@@ -312,7 +318,7 @@ public abstract class SuperDeck {
 				worstCard = heartCards.getCard(heartCards.getSize()-1);
 				break;
 		}
-		Log.d(TAG, "Worst CPV card is ="+worstCard.toString());
+		Log.d(TAG, "Worst CPV card is ="+worstCard.name);
 		return worstCard;
 			
 	}

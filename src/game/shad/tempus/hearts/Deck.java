@@ -38,7 +38,7 @@ public class Deck {
 		int cardSuit =card.getSuit();
 		int cardPointValue = card.getValue()-8;
 		if(!singleSuit){
-			Log.d(TAG, "Single suit is false adding card to deck without order.");
+			Log.d(TAG, "Single suit is false adding card="+card.name);
 			deck.add(card);
 			return;
 		}
@@ -83,9 +83,10 @@ public class Deck {
 						return;
 					}
 					if(dv<cardValue){
-						Log.d(TAG, "i="+i);
+						Log.d(TAG, "deckValue<CardValue, Add above i="+i);
+						i++;
 						deck.add(i, card);
-						Log.d(TAG, "deckValue<CardValue, adding card at i="+i);
+						Log.d(TAG, "deckValue<CardValue, adding card at next spot i="+i);
 						return;
 					}
 							
@@ -199,8 +200,8 @@ public class Deck {
 		}
 	}
 
-	public void removeCardAtIndex(int i){
-		this.deck.remove(i);
+	public Card removeCardAtIndex(int i){
+		return this.deck.remove(i);
 	}
 	/**
 	 * clears the deck and sets CPV values to 0

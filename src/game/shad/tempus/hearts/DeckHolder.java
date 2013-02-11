@@ -256,7 +256,7 @@ public class DeckHolder extends SurfaceView  implements Callback, OnTouchListene
 				if(firstCardTouched!=null){
 			    	if(firstCardTouched.getBounds().contains(initialX, initialY)){
 		    			Log.d(TAG, "Player tapped a CARD");
-		    			game.deckViewTouched(initialX, initialY);  //record first touch location
+//		    			game.deckViewTouched(initialX, initialY);  //record first touch location OLD CODE
 		    			firstCardTouched=null;
 		    		
 			    	}

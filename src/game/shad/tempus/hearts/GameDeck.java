@@ -257,6 +257,7 @@ public class GameDeck{
 		return b;
 	}
 
+	//TODO find if card higher() method that checks to see if a higher card has NOT been played.
 	/**
 	* Create the and deals them out and then finds the two
 	* NEEDS SHUFFLE.

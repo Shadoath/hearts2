@@ -51,7 +51,6 @@ public class SlidingDeckHolder extends LinearLayout
        	params.setMargins(0, 0, 0, 0);
        	
        	this.deck = new ArrayList<Card>();
-        
         cardViewSelected= new ArrayList<CardView>();
         tradingViews= new ArrayList<CardView>();
         //addBlankCards();
@@ -110,85 +109,88 @@ public class SlidingDeckHolder extends LinearLayout
 			Log.d(TAG, "Card added to sliding deckholder="+card.name);
 			CardView cView= new CardView(mContext, card, params);
 			cView.setTag(card.name);
+
 			cView.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
+					@Override
+					public void onClick(View v) {
+					String t = v.getTag().toString();
 					CardView cv = (CardView) v;
-					String t = cv.getTag().toString();
 					Log.d(TAG, "tag="+t);
-					Iterator<Card> it = self.deck.iterator();
-					while(it.hasNext()){
-						Card c = it.next();
-						Log.d(TAG, "card Tag="+c.name);
-						if(c.name.equals(t)){
-							game.slidingDeckViewTouched(c);
-							boolean done = false;
-							if(game.trading){//Pick up to three cards
-								if(tradingViews.size()>0){
-									int cardInt = 0;
-					    			for(View view : tradingViews){
-										if(view.equals(cv)){
-											tradingViews.get(cardInt).setBackgroundColor(Color.BLACK);
-											tradingViews.get(cardInt).setCardSelected(false);
-											
-											tradingViews.remove(cardInt);
-											done=true;	//Already picked that one. Now it is unselected.
-											break;
-										}
-					    				cardInt++;
-
-									}
-					    			if(done){
-					    				Log.d(TAG, "deselected a card ");
-										return;
-					    			}
-								}
-								cv.setSelected(true);
-								cv.setBackgroundColor(Color.YELLOW);
-								int size = tradingViews.size();
-								if(size<3){//Nothing picked yet
-									tradingViews.add(cv);
-									
-								}
-								else {
-									tradingViews.get(0).setBackgroundColor(Color.BLACK);
-									tradingViews.get(0).setSelected(false);
-									tradingViews.get(0).setCardSelected(false);
-									tradingViews.remove(0);
-									tradingViews.add(cv);
-								}
-
-								return;
-							}
-							if(game.checkPlayability(c)){
-								if(viewSelected==null){
-									cv.setSelected(true);
-									cv.setCardSelected(true);
-									cv.setBackgroundColor(Color.YELLOW);
-									viewSelected=(CardView) cv;
-								}
-								else{
-									viewSelected.setSelected(false);
-									viewSelected.setCardSelected(false);
-									
-									viewSelected.setBackgroundColor(Color.BLACK);
-									cv.setBackgroundColor(Color.YELLOW);
-									cv.setSelected(true);
-									cv.setCardSelected(true);
-									viewSelected=(CardView) cv;
-									
-								}
-							}
-							
-						}
-					}
+					game.slidingDeckViewTouched(cv.getCard());
+					
 				}
 			});
 			addView(cView);
 		}
-		this.deck=deck;
+		
+//			cView.setOnClickListener(new OnClickListener() {
+//				
+//				@Override
+//				public void onClick(View v) {
+//					// TODO Auto-generated method stub
+//					CardView cv = (CardView) v;
+//					String t = cv.getTag().toString();
+//					Log.d(TAG, "tag="+t);
+//					Iterator<Card> it = self.deck.iterator();
+//					while(it.hasNext()){
+//						Card c = it.next();
+//						Log.d(TAG, "card Tag="+c.name);
+//						if(c.name.equals(t)){
+//							game.slidingDeckViewTouched(c);
+//							int cardsSelected = tradingViews.size();
+//
+//							if(game.trading){//Pick up to three cards
+//								if(cardsSelected>0){
+//									int cardInt = 0;
+//					    			for(View view : tradingViews){
+//										if(view.equals(cv)){//This one was picked, now remove it.
+//											tradingViews.get(cardInt).setSelected(false);
+//											tradingViews.remove(cardInt);	//Possible CME...
+//											Log.d(TAG, "deselected a card ");
+//											cv.resetCardImage();
+//											return;
+//										}
+//					    				cardInt++;
+//
+//									}
+//
+//								}//did not unselect a card so we must be picking it...
+//								cv.setSelected(true);
+//								cv.setCardSelected(true);
+//								if(cardsSelected<3){//Less than three selected so select this one.
+//									tradingViews.add(cv);
+//								}
+//								else {//unselect the first one and add the new one.
+//									tradingViews.get(0).setSelected(false);
+//									tradingViews.remove(0);
+//									tradingViews.add(cv);
+//								}
+//								cv.resetCardImage();
+//								return;
+//							}//Not trading lets see if the card picked is ok to play...
+//							if(game.checkPlayability(c, game.p1)){
+//								if(viewSelected==null){
+//									cv.setSelected(true);
+//									cv.resetCardImage();
+//									viewSelected=(CardView) cv;
+//								}
+//								else{
+//									viewSelected.setSelected(false);
+//									cv.setSelected(true);
+//									viewSelected=(CardView) cv;
+//									
+//								}
+//								cv.resetCardImage();
+//
+//							}
+//							
+//						}
+//					}
+//
+//				}
+//
+//			});
+
     }
  
     

@@ -6,8 +6,6 @@ import android.util.Log;
 
 public class PlayerDeck extends SuperDeck{
 	public static final String TAG = "Hearts--PlayerDeck";
-	public Card twoOfClubs;
-	public Card queenOfSpades;
 	public boolean hasQueen;
 	public PlayerDeck(Game game) {
 		super(game);
@@ -111,6 +109,7 @@ public class PlayerDeck extends SuperDeck{
 	/**
 	 * Finds the Queen of spades
 	 * Sets Card queenOfSpades to the queen for later use with GetQueenOfSpades
+	 * REMOVES queen from normal Deck.
 	 * returns true if found
 	 * 
 	 * @return
@@ -118,7 +117,6 @@ public class PlayerDeck extends SuperDeck{
 	public boolean checkForQueen(){
 		for (int i=0;i<spadeCards.getSize();i++){//Should only need to check the first two the rest is overkill.
 			if(this.spadeCards.getCard(i).getValue()==(12)){
-				queenOfSpades=this.spadeCards.getCard(i);
 				hasQueen = true;
 				return true;
 			}
@@ -132,12 +130,21 @@ public class PlayerDeck extends SuperDeck{
 	 * @return
 	 */
 	public Card getQueenOfSpades(){
-		if(queenOfSpades!=null){
-			return queenOfSpades;
+		Card Queen = null;
+		for (int i=0;i<spadeCards.getSize();i++){//Should only need to check the first two the rest is overkill.
+			if(this.spadeCards.getCard(i).getValue()==(12)){
+				Queen= this.spadeCards.removeCardAtIndex(i);
+			}
+		
+		
 		}
-		Log.d(TAG, "QueenOfSpades Null, Run check first!");
-		return new Card(3, 0, game);
-	}
+		if (Queen==null){
+			Log.d(TAG, "NO QUEEN FOUND!!");
+			return new Card(3, 0, game);
+		}
+		return Queen;
+		
+}
 	
 	/**
 	 * Finds the two of Clubs 
@@ -150,7 +157,6 @@ public class PlayerDeck extends SuperDeck{
 	public boolean checkForTwo(){
 		for (int i=0;i<clubCards.getSize();i++){//Should only need to check the first two the rest is overkill.
 			if(this.clubCards.getCard(i).getValue()==(2)){
-				twoOfClubs=this.clubCards.getCard(i);
 				return true;
 			}
 		}
@@ -158,11 +164,17 @@ public class PlayerDeck extends SuperDeck{
 	}
 	
 	public Card getTwoOfClubs(){
-		if(twoOfClubs!=null){
-			return twoOfClubs;
+		Card Two = null;
+		for (int i=0;i<clubCards.getSize();i++){//Should only need to check the first two the rest is overkill.
+			if(this.clubCards.getCard(i).getValue()==(2)){
+				Two = this.clubCards.getCard(i);
+			}
 		}
-		Log.d(TAG, "twoOfClubs Null, Run check first!");
-		return new Card(3, 0, game);
+		if (Two==null){
+			Log.d(TAG, "twoOfClubs Null, Run check first!");
+			return new Card(3, 0, game);
+		}
+		return Two;
 	}
 	
 	

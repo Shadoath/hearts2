@@ -46,9 +46,11 @@ public class MainActivity extends Activity {
 	private Bundle gameBundle;
 	private Context myContext;
 	private MainActivity main;
+	private boolean TESTING = true;
+	private float backPressedTimer = 0;
 	
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent gameIntent = getIntent();
         gameBundle = gameIntent.getExtras();
@@ -68,23 +70,21 @@ public class MainActivity extends Activity {
         	setContentView(R.layout.tablelandscape);
         }
 
-        //TODO create option for landscape mode.
-        if(gameBundle.getBoolean("screenMode", true)){
-        	Log.d(TAG, "Portait Mode");
-        	
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            setContentView(R.layout.tableportrait);
-
-        }
-        else{
-        	Log.d(TAG, "LandScape Mode");
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        	setContentView(R.layout.tablelandscape);
-        }
+//        //TODO create option for landscape mode.
+//        if(gameBundle.getBoolean("screenMode", true)){
+//        	Log.d(TAG, "Portait Mode");
+//        	
+//            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//            setContentView(R.layout.tableportrait);
+//
+//        }
+//        else{
+//        	Log.d(TAG, "LandScape Mode");
+//            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+//        	setContentView(R.layout.tablelandscape);
+//        }
         myContext = getBaseContext();
-    	main= this;
-
-    	
+	
     	
     	game = new Game(gameBundle, myContext, main);
 		myToast  = Toast.makeText(getBaseContext(), "", Toast.LENGTH_SHORT);
@@ -162,8 +162,16 @@ public class MainActivity extends Activity {
 
     @Override 
     public void onBackPressed(){
-    	super.onBackPressed();
-    	super.finish();
+    	if(System.currentTimeMillis()-backPressedTimer<1000){
+        	super.onBackPressed();
+        	super.finish();
+    	}
+    	else{
+        	backPressedTimer=System.currentTimeMillis();
+        	Toast.makeText(this, "Double tap 'back' to exit", Toast.LENGTH_SHORT).show();
+
+    	}
+
     	//TODO save the game state.
     }
     
@@ -193,7 +201,7 @@ public class MainActivity extends Activity {
     		break;
     	case R.id.restart:
     		//TODO fix this
-    		game.restartGame();
+    		game.reset();
     		game.update();
     		game.heartsMe();
     		
@@ -285,6 +293,8 @@ public class MainActivity extends Activity {
 	
 	public void onPlayCardPressed(View v){
 		if(game.trading){
+			//Player picked the cards
+			game.p1.tradingCardsRemoved=false;
 			game.tradeCards();
 			return;
 		}
@@ -360,7 +370,13 @@ public class MainActivity extends Activity {
     	else{    	
     		new AlertDialog.Builder(this).setTitle(PlayerInfo).setMessage(info).setNegativeButton("+10 Points for peeking!!", new OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					game.p1.addToScore(10);
+					if(TESTING){
+						//TODO set to false before release
+						Log.d(TAG, "Testing no Points added!");
+					}
+					else{
+						game.p1.addToScore(10);
+					}
 					dialog.dismiss();
 				}
 			}).show();

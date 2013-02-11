@@ -26,8 +26,18 @@ public class CardView extends ImageView{
 	public void setCard(Card card){
 		this.card=card;
 	}
+	
+	@Override
+	public void setSelected(boolean touched){
+		super.setSelected(touched);
+		card.setTouched(touched);
+	}
 
 	public void setCardSelected(boolean b){
 		card.setTouched(b);
+	}
+	
+	public void resetCardImage(){
+		card.getImage();
 	}
 }

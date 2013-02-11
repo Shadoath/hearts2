@@ -279,6 +279,11 @@ public abstract class SuperDeck {
 		fullDeck.addAll(heartCards.getArrayListDeck());
 		return fullDeck;
 	}
+	
+	/**
+	 * Finds the worst Card Point Value (CPV) suit
+	 * @return
+	 */
 	public int getWorstCPVSuit(){
 		Log.d(TAG, "find worst CPV Suit");
 		int c = this.clubCards.getTotalCPV();
@@ -300,6 +305,30 @@ public abstract class SuperDeck {
 			
 	}
 	
+	/**
+	 * Finds the worst Card Point Value (CPV) suit
+	 * TODO NEEDS TESTING
+	 * @return
+	 */
+	public int getLowestCPVSuit(){
+		Log.d(TAG, "find worst CPV Suit");
+		int c = this.clubCards.getTotalCPV();
+		int d = this.diamondCards.getTotalCPV();
+		int s = this.spadeCards.getTotalCPV();
+		int h = this.heartCards.getTotalCPV();
+		int[] test = {c, d, s, h};
+		int position = 0;
+		int low = 0;
+		for(int i=0; i<test.length;i++){
+			if(test[i]<low){
+				position = i;
+				low = test[i];
+			}
+		}
+		Log.d(TAG, "Lowest CPV suit is ="+position);
+		return position;
+			
+	}
 	public Card getWorstCPVCard(int suit){
 		Log.d(TAG, "find worst CPV card in suit="+suit);
 		Card worstCard=null;

@@ -114,7 +114,10 @@ public class Player {
 		
 		if(trick.getSize()==0){	
 			Log.d(TAG+this.getRealName(), "First Card of Pile");
-			return playLow(playerDeck.getLargestSuit(), 0);
+			if(game.heartsBroken)
+				return playLow(playerDeck.getLowestCPVSuit(), 0);//lowest CPV 2013-02-10
+			else
+				return playLowDontBreakHearts();
 		}
 		
 		int startSuit=trick.getCard(0).getSuit();
@@ -124,6 +127,7 @@ public class Player {
 			if(hasQueen){
 				Log.d(TAG+this.getRealName(), "hasQueen = true");
 				if(game.round!=1){
+					hasQueen=false;
 					return playerDeck.getQueenOfSpades();
 				}
 			}
@@ -231,7 +235,11 @@ public class Player {
 		if(trick.getSize()==0){	
 			Log.d(TAG+this.getRealName(), "First Card of Pile");
 			//TODO add more AI smarts here
-			return playerDeck.getWorstCPVCard(playerDeck.getWorstCPVSuit());
+			if(game.heartsBroken)
+				return playLow(playerDeck.getLowestCPVSuit(), 0);//CPV 2013-02-10
+			else
+				return playLowDontBreakHearts();
+//			return playerDeck.getWorstCPVCard(playerDeck.getWorstCPVSuit());
 		}
 		
 		int startSuit=trick.getCard(0).getSuit();
@@ -240,6 +248,7 @@ public class Player {
 			if(hasQueen){
 				Log.d(TAG+this.getRealName(), "Queencheck = true");
 				if(game.round!=1){
+					hasQueen=false;
 					return playerDeck.getQueenOfSpades();
 				}
 			}
@@ -376,7 +385,7 @@ public class Player {
 	 * @return
 	 */
 	private Card playHighDontBreakHearts(){
-		Log.d(TAG+this.getRealName(), "voidPlayHighHearts");
+		Log.d(TAG+this.getRealName(), "PlayHigh Break Hearts");
 		switch(playerDeck.getLargestSuit()){
 		case 0:
 			return playHigh(0, 0);
@@ -404,8 +413,8 @@ public class Player {
 	 * @return playLow(getLagerstSuit());
 	 */
 	private Card playLowDontBreakHearts(){
-		Log.d(TAG+this.getRealName(), "voidPlayHighHearts");
-		switch(playerDeck.getLargestSuit()){
+		Log.d(TAG+this.getRealName(), "PlayLow Don't Break Hearts");
+		switch(playerDeck.getWorstCPVSuit()){//Changed to CPV from largest 2013-02-10
 		case 0:
 			return playerDeck.playLowSimple(0, 0);
 		case 1:
@@ -423,7 +432,7 @@ public class Player {
 	
 	}
 	
-	private Card playLargestSuitAndPlay(){
+	private Card playLargestSuit(){
 		Log.d(TAG+this.getRealName(), "Play largest suit");
 		switch(playerDeck.getLargestSuit()){
 			case 0:
@@ -724,7 +733,8 @@ public class Player {
 		return playerDeck.getFullDeck();
 	}
 	public ArrayList<Card> getArrayListDeck(){
-		return playerDeck.getDeck();
+		ArrayList<Card> deckCards =playerDeck.getDeck();
+		return deckCards;
 	}
 	public PlayerDeck getPlayerDeck(){
 		return playerDeck;

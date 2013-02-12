@@ -1,11 +1,14 @@
 package game.shad.tempus.hearts;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-public class CardView extends ImageView{
+public class CardView extends ImageView{	
+	public static final String TAG = "Hearts--CardView";
+
 
 	private Card card;
 	public CardView(Context context, Card card, LinearLayout.LayoutParams layoutParams) {
@@ -27,17 +30,14 @@ public class CardView extends ImageView{
 		this.card=card;
 	}
 	
-	@Override
-	public void setSelected(boolean touched){
-		super.setSelected(touched);
-		card.setTouched(touched);
-	}
 
-	public void setCardSelected(boolean b){
-		card.setTouched(b);
+	public void setTouched(boolean touched){
+		Log.d(TAG, "Setting Touched to:"+touched);
+		card.setTouched(touched);
+		setImageBitmap(card.getImageFromSuitAndValue());
+//		this.postInvalidate();
+		this.refreshDrawableState();
 	}
 	
-	public void resetCardImage(){
-		card.getImage();
-	}
+
 }

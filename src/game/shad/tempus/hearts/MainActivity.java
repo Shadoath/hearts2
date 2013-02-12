@@ -4,6 +4,8 @@ package game.shad.tempus.hearts;
 
 
 
+
+
 import game.shad.tempus.hearts.GameThread.AutoRunState;
 import game.shad.tempus.hearts.GameThread.State;
 import android.app.Activity;
@@ -15,6 +17,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager.WakeLock;
@@ -24,6 +27,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 /**
@@ -40,6 +46,7 @@ public class MainActivity extends Activity {
 	public GameThread gt;
     private Toast myToast;
     private ProgressDialog progressDialog;  
+    private ProgressBar progressBar;  
 
 	public Handler handler; //Handler to UI thread to post tasks to.
 	private WakeLock mWakeLock;
@@ -57,18 +64,21 @@ public class MainActivity extends Activity {
         Log.d(TAG, "onCreate");
         myContext = this.getApplicationContext();
     	main= this;
-    	if(gameBundle.getBoolean("screenMode", true)){
-        	Log.d(TAG, "Portait Mode");
-        	
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            setContentView(R.layout.tableportrait);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+    	setContentView(R.layout.startup);
 
-        }
-        else{
-        	Log.d(TAG, "LandScape Mode");
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        	setContentView(R.layout.tablelandscape);
-        }
+//    	if(gameBundle.getBoolean("screenMode", true)){
+//        	Log.d(TAG, "Portait Mode");
+//        	
+//            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//            setContentView(R.layout.tableportrait);
+//
+//        }
+//        else{
+//        	Log.d(TAG, "LandScape Mode");
+//            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+//        	setContentView(R.layout.tablelandscape);
+//        }
 
 //        //TODO create option for landscape mode.
 //        if(gameBundle.getBoolean("screenMode", true)){
@@ -89,19 +99,61 @@ public class MainActivity extends Activity {
     	game = new Game(gameBundle, myContext, main);
 		myToast  = Toast.makeText(getBaseContext(), "", Toast.LENGTH_SHORT);
 		gt = new GameThread(myContext, main, game, gameBundle.getInt("aiTime"));
-    	game.createDeckTableViews();
-        Log.d(TAG, "created Views");
+
+
+		new LoadResources().execute();
 
 
     }
-    
+    private class LoadResources extends AsyncTask<Integer, Integer, Integer> {
+    	@Override
+    	protected Integer doInBackground(Integer... params) {
+			Log.d(TAG, "update 15");
+    		updateProgressBar(15);
+            Log.d(TAG, "initialized game view");
+            Log.d(TAG, "created Views");
+//            game.findViewsById();
 
+    		game.loadResources(MainActivity.this);
+			updateProgressBar(99);
+			
+            Log.d(TAG, "created sound service");
+    		return null;
+    	}
+    	
+    	@Override
+    	protected void onPostExecute(Integer result) {
+            if(gameBundle.getBoolean("screenMode", true)){
+            	Log.d(TAG, "Portait Mode");
+            	
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                MainActivity.this.setContentView(R.layout.tableportrait);
+
+            }
+            else{
+            	Log.d(TAG, "LandScape Mode");
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                MainActivity.this.setContentView(R.layout.tablelandscape);
+            }
+    		game.findViewsById();
+            game.createDeckTableViews();
+            game.heartsMe();
+    		gt.start();
+    	}
+    }
+    
+    public void updateProgressBar(int i){
+    	if(progressBar==null){
+    		Log.d(TAG, "Progress bar is null, attempting to find.");
+    		progressBar=(ProgressBar) findViewById(R.id.progressBar);
+    	}
+    	progressBar.setProgress(i);
+    }
+    
 	@Override
     protected void onStart(){
     	super.onStart();
     	Log.d(TAG, "onStart");       
-        game.heartsMe();
-        gt.start();
 
 //        if(gt==null){
 //        	return;

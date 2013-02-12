@@ -10,8 +10,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.view.View;
 
-public class SlidingDeckHolder extends LinearLayout   
+public class SlidingDeckHolder extends LinearLayout  
 {
 	private static final String TAG = "Hearts--DeckHolder";
 	private float xDistance, yDistance, lastX, lastY;
@@ -68,7 +69,7 @@ public class SlidingDeckHolder extends LinearLayout
 			cView.setMaxWidth(cardWidth-10);
 			cView.setVisibility(View.VISIBLE);
 			cView.setLayoutParams(params);
-			cView.setImageBitmap(game.BlueBack);
+			cView.setImageBitmap(game.getBitmap(R.drawable.black_back));
 			cView.setPadding(10,10,10,10);
 			addView(cView);
 	        i++;
@@ -116,7 +117,7 @@ public class SlidingDeckHolder extends LinearLayout
 					String t = v.getTag().toString();
 					CardView cv = (CardView) v;
 					Log.d(TAG, "tag="+t);
-					game.slidingDeckViewTouched(cv.getCard());
+					game.slidingDeckViewTouched(cv);
 					
 				}
 			});
@@ -192,7 +193,6 @@ public class SlidingDeckHolder extends LinearLayout
 //			});
 
     }
- 
     
     public void swipeRight(){
     	if(getPosition()<deck.size()+1)
@@ -239,17 +239,14 @@ public class SlidingDeckHolder extends LinearLayout
     	
     	if(viewSelected==null){
     		toHighLightView.setSelected(true);
-    		toHighLightView.setCardSelected(true);
     		toHighLightView.setBackgroundColor(Color.YELLOW);
 			viewSelected=(CardView) toHighLightView;
 		}
 		else{
 			viewSelected.setSelected(false);
-			viewSelected.setCardSelected(false);
 			viewSelected.setBackgroundColor(Color.BLACK);
 			toHighLightView.setBackgroundColor(Color.YELLOW);
 			toHighLightView.setSelected(true);
-			toHighLightView.setCardSelected(true);
 			viewSelected=(CardView) toHighLightView;
 			
 		}

@@ -12,10 +12,13 @@ import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 import android.R.integer;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -24,6 +27,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
@@ -117,6 +121,7 @@ public class Game extends Activity {
     private LinearLayout bottomTVlayout;
     
     private Button playCard;
+    private CardView oldCardView;
     
     public DeckHolder deckHolder;
     public SlidingDeckHolder slidingDeckHolder;
@@ -141,7 +146,11 @@ public class Game extends Activity {
     private RectF rect = new RectF(); // public rect to be passed to drawable objects for drawing bitmaps
     private Paint paint = new Paint(); // public paint to be passed to drawable objects
 	private Toast myToast;
-   
+	
+	BitmapFactory.Options cardOptions;
+	private static LruCache mMemoryCache;
+	private int displayDpi; //display density
+	
 	public Card[][] cardDartBoard;	
 	public int boardX =3;
 	public int boardY =7;
@@ -155,7 +164,11 @@ public class Game extends Activity {
         this.cardCounterB = (Boolean) b.get("cardCounter");
         this.screenHeight = (int) b.getInt("height");
         this.screenWidth = (int) b.getInt("width");
-        
+		cardOptions = new BitmapFactory.Options();
+//		cardOptions.inJustDecodeBounds = true;
+//		BitmapFactory.decodeResource(main.getResources(), R.drawable.c3, cardOptions);
+		cardOptions.inSampleSize = calculateInSampleSize(cardOptions, screenWidth/7, screenHeight/8)+1;
+		Log.d(TAG, "inSampleSize="+cardOptions.inSampleSize);
         Log.d(TAG, "Text in player name box is "+this.name);
         if (this.name.equalsIgnoreCase("Your name")||this.name.equals("")){
         	this.name = "You";
@@ -171,10 +184,25 @@ public class Game extends Activity {
 //        createBlankHand();
         myToast  = Toast.makeText(context, "", Toast.LENGTH_SHORT);
         setupSaveSettings();
-        findViewsById();
-
+//        findViewsById();
+        initCache();
 	}
     
+    
+	
+	private void initCache(){
+		if(mMemoryCache != null)
+			return;
+		final int memClass = ((ActivityManager) main.getApplicationContext().getSystemService(
+	            Context.ACTIVITY_SERVICE)).getMemoryClass();
+	
+	    // Use 1/6th of the available memory for this memory cache.
+		Log.d(TAG, "mem cache size="+memClass);
+	   final int cacheSize = 1024 * 1024 * memClass / 2;
+	   mMemoryCache = new LruCache<String, Bitmap>(cacheSize);
+	}
+
+		
 	private void setupSaveSettings(){
     	switch(2){
     	case 1:
@@ -974,7 +1002,7 @@ public class Game extends Activity {
 //    	leftButton.setWidth(screenWidth/4);
     	
 
-    	findCardBitmaps();
+//    	findCardBitmaps();
 	}
 	
     /**
@@ -1213,7 +1241,7 @@ public class Game extends Activity {
 			if(c.getOwner()!=null){
 				sDeck+=c.getOwner()+":";
 			}
-			sDeck += c.toString()+"\n";
+			sDeck += c.name+"\n";
 		}
 		return sDeck;
 		//TODO update gameView in thread.
@@ -1638,7 +1666,8 @@ public class Game extends Activity {
      * Called from onclick listener on CardView
      * @param card Touched.
      */
-	public void slidingDeckViewTouched(Card c) {
+	public void slidingDeckViewTouched(CardView cv) {
+		Card c = cv.getCard();
 		Log.d(TAG, "--Sliding Deck View--");
 		int size = p1.cardsToTrade.size();
    		if(trading){//Pick up to three cards
@@ -1646,12 +1675,13 @@ public class Game extends Activity {
 				int cardInt = 0;
     			for(Card card : p1.cardsToTrade){
 					if(card.equals(c)){
-	    				p1.cardsToTrade.get(cardInt).setTouched(false);
+	    				cv.setTouched(false);
 	    				p1.cardsToTrade.remove(cardInt);
 						Log.d(TAG, "deselected a card ");
 	    				updateBottomTextWithTradingCards(true, p1.cardsToTrade);
 						playCard.setEnabled(false);
 						Log.d(TAG, "Found Trading card and removed it");
+						oldCardView=cv;
 						return;
 					}
     				cardInt++;
@@ -1659,8 +1689,8 @@ public class Game extends Activity {
 				}
 
 			}//did not unselect a card so we must be picking it...
-			c.setTouched(true);
-			Log.d(TAG, "Card now touched");
+			cv.setTouched(true);
+			Log.d(TAG, "Did not unselect a card so we must be picking it...Card now touched");
 			if(size<3){//Nothing picked yet
 				p1.cardsToTrade.add(c);
 				Log.d(TAG, "Card added to trading cards");
@@ -1682,17 +1712,17 @@ public class Game extends Activity {
 		}
 		//Not Trading, just check to see if it can be played
 		else if (checkPlayability(c, p1)){	//Select a card to play.
+			Log.d(TAG, "Can play card");
+			cv.setTouched(true);
 			if(cardToPlay==null){//Nothing picked yet
 				cardToPlay=c;
-				cardToPlay.setTouched(true);
 				myToast.setText("You picked the "+c.name);
 				myToast.show();
 				
 			}
 			else{
-				cardToPlay.setTouched(false);
+				oldCardView.setTouched(false);
 				cardToPlay=c;
-				cardToPlay.setTouched(true);
 				myToast.setText("You picked the "+c.name);
 				myToast.show();
 
@@ -1700,6 +1730,7 @@ public class Game extends Activity {
 			}
 			
 		}
+   		oldCardView=cv;
 		updateDH();
 
 	}
@@ -1820,266 +1851,444 @@ public class Game extends Activity {
 		}
 		return true;//we are playing the first card of the pile.
 	}
-			
+	
+	/**
+	 * set up all bitmap drawables by loading them from the resources.
+	 * @param res
+	 */
+	public void loadResources(MainActivity main) {
+		getBitmap(R.drawable.green_back);
+		getBitmap(R.drawable.blue_back);
+		getBitmap(R.drawable.black_back);
+		getBitmap(R.drawable.red_back);
+		getBitmap(R.drawable.cardback);
+    	Log.d(TAG, "CardBacks loaded");
+		main.updateProgressBar(21);
+
+		getBitmap(R.drawable.c2);
+		getBitmap(R.drawable.c3);
+		getBitmap(R.drawable.c4);
+		getBitmap(R.drawable.c5);
+		getBitmap(R.drawable.c6);
+		getBitmap(R.drawable.c7);
+		getBitmap(R.drawable.c8);
+		getBitmap(R.drawable.c9);
+		getBitmap(R.drawable.c10);
+		getBitmap(R.drawable.cj);
+		getBitmap(R.drawable.cq);
+		getBitmap(R.drawable.ck);
+		getBitmap(R.drawable.ca);
+    	Log.d(TAG, "Clubs loaded");
+		main.updateProgressBar(28);
+
+		getBitmap(R.drawable.d2);
+		getBitmap(R.drawable.d3);
+		getBitmap(R.drawable.d4);
+		getBitmap(R.drawable.d5);
+		getBitmap(R.drawable.d6);
+		getBitmap(R.drawable.d7);
+		getBitmap(R.drawable.d8);
+		getBitmap(R.drawable.d9);
+		getBitmap(R.drawable.d10);
+		getBitmap(R.drawable.dj);
+		getBitmap(R.drawable.dq);
+		getBitmap(R.drawable.dk);
+		getBitmap(R.drawable.da);
+    	Log.d(TAG, "Diamonds loaded");
+		main.updateProgressBar(32);
+
+		getBitmap(R.drawable.s2);
+		getBitmap(R.drawable.s3);
+		getBitmap(R.drawable.s4);
+		getBitmap(R.drawable.s5);
+		getBitmap(R.drawable.s6);
+		getBitmap(R.drawable.s7);
+		getBitmap(R.drawable.s8);
+		getBitmap(R.drawable.s9);
+		getBitmap(R.drawable.s10);
+		getBitmap(R.drawable.sj);
+		getBitmap(R.drawable.sq);
+		getBitmap(R.drawable.sk);
+		getBitmap(R.drawable.sa);
+    	Log.d(TAG, "Spades loaded");
+		main.updateProgressBar(42);
+
+		getBitmap(R.drawable.h2);
+		getBitmap(R.drawable.h3);
+		getBitmap(R.drawable.h4);
+		getBitmap(R.drawable.h5);
+		getBitmap(R.drawable.h6);
+		getBitmap(R.drawable.h7);
+		getBitmap(R.drawable.h8);
+		getBitmap(R.drawable.h9);
+		getBitmap(R.drawable.h10);
+		getBitmap(R.drawable.hj);
+		getBitmap(R.drawable.hq);
+		getBitmap(R.drawable.hk);
+		getBitmap(R.drawable.ha);
+    	Log.d(TAG, "Hearts loaded");
+		main.updateProgressBar(50);
+
+		getBitmap(R.drawable.hc2);
+		getBitmap(R.drawable.hc3);
+		getBitmap(R.drawable.hc4);
+		getBitmap(R.drawable.hc5);
+		getBitmap(R.drawable.hc6);
+		getBitmap(R.drawable.hc7);
+		getBitmap(R.drawable.hc8);
+		getBitmap(R.drawable.hc9);
+		getBitmap(R.drawable.hc10);
+		getBitmap(R.drawable.hcj);
+		getBitmap(R.drawable.hcq);
+		getBitmap(R.drawable.hck);
+		getBitmap(R.drawable.hca);
+    	Log.d(TAG, "Highlighted Clubs loaded");
+		main.updateProgressBar(65);
+
+		getBitmap(R.drawable.hd2);
+		getBitmap(R.drawable.hd3);
+		getBitmap(R.drawable.hd4);
+		getBitmap(R.drawable.hd5);
+		getBitmap(R.drawable.hd6);
+		getBitmap(R.drawable.hd7);
+		getBitmap(R.drawable.hd8);
+		getBitmap(R.drawable.hd9);
+		getBitmap(R.drawable.hd10);
+		getBitmap(R.drawable.hdj);
+		getBitmap(R.drawable.hdq);
+		getBitmap(R.drawable.hdk);
+		getBitmap(R.drawable.hda);
+    	Log.d(TAG, "Diamonds Hearts loaded");
+		main.updateProgressBar(72);
+
+		getBitmap(R.drawable.hs2);
+		getBitmap(R.drawable.hs3);
+		getBitmap(R.drawable.hs4);
+		getBitmap(R.drawable.hs5);
+		getBitmap(R.drawable.hs6);
+		getBitmap(R.drawable.hs7);
+		getBitmap(R.drawable.hs8);
+		getBitmap(R.drawable.hs9);
+		getBitmap(R.drawable.hs10);
+		getBitmap(R.drawable.hsj);
+		getBitmap(R.drawable.hsq);
+		getBitmap(R.drawable.hsk);
+		getBitmap(R.drawable.hsa);
+    	Log.d(TAG, "Highlighted Spades loaded");
+		main.updateProgressBar(84);
+
+
+		getBitmap(R.drawable.hh2);
+		getBitmap(R.drawable.hh3);
+		getBitmap(R.drawable.hh4);
+		getBitmap(R.drawable.hh5);
+		getBitmap(R.drawable.hh6);
+		getBitmap(R.drawable.hh7);
+		getBitmap(R.drawable.hh8);
+		getBitmap(R.drawable.hh9);
+		getBitmap(R.drawable.hh10);
+		getBitmap(R.drawable.hhj);
+		getBitmap(R.drawable.hhq);
+		getBitmap(R.drawable.hhk);
+		getBitmap(R.drawable.hha);
+    	Log.d(TAG, "Highlighted Hearts loaded");
+		main.updateProgressBar(95);
+
+	}	
+	public Bitmap getBitmap(int resId) {
+	    final String imageKey = String.valueOf(resId);
+
+	    Bitmap bitmap = getBitmapFromMemCache(imageKey);
+	    if (bitmap ==null){
+	    	bitmap = BitmapFactory.decodeResource(main.getResources(), resId, cardOptions);
+	        addBitmapToMemoryCache(String.valueOf(resId), bitmap);
+	    }
+	    return bitmap;
+	}
+	public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+	    if (getBitmapFromMemCache(key) == null) {
+	        mMemoryCache.put(key, bitmap);
+	    }
+	}
+	
+	public Bitmap getBitmapFromMemCache(String key) {
+	    return (Bitmap) mMemoryCache.get(key);
+	}
+	
+	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    // Raw height and width of image
+    final int height = options.outHeight;
+    final int width = options.outWidth;
+    int inSampleSize = 1;
+
+    if (height > reqHeight || width > reqWidth) {
+
+        // Calculate ratios of height and width to requested height and width
+        final int heightRatio = Math.round((float) height / (float) reqHeight);
+        final int widthRatio = Math.round((float) width / (float) reqWidth);
+
+        // Choose the smallest ratio as inSampleSize value, this will guarantee
+        // a final image with both dimensions larger than or equal to the
+        // requested height and width.
+        inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+    }
+
+    return inSampleSize;
+	}
 	public void findCardBitmaps(){
     	Log.d(TAG, "Finding Card Bitmaps");
-		BitmapFactory.Options cardOptions = new BitmapFactory.Options();
-		cardOptions.outHeight=screenHeight/4;
-		cardOptions.outWidth=screenWidth/4;
-		if(GreenBack==null){	//Added 2013-02-10 if already found don't decode again.
-			//TODO check to see if this null check hack works.
-			GreenBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.green_back, cardOptions);
-			BlueBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.blue_back, cardOptions);
-			BlackBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.black_back, cardOptions);
-			RedBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.red_back, cardOptions);
-			CardBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.cardback, cardOptions);
+//
+//		if(GreenBack==null){	//Added 2013-02-10 if already found don't decode again.
+//			//TODO check to see if this null check hack works.
+//			GreenBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.green_back, cardOptions);
+//			BlueBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.blue_back, cardOptions);
+//			BlackBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.black_back, cardOptions);
+//			RedBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.red_back, cardOptions);
+//			CardBack = BitmapFactory.decodeResource(main.getResources(), R.drawable.cardback, cardOptions);
 	    	Log.d(TAG, "CardBacks loaded");
 
-			ClubsTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.c2, cardOptions);
-			ClubsThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.c3, cardOptions);
-			ClubsFour = BitmapFactory.decodeResource(main.getResources(), R.drawable.c4, cardOptions);
-			ClubsFive = BitmapFactory.decodeResource(main.getResources(), R.drawable.c5, cardOptions);
-			ClubsSix = BitmapFactory.decodeResource(main.getResources(), R.drawable.c6, cardOptions);
-			ClubsSeven = BitmapFactory.decodeResource(main.getResources(), R.drawable.c7, cardOptions);
-			ClubsEight = BitmapFactory.decodeResource(main.getResources(), R.drawable.c8, cardOptions);
-			ClubsNine = BitmapFactory.decodeResource(main.getResources(), R.drawable.c9, cardOptions);
-			ClubsTen = BitmapFactory.decodeResource(main.getResources(), R.drawable.c10, cardOptions);
-			ClubsJack = BitmapFactory.decodeResource(main.getResources(), R.drawable.cj, cardOptions);
-			ClubsQueen = BitmapFactory.decodeResource(main.getResources(), R.drawable.cq, cardOptions);
-			ClubsKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.ck, cardOptions);
-			ClubsAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.ca, cardOptions);
-	    	Log.d(TAG, "Clubs loaded");
-
-			DiamondsTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.d2, cardOptions);
-			DiamondsThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.d3, cardOptions);
-			DiamondsFour = BitmapFactory.decodeResource(main.getResources(), R.drawable.d4, cardOptions);
-			DiamondsFive = BitmapFactory.decodeResource(main.getResources(), R.drawable.d5, cardOptions);
-			DiamondsSix = BitmapFactory.decodeResource(main.getResources(), R.drawable.d6, cardOptions);
-			DiamondsSeven = BitmapFactory.decodeResource(main.getResources(), R.drawable.d7, cardOptions);
-			DiamondsEight = BitmapFactory.decodeResource(main.getResources(), R.drawable.d8, cardOptions);
-			DiamondsNine = BitmapFactory.decodeResource(main.getResources(), R.drawable.d9, cardOptions);
-			DiamondsTen = BitmapFactory.decodeResource(main.getResources(), R.drawable.d10, cardOptions);
-			DiamondsJack = BitmapFactory.decodeResource(main.getResources(), R.drawable.dj, cardOptions);
-			DiamondsQueen = BitmapFactory.decodeResource(main.getResources(), R.drawable.dq, cardOptions);
-			DiamondsKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.dk, cardOptions);
-			DiamondsAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.da, cardOptions);
-	    	Log.d(TAG, "Diamonds loaded");
-
-			SpadesTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.s2, cardOptions);
-			SpadesThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.s3, cardOptions);
-			SpadesFour = BitmapFactory.decodeResource(main.getResources(), R.drawable.s4, cardOptions);
-			SpadesFive = BitmapFactory.decodeResource(main.getResources(), R.drawable.s5, cardOptions);
-			SpadesSix = BitmapFactory.decodeResource(main.getResources(), R.drawable.s6, cardOptions);
-			SpadesSeven = BitmapFactory.decodeResource(main.getResources(), R.drawable.s7, cardOptions);
-			SpadesEight = BitmapFactory.decodeResource(main.getResources(), R.drawable.s8, cardOptions);
-			SpadesNine = BitmapFactory.decodeResource(main.getResources(), R.drawable.s9, cardOptions);
-			SpadesTen = BitmapFactory.decodeResource(main.getResources(), R.drawable.s10, cardOptions);
-			SpadesJack = BitmapFactory.decodeResource(main.getResources(), R.drawable.sj, cardOptions);
-			SpadesQueen = BitmapFactory.decodeResource(main.getResources(), R.drawable.sq, cardOptions);
-			SpadesKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.sk, cardOptions);
-			SpadesAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.sa, cardOptions);
-	    	Log.d(TAG, "Spades loaded");
-
-			HeartsTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.h2, cardOptions);
-			HeartsThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.h3, cardOptions);
-			HeartsFour = BitmapFactory.decodeResource(main.getResources(), R.drawable.h4, cardOptions);
-			HeartsFive = BitmapFactory.decodeResource(main.getResources(), R.drawable.h5, cardOptions);
-			HeartsSix = BitmapFactory.decodeResource(main.getResources(), R.drawable.h6, cardOptions);
-			HeartsSeven = BitmapFactory.decodeResource(main.getResources(), R.drawable.h7, cardOptions);
-			HeartsEight = BitmapFactory.decodeResource(main.getResources(), R.drawable.h8, cardOptions);
-			HeartsNine = BitmapFactory.decodeResource(main.getResources(), R.drawable.h9, cardOptions);
-			HeartsTen = BitmapFactory.decodeResource(main.getResources(), R.drawable.h10, cardOptions);
-			HeartsJack = BitmapFactory.decodeResource(main.getResources(), R.drawable.hj, cardOptions);
-			HeartsQueen = BitmapFactory.decodeResource(main.getResources(), R.drawable.hq, cardOptions);
-			HeartsKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.hk, cardOptions);
-			HeartsAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.ha, cardOptions);
-	    	Log.d(TAG, "Hearts loaded");
-
-		}
-		
-		if(ClubsTwoHighLight!=null){
+//			ClubsTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.c2, cardOptions);
+//			ClubsThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.c3, cardOptions);
+//			ClubsFour = BitmapFactory.decodeResource(main.getResources(), R.drawable.c4, cardOptions);
+//			ClubsFive = BitmapFactory.decodeResource(main.getResources(), R.drawable.c5, cardOptions);
+//			ClubsSix = BitmapFactory.decodeResource(main.getResources(), R.drawable.c6, cardOptions);
+//			ClubsSeven = BitmapFactory.decodeResource(main.getResources(), R.drawable.c7, cardOptions);
+//			ClubsEight = BitmapFactory.decodeResource(main.getResources(), R.drawable.c8, cardOptions);
+//			ClubsNine = BitmapFactory.decodeResource(main.getResources(), R.drawable.c9, cardOptions);
+//			ClubsTen = BitmapFactory.decodeResource(main.getResources(), R.drawable.c10, cardOptions);
+//			ClubsJack = BitmapFactory.decodeResource(main.getResources(), R.drawable.cj, cardOptions);
+//			ClubsQueen = BitmapFactory.decodeResource(main.getResources(), R.drawable.cq, cardOptions);
+//			ClubsKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.ck, cardOptions);
+//			ClubsAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.ca, cardOptions);
+//	    	Log.d(TAG, "Clubs loaded");
+//
+//			DiamondsTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.d2, cardOptions);
+//			DiamondsThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.d3, cardOptions);
+//			DiamondsFour = BitmapFactory.decodeResource(main.getResources(), R.drawable.d4, cardOptions);
+//			DiamondsFive = BitmapFactory.decodeResource(main.getResources(), R.drawable.d5, cardOptions);
+//			DiamondsSix = BitmapFactory.decodeResource(main.getResources(), R.drawable.d6, cardOptions);
+//			DiamondsSeven = BitmapFactory.decodeResource(main.getResources(), R.drawable.d7, cardOptions);
+//			DiamondsEight = BitmapFactory.decodeResource(main.getResources(), R.drawable.d8, cardOptions);
+//			DiamondsNine = BitmapFactory.decodeResource(main.getResources(), R.drawable.d9, cardOptions);
+//			DiamondsTen = BitmapFactory.decodeResource(main.getResources(), R.drawable.d10, cardOptions);
+//			DiamondsJack = BitmapFactory.decodeResource(main.getResources(), R.drawable.dj, cardOptions);
+//			DiamondsQueen = BitmapFactory.decodeResource(main.getResources(), R.drawable.dq, cardOptions);
+//			DiamondsKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.dk, cardOptions);
+//			DiamondsAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.da, cardOptions);
+//	    	Log.d(TAG, "Diamonds loaded");
+//
+//			SpadesTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.s2, cardOptions);
+//			SpadesThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.s3, cardOptions);
+//			SpadesFour = BitmapFactory.decodeResource(main.getResources(), R.drawable.s4, cardOptions);
+//			SpadesFive = BitmapFactory.decodeResource(main.getResources(), R.drawable.s5, cardOptions);
+//			SpadesSix = BitmapFactory.decodeResource(main.getResources(), R.drawable.s6, cardOptions);
+//			SpadesSeven = BitmapFactory.decodeResource(main.getResources(), R.drawable.s7, cardOptions);
+//			SpadesEight = BitmapFactory.decodeResource(main.getResources(), R.drawable.s8, cardOptions);
+//			SpadesNine = BitmapFactory.decodeResource(main.getResources(), R.drawable.s9, cardOptions);
+//			SpadesTen = BitmapFactory.decodeResource(main.getResources(), R.drawable.s10, cardOptions);
+//			SpadesJack = BitmapFactory.decodeResource(main.getResources(), R.drawable.sj, cardOptions);
+//			SpadesQueen = BitmapFactory.decodeResource(main.getResources(), R.drawable.sq, cardOptions);
+//			SpadesKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.sk, cardOptions);
+//			SpadesAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.sa, cardOptions);
+//	    	Log.d(TAG, "Spades loaded");
+//
+//			HeartsTwo = BitmapFactory.decodeResource(main.getResources(), R.drawable.h2, cardOptions);
+//			HeartsThree = BitmapFactory.decodeResource(main.getResources(), R.drawable.h3, cardOptions);
+//			HeartsFour = BitmapFactory.decodeResource(main.getResources(), R.drawable.h4, cardOptions);
+//			HeartsFive = BitmapFactory.decodeResource(main.getResources(), R.drawable.h5, cardOptions);
+//			HeartsSix = BitmapFactory.decodeResource(main.getResources(), R.drawable.h6, cardOptions);
+//			HeartsSeven = BitmapFactory.decodeResource(main.getResources(), R.drawable.h7, cardOptions);
+//			HeartsEight = BitmapFactory.decodeResource(main.getResources(), R.drawable.h8, cardOptions);
+//			HeartsNine = BitmapFactory.decodeResource(main.getResources(), R.drawable.h9, cardOptions);
+//			HeartsTen = BitmapFactory.decodeResource(main.getResources(), R.drawable.h10, cardOptions);
+//			HeartsJack = BitmapFactory.decodeResource(main.getResources(), R.drawable.hj, cardOptions);
+//			HeartsQueen = BitmapFactory.decodeResource(main.getResources(), R.drawable.hq, cardOptions);
+//			HeartsKing = BitmapFactory.decodeResource(main.getResources(), R.drawable.hk, cardOptions);
+//			HeartsAce = BitmapFactory.decodeResource(main.getResources(), R.drawable.ha, cardOptions);
+//	    	Log.d(TAG, "Hearts loaded");
+//
+////		}
+//		
+//		if(ClubsTwoHighLight==null){
 			
-			ClubsTwoHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs2);
-			ClubsThreeHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs3);
-			ClubsFourHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs4);
-			ClubsFiveHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs5);
-			ClubsSixHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs6);
-			ClubsSevenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs7);
-			ClubsEightHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs8);
-			ClubsNineHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs9);
-			ClubsTenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs10);
-			ClubsJackHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs_jack);
-			ClubsQueenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs_queen);
-			ClubsKingHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs_king);
-			ClubsAceHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs_ace);
-	    	Log.d(TAG, "Highlighted Clubs loaded");
+//			ClubsTwoHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs2, cardOptions);
+//			ClubsThreeHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs3, cardOptions);
+//			ClubsFourHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs4, cardOptions);
+//			ClubsFiveHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs5, cardOptions);
+//			ClubsSixHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs6, cardOptions);
+//			ClubsSevenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs7, cardOptions);
+//			ClubsEightHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs8, cardOptions);
+//			ClubsNineHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs9, cardOptions);
+//			ClubsTenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs10, cardOptions);
+//			ClubsJackHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs_jack, cardOptions);
+//			ClubsQueenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs_queen, cardOptions);
+//			ClubsKingHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs_king, cardOptions);
+//			ClubsAceHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hclubs_ace, cardOptions);
+//	    	Log.d(TAG, "Highlighted Clubs loaded");
+//
+//			DiamondsTwoHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds2, cardOptions);
+//			DiamondsThreeHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds3, cardOptions);
+//			DiamondsFourHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds4, cardOptions);
+//			DiamondsFiveHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds5, cardOptions);
+//			DiamondsSixHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds6, cardOptions);
+//			DiamondsSevenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds7, cardOptions);
+//			DiamondsEightHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds8, cardOptions);
+//			DiamondsNineHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds9, cardOptions);
+//			DiamondsTenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds10, cardOptions);
+//			DiamondsJackHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds_jack, cardOptions);
+//			DiamondsQueenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds_queen, cardOptions);
+//			DiamondsKingHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds_king, cardOptions);
+//			DiamondsAceHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds_ace, cardOptions);
+//	    	Log.d(TAG, "Diamonds Hearts loaded");
+//
+//			SpadesTwoHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades2, cardOptions);
+//			SpadesThreeHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades3, cardOptions);
+//			SpadesFourHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades4, cardOptions);
+//			SpadesFiveHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades5, cardOptions);
+//			SpadesSixHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades6, cardOptions);
+//			SpadesSevenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades7, cardOptions);
+//			SpadesEightHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades8, cardOptions);
+//			SpadesNineHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades9, cardOptions);
+//			SpadesTenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades10, cardOptions);
+//			SpadesJackHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades_jack, cardOptions);
+//			SpadesQueenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades_queen, cardOptions);
+//			SpadesKingHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades_king, cardOptions);
+//			SpadesAceHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades_ace, cardOptions);
+//	    	Log.d(TAG, "Highlighted Spades loaded");
+//	
+//	
+//			HeartsTwoHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts2, cardOptions);
+//			HeartsThreeHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts3, cardOptions);
+//			HeartsFourHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts4, cardOptions);
+//			HeartsFiveHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts5, cardOptions);
+//			HeartsSixHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts6, cardOptions);
+//			HeartsSevenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts7, cardOptions);
+//			HeartsEightHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts8, cardOptions);
+//			HeartsNineHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts9, cardOptions);
+//			HeartsTenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts10, cardOptions);
+//			HeartsJackHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts_jack, cardOptions);
+//			HeartsQueenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts_queen, cardOptions);
+//			HeartsKingHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts_king, cardOptions);
+//			HeartsAceHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts_ace, cardOptions);
+//	    	Log.d(TAG, "Highlighted Hearts loaded");
 
-			DiamondsTwoHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds2);
-			DiamondsThreeHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds3);
-			DiamondsFourHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds4);
-			DiamondsFiveHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds5);
-			DiamondsSixHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds6);
-			DiamondsSevenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds7);
-			DiamondsEightHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds8);
-			DiamondsNineHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds9);
-			DiamondsTenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds10);
-			DiamondsJackHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds_jack);
-			DiamondsQueenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds_queen);
-			DiamondsKingHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds_king);
-			DiamondsAceHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hdiamonds_ace);
-	    	Log.d(TAG, "Diamonds Hearts loaded");
-
-			SpadesTwoHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades2);
-			SpadesThreeHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades3);
-			SpadesFourHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades4);
-			SpadesFiveHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades5);
-			SpadesSixHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades6);
-			SpadesSevenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades7);
-			SpadesEightHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades8);
-			SpadesNineHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades9);
-			SpadesTenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades10);
-			SpadesJackHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades_jack);
-			SpadesQueenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades_queen);
-			SpadesKingHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades_king);
-			SpadesAceHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hspades_ace);
-	    	Log.d(TAG, "Highlighted Spades loaded");
-	
-	
-			HeartsTwoHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts2);
-			HeartsThreeHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts3);
-			HeartsFourHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts4);
-			HeartsFiveHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts5);
-			HeartsSixHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts6);
-			HeartsSevenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts7);
-			HeartsEightHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts8);
-			HeartsNineHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts9);
-			HeartsTenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts10);
-			HeartsJackHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts_jack);
-			HeartsQueenHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts_queen);
-			HeartsKingHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts_king);
-			HeartsAceHighLight = BitmapFactory.decodeResource(main.getResources(), R.drawable.hhearts_ace);
-	    	Log.d(TAG, "Highlighted Hearts loaded");
-
-		}
+//		}
 	}
 //////////////////////////BITMAPS
-public Bitmap GreenBack;
-public Bitmap BlueBack;
-public Bitmap BlackBack;
-public Bitmap RedBack;
-public Bitmap CardBack;
-
-public Bitmap ClubsTwo;
-public Bitmap ClubsThree;
-public Bitmap ClubsFour;
-public Bitmap ClubsFive;
-public Bitmap ClubsSix;
-public Bitmap ClubsSeven;
-public Bitmap ClubsEight;
-public Bitmap ClubsNine;
-public Bitmap ClubsTen;
-public Bitmap ClubsJack;
-public Bitmap ClubsQueen;
-public Bitmap ClubsKing;
-public Bitmap ClubsAce;
-
-public Bitmap DiamondsTwo;
-public Bitmap DiamondsThree;
-public Bitmap DiamondsFour;
-public Bitmap DiamondsFive;
-public Bitmap DiamondsSix;
-public Bitmap DiamondsSeven;
-public Bitmap DiamondsEight;
-public Bitmap DiamondsNine;
-public Bitmap DiamondsTen;
-public Bitmap DiamondsJack;
-public Bitmap DiamondsQueen;
-public Bitmap DiamondsKing;
-public Bitmap DiamondsAce;
-
-public Bitmap SpadesTwo;
-public Bitmap SpadesThree;
-public Bitmap SpadesFour;
-public Bitmap SpadesFive;
-public Bitmap SpadesSix;
-public Bitmap SpadesSeven;
-public Bitmap SpadesEight;
-public Bitmap SpadesNine;
-public Bitmap SpadesTen;
-public Bitmap SpadesJack;
-public Bitmap SpadesQueen;
-public Bitmap SpadesKing;
-public Bitmap SpadesAce;
-
-public Bitmap HeartsTwo;
-public Bitmap HeartsThree;
-public Bitmap HeartsFour;
-public Bitmap HeartsFive;
-public Bitmap HeartsSix;
-public Bitmap HeartsSeven;
-public Bitmap HeartsEight;
-public Bitmap HeartsNine;
-public Bitmap HeartsTen;
-public Bitmap HeartsJack;
-public Bitmap HeartsQueen;
-public Bitmap HeartsKing;
-public Bitmap HeartsAce;
-
-
-public Bitmap ClubsTwoHighLight;
-public Bitmap ClubsThreeHighLight;
-public Bitmap ClubsFourHighLight;
-public Bitmap ClubsFiveHighLight;
-public Bitmap ClubsSixHighLight;
-public Bitmap ClubsSevenHighLight;
-public Bitmap ClubsEightHighLight;
-public Bitmap ClubsNineHighLight;
-public Bitmap ClubsTenHighLight;
-public Bitmap ClubsJackHighLight;
-public Bitmap ClubsQueenHighLight;
-public Bitmap ClubsKingHighLight;
-public Bitmap ClubsAceHighLight;
-
-public Bitmap DiamondsTwoHighLight;
-public Bitmap DiamondsThreeHighLight;
-public Bitmap DiamondsFourHighLight;
-public Bitmap DiamondsFiveHighLight;
-public Bitmap DiamondsSixHighLight;
-public Bitmap DiamondsSevenHighLight;
-public Bitmap DiamondsEightHighLight;
-public Bitmap DiamondsNineHighLight;
-public Bitmap DiamondsTenHighLight;
-public Bitmap DiamondsJackHighLight;
-public Bitmap DiamondsQueenHighLight;
-public Bitmap DiamondsKingHighLight;
-public Bitmap DiamondsAceHighLight;
-
-public Bitmap SpadesTwoHighLight;
-public Bitmap SpadesThreeHighLight;
-public Bitmap SpadesFourHighLight;
-public Bitmap SpadesFiveHighLight;
-public Bitmap SpadesSixHighLight;
-public Bitmap SpadesSevenHighLight;
-public Bitmap SpadesEightHighLight;
-public Bitmap SpadesNineHighLight;
-public Bitmap SpadesTenHighLight;
-public Bitmap SpadesJackHighLight;
-public Bitmap SpadesQueenHighLight;
-public Bitmap SpadesKingHighLight;
-public Bitmap SpadesAceHighLight;
-
-public Bitmap HeartsTwoHighLight;
-public Bitmap HeartsThreeHighLight;
-public Bitmap HeartsFourHighLight;
-public Bitmap HeartsFiveHighLight;
-public Bitmap HeartsSixHighLight;
-public Bitmap HeartsSevenHighLight;
-public Bitmap HeartsEightHighLight;
-public Bitmap HeartsNineHighLight;
-public Bitmap HeartsTenHighLight;
-public Bitmap HeartsJackHighLight;
-public Bitmap HeartsQueenHighLight;
-public Bitmap HeartsKingHighLight;
-public Bitmap HeartsAceHighLight;
+//
+//public Bitmap CardBack;
+//
+//public Bitmap ClubsTwo;
+//public Bitmap ClubsThree;
+//public Bitmap ClubsFour;
+//public Bitmap ClubsFive;
+//public Bitmap ClubsSix;
+//public Bitmap ClubsSeven;
+//public Bitmap ClubsEight;
+//public Bitmap ClubsNine;
+//public Bitmap ClubsTen;
+//public Bitmap ClubsJack;
+//public Bitmap ClubsQueen;
+//public Bitmap ClubsKing;
+//public Bitmap ClubsAce;
+//
+//public Bitmap DiamondsTwo;
+//public Bitmap DiamondsThree;
+//public Bitmap DiamondsFour;
+//public Bitmap DiamondsFive;
+//public Bitmap DiamondsSix;
+//public Bitmap DiamondsSeven;
+//public Bitmap DiamondsEight;
+//public Bitmap DiamondsNine;
+//public Bitmap DiamondsTen;
+//public Bitmap DiamondsJack;
+//public Bitmap DiamondsQueen;
+//public Bitmap DiamondsKing;
+//public Bitmap DiamondsAce;
+//
+//public Bitmap SpadesTwo;
+//public Bitmap SpadesThree;
+//public Bitmap SpadesFour;
+//public Bitmap SpadesFive;
+//public Bitmap SpadesSix;
+//public Bitmap SpadesSeven;
+//public Bitmap SpadesEight;
+//public Bitmap SpadesNine;
+//public Bitmap SpadesTen;
+//public Bitmap SpadesJack;
+//public Bitmap SpadesQueen;
+//public Bitmap SpadesKing;
+//public Bitmap SpadesAce;
+//
+//public Bitmap HeartsTwo;
+//public Bitmap HeartsThree;
+//public Bitmap HeartsFour;
+//public Bitmap HeartsFive;
+//public Bitmap HeartsSix;
+//public Bitmap HeartsSeven;
+//public Bitmap HeartsEight;
+//public Bitmap HeartsNine;
+//public Bitmap HeartsTen;
+//public Bitmap HeartsJack;
+//public Bitmap HeartsQueen;
+//public Bitmap HeartsKing;
+//public Bitmap HeartsAce;
+//
+//
+//public Bitmap ClubsTwoHighLight;
+//public Bitmap ClubsThreeHighLight;
+//public Bitmap ClubsFourHighLight;
+//public Bitmap ClubsFiveHighLight;
+//public Bitmap ClubsSixHighLight;
+//public Bitmap ClubsSevenHighLight;
+//public Bitmap ClubsEightHighLight;
+//public Bitmap ClubsNineHighLight;
+//public Bitmap ClubsTenHighLight;
+//public Bitmap ClubsJackHighLight;
+//public Bitmap ClubsQueenHighLight;
+//public Bitmap ClubsKingHighLight;
+//public Bitmap ClubsAceHighLight;
+//
+//public Bitmap DiamondsTwoHighLight;
+//public Bitmap DiamondsThreeHighLight;
+//public Bitmap DiamondsFourHighLight;
+//public Bitmap DiamondsFiveHighLight;
+//public Bitmap DiamondsSixHighLight;
+//public Bitmap DiamondsSevenHighLight;
+//public Bitmap DiamondsEightHighLight;
+//public Bitmap DiamondsNineHighLight;
+//public Bitmap DiamondsTenHighLight;
+//public Bitmap DiamondsJackHighLight;
+//public Bitmap DiamondsQueenHighLight;
+//public Bitmap DiamondsKingHighLight;
+//public Bitmap DiamondsAceHighLight;
+//
+//public Bitmap SpadesTwoHighLight;
+//public Bitmap SpadesThreeHighLight;
+//public Bitmap SpadesFourHighLight;
+//public Bitmap SpadesFiveHighLight;
+//public Bitmap SpadesSixHighLight;
+//public Bitmap SpadesSevenHighLight;
+//public Bitmap SpadesEightHighLight;
+//public Bitmap SpadesNineHighLight;
+//public Bitmap SpadesTenHighLight;
+//public Bitmap SpadesJackHighLight;
+//public Bitmap SpadesQueenHighLight;
+//public Bitmap SpadesKingHighLight;
+//public Bitmap SpadesAceHighLight;
+//
+//public Bitmap HeartsTwoHighLight;
+//public Bitmap HeartsThreeHighLight;
+//public Bitmap HeartsFourHighLight;
+//public Bitmap HeartsFiveHighLight;
+//public Bitmap HeartsSixHighLight;
+//public Bitmap HeartsSevenHighLight;
+//public Bitmap HeartsEightHighLight;
+//public Bitmap HeartsNineHighLight;
+//public Bitmap HeartsTenHighLight;
+//public Bitmap HeartsJackHighLight;
+//public Bitmap HeartsQueenHighLight;
+//public Bitmap HeartsKingHighLight;
+//public Bitmap HeartsAceHighLight;
 
 }

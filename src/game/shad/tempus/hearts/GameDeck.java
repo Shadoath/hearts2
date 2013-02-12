@@ -82,7 +82,7 @@ public class GameDeck{
 			
 		break;
 		case 2:
-			//TODO FIX ME
+			//TODO Create random number for each card in deck and sort by that number.
 			Log.d(TAG, "shuffle type 2");
 			x=0;
 			z=50;//times to loop the deck and 'randomly' switch cards.

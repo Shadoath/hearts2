@@ -1,10 +1,12 @@
 package game.shad.tempus.hearts;
 
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 
 public class Card {
 	public static final String TAG = "Hearts--Card";
@@ -38,11 +40,12 @@ public class Card {
 	    this.game = game;
 		this.value = value;
 		this.suit = suit;
-	    this.bitmap = getImage();
+	    this.bitmap = getImageFromSuitAndValue();
 		this.name = toString();
 	}
 	 
    public void draw(Canvas canvas) {
+//		Log.d(TAG, "OnDraw Card");
 		//Add z layer
         //Paint paint = new Paint();
         //paint.setStrokeWidth(2);
@@ -52,392 +55,395 @@ public class Card {
         //Rect r = new Rect(x, y, x + bitmap.getWidth()/2, y + bitmap.getHeight()/2);
         r = new Rect(x1, y1, x2,  y2);
         if(touched!=lastTouched){
-        	this.bitmap = getImage();
+        	Log.d(TAG, "Card touched--- changing Image");
+        	refreshBitmap();
         	lastTouched=touched;
         }
         canvas.drawBitmap(bitmap, null, r, null);
     }
-
    
-	public Bitmap getImage(){
+	public Bitmap getImageFromSuitAndValue(){
 		if(!touched){
 	        switch (suit){
 	        case 0:
 	            switch(value){	 
 	            	case 0:
-	            		return game.GreenBack;
+	            		return game.getBitmap(R.drawable.green_back);
 	            	case 1:
-	            		return game.CardBack;
+	            		return game.getBitmap(R.drawable.cardback);
 	                case 2:
-	                    return game.ClubsTwo;
+	                    return game.getBitmap(R.drawable.c2);
 	                case 3:
-	                    return game.ClubsThree;
+	                    return game.getBitmap(R.drawable.c3);
 	                case 4:
-	                    return game.ClubsFour;
+	                    return game.getBitmap(R.drawable.c4);
 	
 	                case 5:
-	                    return game.ClubsFive;
+	                    return game.getBitmap(R.drawable.c5);
 	
 	                case 6:
-	                    return game.ClubsSix;
+	                    return game.getBitmap(R.drawable.c6);
 	
 	                case 7:
-	                    return game.ClubsSeven;
+	                    return game.getBitmap(R.drawable.c7);
 	
 	                case 8:
-	                    return game.ClubsEight;
+	                    return game.getBitmap(R.drawable.c8);
 	
 	                case 9:
-	                    return game.ClubsNine;
+	                    return game.getBitmap(R.drawable.c9);
 	
 	                case 10:
-	                    return game.ClubsTen;
+	                    return game.getBitmap(R.drawable.c10);
 	
 	                case 11:
-	                    return game.ClubsJack;
+	                    return game.getBitmap(R.drawable.cj);
 	
 	                case 12:
-	                    return game.ClubsQueen;
+	                    return game.getBitmap(R.drawable.cq);
 	
 	                case 13:
-	                    return game.ClubsKing;
+	                    return game.getBitmap(R.drawable.ck);
 	
 	                case 14:
-	                    return game.ClubsAce;
+	                    return game.getBitmap(R.drawable.ca);
 	
 	                default:
-	                    return game.GreenBack;
+	                    return game.getBitmap(R.drawable.green_back);
 	
 	            }
 	            case 1:
 	                switch(value){
 	            	case 0:
-	            		return game.BlueBack;
+	            		return game.getBitmap(R.drawable.blue_back);
 	                case 2:
-	                    return game.DiamondsTwo;
+	                    return game.getBitmap(R.drawable.d2);
 	                case 3:
-	                    return game.DiamondsThree;
+	                    return game.getBitmap(R.drawable.d3);
 	                case 4:
-	                    return game.DiamondsFour ;
+	                    return game.getBitmap(R.drawable.d4);
 	
 	                case 5:
-	                    return game.DiamondsFive;
+	                    return game.getBitmap(R.drawable.d5);
 	
 	                case 6:
-	                    return game.DiamondsSix;
+	                    return game.getBitmap(R.drawable.d6);
 	
 	                case 7:
-	                    return game.DiamondsSeven;
+	                    return game.getBitmap(R.drawable.d7);
 	
 	                case 8:
-	                    return game.DiamondsEight;
+	                    return game.getBitmap(R.drawable.d8);
 	
 	                case 9:
-	                    return game.DiamondsNine;
+	                    return game.getBitmap(R.drawable.d9);
 	
 	                case 10:
-	                    return game.DiamondsTen;
+	                    return game.getBitmap(R.drawable.d10);
 	
 	                case 11:
-	                    return game.DiamondsJack;
+	                    return game.getBitmap(R.drawable.dj);
 	
 	                case 12:
-	                    return game.DiamondsQueen;
+	                    return game.getBitmap(R.drawable.dq);
 	
 	                case 13:
-	                    return game.DiamondsKing;
+	                    return game.getBitmap(R.drawable.dk);
 	
 	                case 14:
-	                    return game.DiamondsAce;
+	                    return game.getBitmap(R.drawable.da);
 	
 	                default:
-	                    return game.BlueBack;
+	                    return game.getBitmap(R.drawable.blue_back);
 	
 	            }
 	            case 2:
 	                switch(value){
 	            	case 0:
-	            		return game.BlackBack;
+	            		return game.getBitmap(R.drawable.black_back);
 	                case 2:
-	                    return game.SpadesTwo;
+	                    return game.getBitmap(R.drawable.s2);
 	                case 3:
-	                    return game.SpadesThree;
+	                    return game.getBitmap(R.drawable.s3);
 	                case 4:
-	                    return game.SpadesFour ;
+	                    return game.getBitmap(R.drawable.s4);
 	
 	                case 5:
-	                    return game.SpadesFive;
+	                    return game.getBitmap(R.drawable.s5);
 	
 	                case 6:
-	                    return game.SpadesSix;
+	                    return game.getBitmap(R.drawable.s6);
 	
 	                case 7:
-	                    return game.SpadesSeven;
+	                    return game.getBitmap(R.drawable.s7);
 	
 	                case 8:
-	                    return game.SpadesEight;
+	                    return game.getBitmap(R.drawable.s8);
 	
 	                case 9:
-	                    return game.SpadesNine;
+	                    return game.getBitmap(R.drawable.s9);
 	
 	                case 10:
-	                    return game.SpadesTen;
+	                    return game.getBitmap(R.drawable.s10);
 	
 	                case 11:
-	                    return game.SpadesJack;
+	                    return game.getBitmap(R.drawable.sj);
 	
 	                case 12:
-	                    return game.SpadesQueen;
+	                    return game.getBitmap(R.drawable.sq);
 	
 	                case 13:
-	                    return game.SpadesKing;
+	                    return game.getBitmap(R.drawable.sk);
 	
 	                case 14:
-	                    return game.SpadesAce;
+	                    return game.getBitmap(R.drawable.sa);
 	
 	                default:
-	                    return game.BlackBack;
+	            		return game.getBitmap(R.drawable.black_back);
 	
 	            }
 	            case 3:
 	                switch(value){
 	            	case 0:
-	            		return game.RedBack;
+	            		return game.getBitmap(R.drawable.red_back);
 	                case 2:
-	                    return game.HeartsTwo;
+	                    return game.getBitmap(R.drawable.h2);
 	                case 3:
-	                    return game.HeartsThree;
+	                    return game.getBitmap(R.drawable.h3);
 	                case 4:
-	                    return game.HeartsFour ;
+	                    return game.getBitmap(R.drawable.h4);
 	
 	                case 5:
-	                    return game.HeartsFive;
+	                    return game.getBitmap(R.drawable.h5);
 	
 	                case 6:
-	                    return game.HeartsSix;
+	                    return game.getBitmap(R.drawable.h6);
 	
 	                case 7:
-	                    return game.HeartsSeven;
+	                    return game.getBitmap(R.drawable.h7);
 	
 	                case 8:
-	                    return game.HeartsEight;
+	                    return game.getBitmap(R.drawable.h8);
 	
 	                case 9:
-	                    return game.HeartsNine;
+	                    return game.getBitmap(R.drawable.h9);
 	
 	                case 10:
-	                    return game.HeartsTen;
+	                    return game.getBitmap(R.drawable.h10);
 	
 	                case 11:
-	                    return game.HeartsJack;
+	                    return game.getBitmap(R.drawable.hj);
 	
 	                case 12:
-	                    return game.HeartsQueen;
+	                    return game.getBitmap(R.drawable.hq);
 	
 	                case 13:
-	                    return game.HeartsKing;
+	                    return game.getBitmap(R.drawable.hk);
 	
 	                case 14:
-	                    return game.HeartsAce;
+	                    return game.getBitmap(R.drawable.ha);
 	
 	                default:
-	                    return game.RedBack;
+	            		return game.getBitmap(R.drawable.red_back);
 	
 	            }
 	        }
-	        return game.BlueBack;
+    		return game.getBitmap(R.drawable.blue_back);
 		}
-		else{
-		switch (suit){
-		    case 0:
-		        switch(value){	 
-		        	case 0:
-		        		return game.GreenBack;
-		        	case 1:
-		        		return game.CardBack;
-		            case 2:
-		                return game.ClubsTwoHighLight;
-		            case 3:
-		                return game.ClubsThreeHighLight;
-		            case 4:
-		                return game.ClubsFourHighLight;
-		
-		            case 5:
-		                return game.ClubsFiveHighLight;
-		
-		            case 6:
-		                return game.ClubsSixHighLight;
-		
-		            case 7:
-		                return game.ClubsSevenHighLight;
-		
-		            case 8:
-		                return game.ClubsEightHighLight;
-		
-		            case 9:
-		                return game.ClubsNineHighLight;
-		
-		            case 10:
-		                return game.ClubsTenHighLight;
-		
-		            case 11:
-		                return game.ClubsJackHighLight;
-		
-		            case 12:
-		                return game.ClubsQueenHighLight;
-		
-		            case 13:
-		                return game.ClubsKingHighLight;
-		
-		            case 14:
-		                return game.ClubsAceHighLight;
-		
-		            default:
-		                return game.GreenBack;
-		
-		        }
-		        case 1:
-		            switch(value){
-		        	case 0:
-		        		return game.BlueBack;
-		            case 2:
-		                return game.DiamondsTwoHighLight;
-		            case 3:
-		                return game.DiamondsThreeHighLight;
-		            case 4:
-		                return game.DiamondsFourHighLight;
-		
-		            case 5:
-		                return game.DiamondsFiveHighLight;
-		
-		            case 6:
-		                return game.DiamondsSixHighLight;
-		
-		            case 7:
-		                return game.DiamondsSevenHighLight;
-		
-		            case 8:
-		                return game.DiamondsEightHighLight;
-		
-		            case 9:
-		                return game.DiamondsNineHighLight;
-		
-		            case 10:
-		                return game.DiamondsTenHighLight;
-		
-		            case 11:
-		                return game.DiamondsJackHighLight;
-		
-		            case 12:
-		                return game.DiamondsQueenHighLight;
-		
-		            case 13:
-		                return game.DiamondsKingHighLight;
-		
-		            case 14:
-		                return game.DiamondsAceHighLight;
-		
-		            default:
-		                return game.BlueBack;
-		
-		        }
-		        case 2:
-		            switch(value){
-		        	case 0:
-		        		return game.BlackBack;
-		            case 2:
-		                return game.SpadesTwoHighLight;
-		            case 3:
-		                return game.SpadesThreeHighLight;
-		            case 4:
-		                return game.SpadesFourHighLight;
-		
-		            case 5:
-		                return game.SpadesFiveHighLight;
-		
-		            case 6:
-		                return game.SpadesSixHighLight;
-		
-		            case 7:
-		                return game.SpadesSevenHighLight;
-		
-		            case 8:
-		                return game.SpadesEightHighLight;
-		
-		            case 9:
-		                return game.SpadesNineHighLight;
-		
-		            case 10:
-		                return game.SpadesTenHighLight;
-		
-		            case 11:
-		                return game.SpadesJackHighLight;
-		
-		            case 12:
-		                return game.SpadesQueenHighLight;
-		
-		            case 13:
-		                return game.SpadesKingHighLight;
-		
-		            case 14:
-		                return game.SpadesAceHighLight;
-		
-		            default:
-		                return game.BlackBack;
-		
-		        }
-		        case 3:
-		            switch(value){
-		        	case 0:
-		        		return game.RedBack;
-		            case 2:
-		                return game.HeartsTwoHighLight;
-		            case 3:
-		                return game.HeartsThreeHighLight;
-		            case 4:
-		                return game.HeartsFourHighLight;
-		
-		            case 5:
-		                return game.HeartsFiveHighLight;
-		
-		            case 6:
-		                return game.HeartsSixHighLight;
-		
-		            case 7:
-		                return game.HeartsSevenHighLight;
-		
-		            case 8:
-		                return game.HeartsEightHighLight;
-		
-		            case 9:
-		                return game.HeartsNineHighLight;
-		
-		            case 10:
-		                return game.HeartsTenHighLight;
-		
-		            case 11:
-		                return game.HeartsJackHighLight;
-		
-		            case 12:
-		                return game.HeartsQueenHighLight;
-		
-		            case 13:
-		                return game.HeartsKingHighLight;
-		
-		            case 14:
-		                return game.HeartsAceHighLight;
-		
-		            default:
-		                return game.RedBack;
-		
-		        }
-		    }
-		    return game.BlueBack;
+		else
+		{
+			Log.d(TAG, "Highlighted Card to be selected");
+			switch (suit){
+	        case 0:
+	            switch(value){	 
+	            	case 0:
+	            		return game.getBitmap(R.drawable.green_back);
+	            	case 1:
+	            		return game.getBitmap(R.drawable.cardback);
+	                case 2:
+	                    return game.getBitmap(R.drawable.hc2);
+	                case 3:
+	                    return game.getBitmap(R.drawable.hc3);
+	                case 4:
+	                    return game.getBitmap(R.drawable.hc4);
+	
+	                case 5:
+	                    return game.getBitmap(R.drawable.hc5);
+	
+	                case 6:
+	                    return game.getBitmap(R.drawable.hc6);
+	
+	                case 7:
+	                    return game.getBitmap(R.drawable.hc7);
+	
+	                case 8:
+	                    return game.getBitmap(R.drawable.hc8);
+	
+	                case 9:
+	                    return game.getBitmap(R.drawable.hc9);
+	
+	                case 10:
+	                    return game.getBitmap(R.drawable.hc10);
+	
+	                case 11:
+	                    return game.getBitmap(R.drawable.hcj);
+	
+	                case 12:
+	                    return game.getBitmap(R.drawable.hcq);
+	
+	                case 13:
+	                    return game.getBitmap(R.drawable.hck);
+	
+	                case 14:
+	                    return game.getBitmap(R.drawable.hca);
+	
+	                default:
+	                    return game.getBitmap(R.drawable.green_back);
+	
+	            }
+	            case 1:
+	                switch(value){
+	            	case 0:
+	            		return game.getBitmap(R.drawable.blue_back);
+	                case 2:
+	                    return game.getBitmap(R.drawable.hd2);
+	                case 3:
+	                    return game.getBitmap(R.drawable.hd3);
+	                case 4:
+	                    return game.getBitmap(R.drawable.hd4);
+	
+	                case 5:
+	                    return game.getBitmap(R.drawable.hd5);
+	
+	                case 6:
+	                    return game.getBitmap(R.drawable.hd6);
+	
+	                case 7:
+	                    return game.getBitmap(R.drawable.hd7);
+	
+	                case 8:
+	                    return game.getBitmap(R.drawable.hd8);
+	
+	                case 9:
+	                    return game.getBitmap(R.drawable.hd9);
+	
+	                case 10:
+	                    return game.getBitmap(R.drawable.hd10);
+	
+	                case 11:
+	                    return game.getBitmap(R.drawable.hdj);
+	
+	                case 12:
+	                    return game.getBitmap(R.drawable.hdq);
+	
+	                case 13:
+	                    return game.getBitmap(R.drawable.hdk);
+	
+	                case 14:
+	                    return game.getBitmap(R.drawable.hda);
+	
+	                default:
+	                    return game.getBitmap(R.drawable.blue_back);
+	
+	            }
+	            case 2:
+	                switch(value){
+	            	case 0:
+	            		return game.getBitmap(R.drawable.black_back);
+	                case 2:
+	                    return game.getBitmap(R.drawable.hs2);
+	                case 3:
+	                    return game.getBitmap(R.drawable.hs3);
+	                case 4:
+	                    return game.getBitmap(R.drawable.hs4);
+	
+	                case 5:
+	                    return game.getBitmap(R.drawable.hs5);
+	
+	                case 6:
+	                    return game.getBitmap(R.drawable.hs6);
+	
+	                case 7:
+	                    return game.getBitmap(R.drawable.hs7);
+	
+	                case 8:
+	                    return game.getBitmap(R.drawable.hs8);
+	
+	                case 9:
+	                    return game.getBitmap(R.drawable.hs9);
+	
+	                case 10:
+	                    return game.getBitmap(R.drawable.hs10);
+	
+	                case 11:
+	                    return game.getBitmap(R.drawable.hsj);
+	
+	                case 12:
+	                    return game.getBitmap(R.drawable.hsq);
+	
+	                case 13:
+	                    return game.getBitmap(R.drawable.hsk);
+	
+	                case 14:
+	                    return game.getBitmap(R.drawable.hsa);
+	
+	                default:
+	            		return game.getBitmap(R.drawable.black_back);
+	
+	            }
+	            case 3:
+	                switch(value){
+	            	case 0:
+	            		return game.getBitmap(R.drawable.red_back);
+	                case 2:
+	                    return game.getBitmap(R.drawable.hh2);
+	                case 3:
+	                    return game.getBitmap(R.drawable.hh3);
+	                case 4:
+	                    return game.getBitmap(R.drawable.hh4);
+	
+	                case 5:
+	                    return game.getBitmap(R.drawable.hh5);
+	
+	                case 6:
+	                    return game.getBitmap(R.drawable.hh6);
+	
+	                case 7:
+	                    return game.getBitmap(R.drawable.hh7);
+	
+	                case 8:
+	                    return game.getBitmap(R.drawable.hh8);
+	
+	                case 9:
+	                    return game.getBitmap(R.drawable.hh9);
+	
+	                case 10:
+	                    return game.getBitmap(R.drawable.hh10);
+	
+	                case 11:
+	                    return game.getBitmap(R.drawable.hhj);
+	
+	                case 12:
+	                    return game.getBitmap(R.drawable.hhq);
+	
+	                case 13:
+	                    return game.getBitmap(R.drawable.hhk);
+	
+	                case 14:
+	                    return game.getBitmap(R.drawable.hha);
+	
+	                default:
+	            		return game.getBitmap(R.drawable.red_back);
+	
+	            }
+	        }
+    		return game.getBitmap(R.drawable.blue_back);
 		}
 		}
 	
     public Bitmap getBitmap(){
-		return bitmap;
+		return getImageFromSuitAndValue();
+//		return bitmap;
 	}
     public Rect getBounds(){
     	return new Rect(x1, y1, x2, y2);
@@ -445,6 +451,11 @@ public class Card {
        
 	public int getRid(){
 		return Rid;
+	}
+	public void refreshBitmap(){
+		Log.d(TAG, "Refreshing Bitmap");
+    	lastTouched=touched;
+		this.bitmap = getImageFromSuitAndValue();
 	}
 	public void setBitmap(Bitmap bitmap){
 		this.bitmap = bitmap;
@@ -535,7 +546,7 @@ public class Card {
 	public String toString(){
 		String sValue = suittoString(suit);
 		String sSuit = valueToString(value);
-		return sValue+" of "+sSuit;
+		return sSuit+" of "+sValue;
 		
 	}
 
@@ -655,7 +666,9 @@ public class Card {
     }
     
     public void setTouched(boolean touched){
+		Log.d(TAG, "Setting Card Touched to--"+touched);
         this.touched = touched;
+        refreshBitmap();
     }
     
     public int getCordX(){

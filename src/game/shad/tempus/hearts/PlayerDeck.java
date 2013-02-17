@@ -6,9 +6,11 @@ import android.util.Log;
 
 public class PlayerDeck extends SuperDeck{
 	public static final String TAG = "Hearts--PlayerDeck";
+	private Player owner;
 	public boolean hasQueen;
-	public PlayerDeck(Game game) {
+	public PlayerDeck(Game game, Player player) {
 		super(game);
+		this.owner=player;
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -18,20 +20,20 @@ public class PlayerDeck extends SuperDeck{
 	 * @param cardToBeat Card to be lower than
 	 * @param lastPlayer if we are the last player of the trick, if true and we have no cards lower just play highest card.
 	 */
-	public Card getDeckCardBelow(Card cardToBeat, boolean lastPlayer, Card startCard){
+	public Card getDeckCardBelow(Card cardToBeat, boolean lastPlayer, Card highCardOfSuit){
 		Card bestPick = null;
 		switch (cardToBeat.getSuit()){
 		case 0:
-			bestPick = clubCards.getCardBelow(cardToBeat, startCard);
+			bestPick = clubCards.getCardBelow(cardToBeat, highCardOfSuit);
 			break;
 		case 1:
-			bestPick = diamondCards.getCardBelow(cardToBeat, startCard);
+			bestPick = diamondCards.getCardBelow(cardToBeat, highCardOfSuit);
 			break;
 		case 2:
-			bestPick = spadeCards.getCardBelow(cardToBeat, startCard);
+			bestPick = spadeCards.getCardBelow(cardToBeat, highCardOfSuit);
 			break;
 		case 3:
-			bestPick = heartCards.getCardBelow(cardToBeat, startCard);
+			bestPick = heartCards.getCardBelow(cardToBeat, highCardOfSuit);
 			break;
 		}
 		if(bestPick.getSuit()==-1){
@@ -82,21 +84,25 @@ public class PlayerDeck extends SuperDeck{
 	public boolean checkVoid(int suit){
 		switch(suit){
 		case 0:
+			Log.d(TAG+owner.shortName, "clubs size="+clubCards.getSize());
 			if(clubCards.getSize()==0){
 				return true;
 			}
 		break;
 			case 1:
-			if(spadeCards.getSize()==0){
-				return true;
+				Log.d(TAG+owner.shortName, "Diamonds size="+diamondCards.getSize());
+				if(diamondCards.getSize()==0){
+					return true;
 			}
 		break;
 		case 2:
-			if(diamondCards.getSize()==0){
+			Log.d(TAG+owner.shortName, "Spades size="+spadeCards.getSize());
+			if(spadeCards.getSize()==0){
 				return  true;
 			}
 		break;
 		case 3:
+			Log.d(TAG+owner.shortName, "Hearts size="+heartCards.getSize());
 			if(heartCards.getSize()==0){
 				return true;
 			}
@@ -106,6 +112,9 @@ public class PlayerDeck extends SuperDeck{
 		
 	}
 	
+	public void CheckAllVoids(){
+		
+	}
 	/**
 	 * Finds the Queen of spades
 	 * Sets Card queenOfSpades to the queen for later use with GetQueenOfSpades

@@ -47,7 +47,7 @@ public class Player {
 	public Player(MainActivity main, Game game, ArrayList<Card> hand1, int AISmarts, int seat, String name, int color){
 		this.main =main;
 		this.game = game;
-		this.playerDeck = new PlayerDeck(game);	//may be obsolete
+		this.playerDeck = new PlayerDeck(game, this);	//may be obsolete
 		this.playerDeck.addCards(hand1);
 		this.AISmarts = AISmarts;
 		this.seat = seat;
@@ -211,7 +211,7 @@ public class Player {
 			if(trickHasPoints){
 				Log.d(TAG+this.getRealName(), "Play below highest in pile --POINTS in pile!!");
 				Card bestPick = playerDeck.playHighSimple(startSuit, 0);
-				Log.d(TAG+this.getRealName(), "Checking for a card below "+bestPick.name);
+				Log.d(TAG+this.getRealName(), "Checking for a card below "+trick.getHighCard());
 				return playerDeck.getDeckCardBelow(trick.getHighCard(), true, bestPick);			}
 			if(trickNegativePoints){
 				Log.d(TAG+this.getRealName(), "Jack in trick, play high.");

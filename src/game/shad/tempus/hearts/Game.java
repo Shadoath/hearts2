@@ -1829,7 +1829,7 @@ public class Game extends Activity {
 			}
 			else{
 				Log.d(TAG, "Trying to play "+c.name);
-				myToast.setText("Not a Valid Choice, Choose a "+c.toString());
+				myToast.setText(c.toString()+" is not a Valid Choice");
 				myToast.show();
 				return false;
 			}

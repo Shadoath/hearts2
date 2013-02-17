@@ -21,8 +21,6 @@ public class SlidingDeckHolder extends LinearLayout
 
 	
     private ArrayList<Card> deck;
-    private ArrayList<CardView> cardViewSelected;
-    private ArrayList<CardView> tradingViews;
     private CardView viewSelected;
     private CardView cardImageView;
     private Card Card;
@@ -52,8 +50,6 @@ public class SlidingDeckHolder extends LinearLayout
        	params.setMargins(0, 0, 0, 0);
        	
        	this.deck = new ArrayList<Card>();
-        cardViewSelected= new ArrayList<CardView>();
-        tradingViews= new ArrayList<CardView>();
         //addBlankCards();
         //this.addCardViews(cardView);
 
@@ -86,6 +82,15 @@ public class SlidingDeckHolder extends LinearLayout
         return this.deck.get(i);
     }
     
+    public void setCardTouched(Card c, boolean touched){
+    	for(Card card :deck){
+    		if(card.equals(c)){
+    			card.setTouched(touched);
+    			return;
+    		}
+    	}
+    }
+    
     public int getPosition() {
 		return position;
 	}
@@ -103,7 +108,6 @@ public class SlidingDeckHolder extends LinearLayout
 	 */
 	public void addDeck(ArrayList<Card> deck){
     	removeAllViews();
-		cardViewSelected= new ArrayList<CardView>();
 		Iterator<Card> it = deck.iterator();
 		while(it.hasNext()){
 			Card card = it.next();
@@ -216,42 +220,6 @@ public class SlidingDeckHolder extends LinearLayout
     	this.deck.remove(c);
     	this.deck.add(c);
     }
-    public void removeAll(){
-		this.cardViewSelected= new ArrayList<CardView>();
-    }
-            
-    public void setSelectedCard(Card c){
-    	int count=getChildCount();
-    	int i=0;
-    	CardView toHighLightView = null;
-    	while(i<count){
-	    	if(c.name.equals(getChildAt(i).getTag())){
-	    		toHighLightView=(CardView) getChildAt(i);
-	    		Log.d(TAG, "view found, Setting background yellow");
-	    		break;
-	    	}
-	    	i++;
-		}
-    	if(toHighLightView==null){
-    		Log.d(TAG, "no View found for card!");
-    		return;
-    	}
-    	
-    	if(viewSelected==null){
-    		toHighLightView.setSelected(true);
-    		toHighLightView.setBackgroundColor(Color.YELLOW);
-			viewSelected=(CardView) toHighLightView;
-		}
-		else{
-			viewSelected.setSelected(false);
-			viewSelected.setBackgroundColor(Color.BLACK);
-			toHighLightView.setBackgroundColor(Color.YELLOW);
-			toHighLightView.setSelected(true);
-			viewSelected=(CardView) toHighLightView;
-			
-		}
-    }
-    	
     public ArrayList<Card> getDeck(){
         return this.deck;
     }

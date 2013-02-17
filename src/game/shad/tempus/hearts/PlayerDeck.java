@@ -126,6 +126,7 @@ public class PlayerDeck extends SuperDeck{
 	}
 	/**
 	 * Gets queen from deck.
+	 * Removes Card from Deck
 	 * Must run checkForQueen first
 	 * @return
 	 */

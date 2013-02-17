@@ -108,8 +108,8 @@ public class GameThread extends Thread
 	public void updateLastTime(){
 		lastTime=System.currentTimeMillis()+AutoRunTime; 
 	}
-	public void setAutoRunTime(int autoRunTime){
-		this.AutoRunTime=(1000*autoRunTime);
+	public void setAutoRunTime(double d){
+		this.AutoRunTime=(long) (1000*d);
 		
 	}
 	public int getAutoRunTimeinMilli(){

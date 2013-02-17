@@ -264,7 +264,7 @@ public class MainActivity extends Activity {
     		gt.fullAutoRun=!gt.fullAutoRun;
     		if(!gt.autoRunState.compareAndSet(AutoRunState.PAUSED,  AutoRunState.RUNNING))
     			gt.autoRunState.compareAndSet(AutoRunState.RUNNING,  AutoRunState.PAUSED);
-    		
+			gt.setAutoRunTime(.5);
 			break;
 
     	case R.id.normalRun:
@@ -363,7 +363,7 @@ public class MainActivity extends Activity {
 						game.playerHelperIntTotal++;
 						myToast.cancel();
 						Card cardToChooseCard = game.p1.go(game.round, game.tableTrick);
-						game.slidingDeckHolder.setSelectedCard(cardToChooseCard);
+						game.slidingDeckHolder.setCardTouched(cardToChooseCard, true);
 						myToast.setText("Pick a card, or press 'Play Card' again to let the game play the "+cardToChooseCard.name);
 				        myToast.setDuration(Toast.LENGTH_LONG);
 						myToast.show();

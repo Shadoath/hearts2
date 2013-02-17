@@ -89,15 +89,6 @@ public class Deck {
 						Log.d(TAG, "deckValue<CardValue, adding card at next spot i="+i);
 						return;
 					}
-							
-					
-					
-//					if(deck.get(i).getValue()<cardValue){
-//						Log.d(TAG, "Adding at i="+i);
-//						this.deck.add(i+1, card);
-//						added=true;
-//						break;
-//					}
 				}
 			}
 		}

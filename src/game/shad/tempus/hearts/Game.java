@@ -63,7 +63,6 @@ public class Game extends Activity {
 	public Canvas canvas = new Canvas();
 	private ArrayList<TrickStats> roundWinnerAndPoints= new ArrayList<TrickStats>(); 
 	public String roundCardString = "";
-
 	
     //Booleans for setting game states
     public boolean playing 			= false;  //initialized to false but set true during check for 2
@@ -196,7 +195,7 @@ public class Game extends Activity {
 		final int memClass = ((ActivityManager) main.getApplicationContext().getSystemService(
 	            Context.ACTIVITY_SERVICE)).getMemoryClass();
 	
-	    // Use 1/6th of the available memory for this memory cache.
+	    // Use 1/2th of the available memory for this memory cache.
 		Log.d(TAG, "mem cache size="+memClass);
 	   final int cacheSize = 1024 * 1024 * memClass / 2;
 	   mMemoryCache = new LruCache<String, Bitmap>(cacheSize);
@@ -259,11 +258,10 @@ public class Game extends Activity {
 		for(int suit=0;suit<4;suit++){			
 			for(int value=2;value<15;value++){
 				Card cd = new Card(value, suit, this);
+				Log.d(TAG, cd.name);
 				gameDeck.addGameDeckCard(cd);
 			}
-	
 		}
-		
 	}
 	
 	/**
@@ -293,7 +291,6 @@ public class Game extends Activity {
 			p3 = new Player(main, this, playerDecks.get(2), difficulty, 3, "(P3)", color2);
 			p4 = new Player(main, this, playerDecks.get(3), difficulty, 4, "(P4)", Color.RED);
 //			slidingDeckHolder.addDeck(playerDecks.get(0));
-			
 			createPlayerViews();
 			updatePlayerInfo();
 		}
@@ -1239,9 +1236,9 @@ public class Game extends Activity {
 		for(int i=0; i<deck.getSize();i++){
 			Card c = deck.getCard(i);
 			if(c.getOwner()!=null){
-				sDeck+=c.getOwner()+":";
+				sDeck+=c.getOwner().realName+":\n";
 			}
-			sDeck += c.name+"\n";
+			sDeck += c.name+", ";
 		}
 		return sDeck;
 		//TODO update gameView in thread.
@@ -1399,6 +1396,7 @@ public class Game extends Activity {
 			break;
 		}
 	}
+	
 	
 	/**
 	 * Clears and then adds blank cards to the tableHolder

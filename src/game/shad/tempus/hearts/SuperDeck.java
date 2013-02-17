@@ -140,9 +140,8 @@ public abstract class SuperDeck {
 	
 	/**
 	 * Use on a deck to see if it contains points
-	 * Does not check for the jack of Diamonds.
 	 * @param deck
-	 * @return true if has points
+	 * @return the number of points found
 	 */
 	public int checkForPoints() {
 		Log.d(TAG, "checkForPoints ");
@@ -269,6 +268,24 @@ public abstract class SuperDeck {
 	}
 	
 	/**
+	 * Returns the Deck of suit
+	 */
+	public Deck getSuitDeck(int suit){
+		Deck fullDeck = new Deck();
+		switch(suit){
+		case 0:	
+			fullDeck = clubCards;
+		case 1:
+			fullDeck = diamondCards;
+		case 2:
+			fullDeck = spadeCards;
+		case 3:
+			fullDeck = heartCards;
+		}
+		return fullDeck;
+	 }
+	
+	/**
 	 * Returns the whole SuperDeck as a ArrayList<Card>
 	 */
 	public ArrayList<Card> getDeck(){
@@ -284,7 +301,7 @@ public abstract class SuperDeck {
 	 * Finds the worst Card Point Value (CPV) suit
 	 * @return
 	 */
-	public int getWorstCPVSuit(){
+	public int getHeighestCPVSuit(){
 		Log.d(TAG, "find worst CPV Suit");
 		int c = this.clubCards.getTotalCPV();
 		int d = this.diamondCards.getTotalCPV();
@@ -294,6 +311,7 @@ public abstract class SuperDeck {
 		int position = 0;
 		int high = 0;
 		for(int i=0; i<test.length;i++){
+			Log.d(TAG, "CPV="+test[i]);
 			if(test[i]>high){
 				position = i;
 				high = test[i];

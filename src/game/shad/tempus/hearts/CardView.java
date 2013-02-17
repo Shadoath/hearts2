@@ -35,9 +35,7 @@ public class CardView extends ImageView{
 		Log.d(TAG, "Setting Touched to:"+touched);
 		card.setTouched(touched);
 		setImageBitmap(card.getImageFromSuitAndValue());
-//		this.postInvalidate();
 		this.refreshDrawableState();
 	}
 	
-
 }

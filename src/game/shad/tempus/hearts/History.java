@@ -109,17 +109,17 @@ public class History extends Activity{
 	private void setupSettings(){
     	switch(2){
     	case 1:
-        	path = this.getCacheDir();
+        	path = this.getCacheDir();//temp files
         	loadPath = path + "/winner"+winnerCount+".txt";
         	Log.d(TAG, loadPath);
         	break;
     	case 2:
-        	path = this.getFilesDir();
+        	path = this.getFilesDir();//Local install files
         	loadPath = path + "/winner"+winnerCount+".txt";
         	Log.d(TAG, loadPath);
         	break;
     	case 3:
-        	path = this.getExternalCacheDir();
+        	path = this.getExternalCacheDir();//SD card needs extra permission.
         	loadPath = path + "/winner"+winnerCount+".txt";
         	Log.d(TAG, loadPath);
         	break;

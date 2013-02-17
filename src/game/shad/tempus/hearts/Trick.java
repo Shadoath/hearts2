@@ -12,6 +12,7 @@ public class Trick{
 	public int startSuit=0;
 	public Card highCard;
 	public int highCardValue=0;
+	public boolean hasQueen =false;
 	
 	private ArrayList<Card> trick;
 	
@@ -63,14 +64,18 @@ public class Trick{
 		}
 		if(newCardSuit==1){
 			if(newCardValue==11)
+				Log.d(TAG, "Jack of Diamonds added to trick!");
 				points-=10;
 		}
 		else if(newCardSuit==2){
 			if(newCardValue==12)
+				Log.d(TAG, "Queen of Spades added to trick!");
+				hasQueen=true;
 				points+=13;
 			
 		}
 		else if(newCardSuit==3){
+			Log.d(TAG, c.name+" added to trick!");
 			points++;
 		}
 
@@ -124,6 +129,7 @@ public class Trick{
 		startSuit=0;
 		highCard=null;
 		highCardValue=0;
+		hasQueen=false;
 		
 	}
 	

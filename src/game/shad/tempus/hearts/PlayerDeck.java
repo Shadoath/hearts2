@@ -83,21 +83,25 @@ public class PlayerDeck extends SuperDeck{
 		switch(suit){
 		case 0:
 			if(clubCards.getSize()==0){
+				Log.d(TAG, "clubs void");
 				return true;
 			}
 		break;
 			case 1:
 			if(spadeCards.getSize()==0){
+				Log.d(TAG, "spades void");
 				return true;
 			}
 		break;
 		case 2:
 			if(diamondCards.getSize()==0){
+				Log.d(TAG, "diamonds void");
 				return  true;
 			}
 		break;
 		case 3:
 			if(heartCards.getSize()==0){
+				Log.d(TAG, "hearts void");
 				return true;
 			}
 		break;

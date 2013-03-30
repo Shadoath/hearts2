@@ -1,7 +1,9 @@
 package game.shad.tempus.hearts;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +19,7 @@ public class Player {
     public ArrayList<Card> cardsToTrade=new ArrayList<Card>();
 
 	private PlayerDeck playerDeck;
+	private ArrayList<Trick> takenTricks;
 	public int seat=0; //position
 	public String realName = "";
 	public String shortName = "";
@@ -54,7 +57,7 @@ public class Player {
 		setShortName();
 		this.realName = name;
 		this.colorInt = color;
-		
+		takenTricks=new ArrayList<Trick>();
 		
 	}
 	/**
@@ -371,6 +374,32 @@ public class Player {
 		return oddBall;
 	}
 	
+	public void goSmart(){
+		int round = game.round;
+		Trick trick = game.tableTrick;
+		
+	}
+	
+	public void selectBestSuit(boolean heartsBroken){
+		Integer cCPV =playerDeck.getTotalCPV(0);
+		Integer dCPV =playerDeck.getTotalCPV(1);
+		Integer sCPV =playerDeck.getTotalCPV(2);
+		Integer hCPV =playerDeck.getTotalCPV(3);
+		ArrayList<Integer> cpv = new ArrayList<Integer>();
+		cpv.add(cCPV);
+		cpv.add(dCPV);
+		cpv.add(sCPV);
+		cpv.add(hCPV);
+		Collections.sort(cpv);
+		
+		int cSize =playerDeck.getSuitSize(0);
+		int dSize =playerDeck.getSuitSize(1);
+		int sSize =playerDeck.getSuitSize(2);
+		int hSize =playerDeck.getSuitSize(3);
+		
+	}
+	
+		
 	/**
 	 * Recursive method to get the lowest card of a suit OR roll-over to the next suit.
 	 * @param suit we want to get
@@ -378,6 +407,7 @@ public class Player {
 	 * When count>6 returns a new card with a red back. used to get out of a endless loop.
 	 * @return Card to play
 	 */
+
 	public Card playLow(int suit, int count){
 		return playerDeck.playLowSimple(suit, count);
 	}
@@ -579,7 +609,7 @@ public class Player {
 		voidSpades= playerDeck.checkVoid(2);
 		voidHearts = playerDeck.checkVoid(3);
 		if(voidClubs&&voidDiamonds&&voidSpades&&voidHearts){
-			Log.d(TAG+this.getRealName(), "No Cards left for "+this.realName);
+			Log.d(TAG+this.getRealName(), "!!ERROR!! No Cards left for "+this.realName);
 
 		}
 	}
@@ -668,6 +698,14 @@ public class Player {
 	
 	
 	/////////////////////////////////////////////////////////Simple SET GET CODE//////////////////
+	
+	public void addTakenTrick(Trick tt){
+		takenTricks.add(tt);
+	}
+	
+	public ArrayList<Trick> returnTakenTricks(){
+		return takenTricks;
+	}
 	
 	/**
 	 * Does no Checks just Plays low suit.

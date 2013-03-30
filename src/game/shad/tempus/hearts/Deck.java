@@ -23,9 +23,25 @@ public class Deck {
 	private int highCPV = 0;
 	private int deckSuit = 4;
 	private boolean singleSuit = true;
-	
+	private boolean majorCardBoolean = false;
+	private boolean greaterCardsBoolean = false;
+	private boolean greaterCardsBooleanTwo = false;
+	private boolean greaterCardsBooleanThree = false;
+	private Card majorCard = null;
 	public Deck(){
 		deck = new ArrayList<Card>();
+	}
+	
+	public void checkForMajorCard(){
+		switch (deckSuit){
+		case 0://clubs
+			if(deck.get(0).getValue()==2){
+				majorCardBoolean=true;
+			}
+			break;
+		case 1://diamonds
+			//if(deck.)
+		}
 	}
 	
 	/**
@@ -37,6 +53,8 @@ public class Deck {
 		int cardValue =card.getValue();
 		int cardSuit =card.getSuit();
 		int cardPointValue = card.getValue()-8;
+		Log.d(TAG, "Adding card to Deck. Card = Suit:"+cardSuit+" Value:"+cardValue);
+		checkAndAddMajorCard(cardValue, card);
 		if(!singleSuit){
 			Log.d(TAG, "Single suit is false adding card="+card.name);
 			deck.add(card);
@@ -49,26 +67,23 @@ public class Deck {
 		else if(deckSuit!=cardSuit){
 			Log.d(TAG, "!!!!!Trying to add Card S:"+cardSuit+" V:"+cardValue+" which is different than original deckSuit="+deckSuit);
 			return;
-
-
 		}
-		Log.d(TAG, "Adding card to Deck. Card = Suit:"+cardSuit+" Value:"+cardValue);
 		boolean added=false;
 		if(deck.size()>0){
 			if(cardPointValue<=0){//Start from bottom of deck
-				Log.d(TAG, "Going from bottom of the deck. CPV="+cardPointValue);
+//				Log.d(TAG, "Going from bottom of the deck. CPV="+cardPointValue);
 				lowCPV += cardPointValue;
 				for(int i=0; i<deck.size();i++){
 					int dv = deck.get(i).getValue();//waist of a variable but good to debug
 					if(dv>cardValue){
-						Log.d(TAG, "Adding at i="+i);
+//						Log.d(TAG, "Adding at i="+i);
 						this.deck.add(i, card);
-						return;
+						added=true;
 					}
 				}
 			}
 			else{//start from top of deck
-				Log.d(TAG, "Going from top of the deck. CPV="+cardPointValue);
+//				Log.d(TAG, "Going from top of the deck. CPV="+cardPointValue);
 				highCPV += cardPointValue;
 				for(int i=deck.size()-1; i>=0;i--){
 					int dv = deck.get(i).getValue();
@@ -78,23 +93,72 @@ public class Deck {
 					}
 					if(dv==cardValue){
 						Log.d(TAG, "deckValue==CardValue, adding card at i="+i);
-						Log.d(TAG, "This should only occur when singleSingle suit is false");
+						Log.d(TAG, "This should only occur when singleSingle suit is false, else !!!ERROR! should not happen at all. ERROR!!!!");
 						deck.add(i, card);
-						return;
+						added=true;
+
+						break;
 					}
 					if(dv<cardValue){
-						Log.d(TAG, "deckValue<CardValue, Add above i="+i);
+//						Log.d(TAG, "deckValue<CardValue, Add above i="+i);
 						i++;
 						deck.add(i, card);
-						Log.d(TAG, "deckValue<CardValue, adding card at next spot i="+i);
-						return;
+						added=true;
+						break;
 					}
 				}
 			}
 		}
 		if(!added){
-			Log.d(TAG, "Adding card to end of deck");
+			Log.d(TAG, "added= false, Adding card to end of deck");
 			this.deck.add(card);
+		}
+	}
+	
+	private void checkAndAddMajorCard(int cardValue, Card card ){
+		
+		if(deckSuit==Card.CLUBS && cardValue==2){//Two of Clubs
+			Log.d(TAG, "Two of Clubs Added to Deck");
+			majorCardBoolean=true;
+			majorCard = card;
+		}
+		else if(deckSuit==Card.DIAMONDS){
+			if(cardValue==11){//Jack of Diamonds
+				Log.d(TAG, "Jack of Diamonds Added to Deck");
+				majorCardBoolean=true;
+				majorCard = card;
+			}
+			if(cardValue>11){
+				if(greaterCardsBoolean){
+					if(greaterCardsBooleanTwo){
+						greaterCardsBooleanThree=true;
+					}
+					else
+						greaterCardsBooleanTwo=true;
+				}
+				else
+					greaterCardsBoolean=true;
+			}
+		}
+		else if(deckSuit==Card.SPADES){
+			if(cardValue==12){//Queen of Spades
+				Log.d(TAG, "Queen of Spades Added to Deck");
+				majorCardBoolean=true;
+				majorCard = card;
+			}
+			if(cardValue>12){
+				if(greaterCardsBoolean){
+					greaterCardsBooleanTwo=true;
+				}
+				else
+					greaterCardsBoolean=true;
+			}
+		}
+		else if(deckSuit==Card.HEARTS && cardValue==14){//Ace of Hearts
+			Log.d(TAG, "Ace of Hearts Added to Deck");
+
+			majorCardBoolean=true;
+			majorCard = card;
 		}
 	}
 	
@@ -107,21 +171,64 @@ public class Deck {
 		int cardValue =card.getValue();
 		int cardPointValue = card.getValue()-8;
 		Log.d(TAG, "Removing card from Deck. Card = S:"+card.getSuit()+" V:"+cardValue);
+		checkAndRemoveMajorCard(cardValue, card);
 		if(deck.size()>0){
 			if(cardPointValue<0){//Start from bottom of deck
-				Log.d(TAG, "lowCPV="+cardPointValue);
+//				Log.d(TAG, "lowCPV="+cardPointValue);
 				lowCPV -= cardPointValue;
 				this.deck.remove(card);
 			}
 			
 			else{//start from top of deck
-				Log.d(TAG, "highCPV="+cardPointValue);
+//				Log.d(TAG, "highCPV="+cardPointValue);
 				highCPV -= cardPointValue;
 				this.deck.remove(card);
 			}
 		}
 		else{
 			Log.d(TAG, "Deck has no cards");
+		}
+	}
+	
+	private void checkAndRemoveMajorCard(int cardValue, Card card ){
+		
+		if(deckSuit==Card.CLUBS && cardValue==2){//Two of clubs
+			majorCardBoolean=false;
+			majorCard = null;
+		}
+		else if(deckSuit==Card.DIAMONDS){
+			if(cardValue==11){//Jack of diamonds
+				majorCardBoolean=false;
+				majorCard = null;
+			}
+			if(cardValue>11){
+				if(greaterCardsBoolean){
+					if(greaterCardsBooleanTwo){
+						greaterCardsBooleanThree=false;
+					}
+					else
+						greaterCardsBooleanTwo=false;
+				}
+				else
+					greaterCardsBoolean=false;
+			}
+		}
+		else if(deckSuit==Card.SPADES){
+			if(cardValue==12){//Queen of Spades
+				majorCardBoolean=false;
+				majorCard = null;
+			}
+			if(cardValue>12){
+				if(greaterCardsBoolean){
+					greaterCardsBooleanTwo=false;
+				}
+				else
+					greaterCardsBoolean=false;
+			}
+		}
+		else if(deckSuit==Card.HEARTS && cardValue==14){//Ace of Hearts
+			majorCardBoolean=false;
+			majorCard = null;
 		}
 	}
 	
@@ -179,7 +286,8 @@ public class Deck {
 		}
 	}
 	
-	public void addCards(ArrayList<Card> cards){
+	public void addNewCards(ArrayList<Card> cards){
+		
 		for(Card c : cards){
 			addCard(c);
 		}
@@ -202,6 +310,11 @@ public class Deck {
 		lowCPV  = 0;
 		highCPV = 0;
 		deckSuit= 4;
+		majorCardBoolean = false;
+		greaterCardsBoolean = false;
+		greaterCardsBooleanTwo = false;
+		greaterCardsBooleanThree = false;
+		majorCard = null;
 		this.deck.clear();
 		
 	}
@@ -228,7 +341,24 @@ public class Deck {
 	public void setSingleSuit(boolean b){
 		singleSuit = b;
 	}
+	
 	public boolean getSingleSuit(){
 		return singleSuit;
+	}
+	
+	public boolean isMajorCard() {
+		return majorCardBoolean;
+	}
+
+	public void setMajorCard(boolean majorCard) {
+		this.majorCardBoolean = majorCard;
+	}
+	
+	public boolean isHasGreaterCards() {
+		return greaterCardsBoolean;
+	}
+
+	public void setHasGreaterCards(boolean hasGreaterCards) {
+		this.greaterCardsBoolean = hasGreaterCards;
 	}
 }

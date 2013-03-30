@@ -8,24 +8,28 @@ import android.util.Log;
 public class Trick{
 	public static final String TAG = "Hearts--Trick";
 
+	public int round = 0;
 	public int points;
 	public int startSuit=0;
 	public Card highCard;
 	public int highCardValue=0;
 	public boolean hasQueen =false;
+	public boolean hasJack =false;
 	
 	private ArrayList<Card> trick;
 	
-	public Trick(){
+	public Trick(int round){
+		this.round=round;
 		trick = new ArrayList<Card>();
 	}
 	
 	public Deck TrickToDeck(){
 		Deck deck= new Deck();
+		deck.setSingleSuit(false);
 		deck.setDeck(trick);
 		return deck;
 	}
-	
+		
 	public void addCard(Card c){
 		int newCardValue=c.getValue();
 		int newCardSuit=c.getSuit();
@@ -63,9 +67,11 @@ public class Trick{
 			}
 		}
 		if(newCardSuit==1){
-			if(newCardValue==11)
+			if(newCardValue==11){
 				Log.d(TAG, "Jack of Diamonds added to trick!");
+				hasJack=true;
 				points-=10;
+			}
 		}
 		else if(newCardSuit==2){
 			if(newCardValue==12)

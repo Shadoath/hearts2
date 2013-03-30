@@ -111,10 +111,9 @@ public class MainActivity extends Activity {
 			Log.d(TAG, "update 15");
     		updateProgressBar(15);
             Log.d(TAG, "initialized game view");
-            Log.d(TAG, "created Views");
-//            game.findViewsById();
-
     		game.loadResources(MainActivity.this);
+            Log.d(TAG, "created Views");
+
 			updateProgressBar(99);
 			
             Log.d(TAG, "created sound service");
@@ -182,10 +181,6 @@ public class MainActivity extends Activity {
     	Log.d(TAG, "onResume");
     	super.onResume();
         handler= new Handler();
-
-
-		
-
 
     }
     
@@ -330,18 +325,7 @@ public class MainActivity extends Activity {
 		return false;
         //return gestures.onTouchEvent(e);
     }
-	
-	public void onSwipeLeftPressed(View v){
-		game.deckHolder.swipeLeft();
-		game.update();
-	}
-	
-	public void onSwipeRightPressed(View v){
-		game.deckHolder.swipeRight();
-//		Toast.makeText(this, "position is "+game.deckHolder.getPosition(),  Toast.LENGTH_SHORT).show();
-		game.update();
 
-	}
 	
 	public void onPlayCardPressed(View v){
 		if(game.trading){
@@ -380,7 +364,7 @@ public class MainActivity extends Activity {
 		}
 
 	public void onFixHandPressed(View v){
-		game.slidingDeckHolder.addDeck(game.p1.getArrayListDeck());
+		game.slidingDeckHolder.setDeck(game.p1.getArrayListDeck());
 	}
 	
     private void showHelp() {

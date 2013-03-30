@@ -106,7 +106,7 @@ public class SlidingDeckHolder extends LinearLayout
 	 * Clears the deck then adds a new one.
 	 * @param deck: new deck to be drawn in this view.
 	 */
-	public void addDeck(ArrayList<Card> deck){
+	public void setDeck(ArrayList<Card> deck){
     	removeAllViews();
 		Iterator<Card> it = deck.iterator();
 		while(it.hasNext()){

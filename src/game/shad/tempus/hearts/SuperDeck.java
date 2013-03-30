@@ -260,10 +260,10 @@ public abstract class SuperDeck {
 	public Deck getFullDeck(){
 		Deck fullDeck = new Deck();
 		fullDeck.setSingleSuit(false);
-		fullDeck.addCards(clubCards.getArrayListDeck());
-		fullDeck.addCards(diamondCards.getArrayListDeck());
-		fullDeck.addCards(spadeCards.getArrayListDeck());
-		fullDeck.addCards(heartCards.getArrayListDeck());
+		fullDeck.addNewCards(clubCards.getArrayListDeck());
+		fullDeck.addNewCards(diamondCards.getArrayListDeck());
+		fullDeck.addNewCards(spadeCards.getArrayListDeck());
+		fullDeck.addNewCards(heartCards.getArrayListDeck());
 		return fullDeck;
 	}
 	
@@ -370,7 +370,7 @@ public abstract class SuperDeck {
 			
 	}
 
-	public int getTotalCPV(int suit){
+	public Integer getTotalCPV(int suit){
 		int total=0;
 		switch (suit){
 		case 0:
@@ -386,7 +386,7 @@ public abstract class SuperDeck {
 			total = heartCards.getTotalCPV();
 			break;
 		}
-	return total;
+	return (Integer) total;
 	}
 	public int getLowCPV(int suit){
 		int total=0;
@@ -435,6 +435,22 @@ public abstract class SuperDeck {
 	public int getSize(){
 		return this.clubCards.getSize()+this.diamondCards.getSize()+this.spadeCards.getSize()+this.heartCards.getSize();
 	}
+	
+	public int getSuitSize(int suit){
+		switch (suit){
+		case 0:
+			return clubCards.getHighCPV();
+		case 1:
+			return diamondCards.getHighCPV();
+		case 2:
+			return spadeCards.getHighCPV();
+		case 3:
+			return heartCards.getHighCPV();
+		}
+		return getSize();
+	}
+
+	
 	
 	public Deck getClubs(){
 		return clubCards;

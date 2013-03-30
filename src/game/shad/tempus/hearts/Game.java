@@ -1823,8 +1823,7 @@ public class Game extends Activity {
 			}
 			else{
 				Log.d(TAG, "Trying to play "+c.name);
-				String suitToS = Card.suittoString(startSuit);
-				myToast.setText("Not a Valid Choice, Choose a "+suitToS.substring(0, suitToS.length()-1));//don't want the s at the end.
+				myToast.setText(c.toString()+" is not a Valid Choice");
 				myToast.show();
 				return false;
 			}

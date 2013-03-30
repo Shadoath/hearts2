@@ -34,37 +34,40 @@ public class Trick{
 		int newCardValue=c.getValue();
 		int newCardSuit=c.getSuit();
 		switch (trick.size()){
-		
 		case 0:
 			trick.add(c);
-			startSuit=c.getSuit();
-			highCardValue=c.getValue();
-			highCard=c;
+			startSuit = c.getSuit();
+			highCardValue = c.getValue();
+			highCard = c;
 			break;
 			
 		case 1:
 			trick.add(c);
 			if(startSuit==newCardSuit){
-				if(highCardValue<newCardValue)
+				if(highCardValue<newCardValue){
 					highCardValue=newCardValue;
 					highCard=c;
+				}
 			}
 			break;
 		case 2:
 			trick.add(c);
 			if(startSuit==newCardSuit){
-				if(highCardValue<newCardValue)
+				if(highCardValue<newCardValue){
 					highCardValue=newCardValue;
 					highCard=c;
+				}
 			}
 			break;
 		case 3:
 			trick.add(c);
 			if(startSuit==newCardSuit){
-				if(highCardValue<newCardValue)
+				if(highCardValue<newCardValue){
 					highCardValue=newCardValue;
 					highCard=c;
+				}
 			}
+			break;
 		}
 		if(newCardSuit==1){
 			if(newCardValue==11){
@@ -74,10 +77,11 @@ public class Trick{
 			}
 		}
 		else if(newCardSuit==2){
-			if(newCardValue==12)
+			if(newCardValue==12){
 				Log.d(TAG, "Queen of Spades added to trick!");
 				hasQueen=true;
 				points+=13;
+			}
 			
 		}
 		else if(newCardSuit==3){

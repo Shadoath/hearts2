@@ -376,7 +376,7 @@ public class MainActivity extends Activity {
     }
     
     public void roundStatsPressed(View v){
-    	new AlertDialog.Builder(this).setTitle("Cards played this round").setMessage("Jack played ="+game.jackFound+"\nQueen played ="+game.queenFound+"\nRound Points ="+game.roundScore+"\n\n"+game.roundCardString)
+    	new AlertDialog.Builder(this).setTitle("Cards played this round").setMessage("Jack played ="+game.jackFound+"\nQueen played ="+game.queenFound+"\nHearts Broken ="+game.heartsBroken+"\nRound Points ="+game.roundScore+"\n\n"+game.roundCardString)
     	.setNeutralButton("Ok", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();

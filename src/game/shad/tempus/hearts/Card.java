@@ -40,6 +40,7 @@ public class Card {
 	private Game game;
 	public String name = "";
     
+	
 	public Card( int value, int suit, Game game){
 	    this.game = game;
 		this.value = value;
@@ -728,6 +729,11 @@ public class Card {
 		//this.y = eventY;
 	}
 	
+	/**
+	 * 
+	 * @param eventX
+	 * @param eventY
+	 */
 	public void handleActionUp(int eventX, int eventY){
 		setTouched(false);
 		this.x = eventX;

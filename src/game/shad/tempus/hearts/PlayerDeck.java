@@ -86,24 +86,28 @@ public class PlayerDeck extends SuperDeck{
 		case 0:
 			Log.d(TAG+owner.shortName, "clubs size="+clubCards.getSize());
 			if(clubCards.getSize()==0){
+				Log.d(TAG, "clubs void");
 				return true;
 			}
 		break;
 			case 1:
 				Log.d(TAG+owner.shortName, "Diamonds size="+diamondCards.getSize());
 				if(diamondCards.getSize()==0){
+					Log.d(TAG, "diamonds void");
 					return true;
-			}
+				}
 		break;
 		case 2:
 			Log.d(TAG+owner.shortName, "Spades size="+spadeCards.getSize());
 			if(spadeCards.getSize()==0){
+				Log.d(TAG, "Spades void");
 				return  true;
 			}
 		break;
 		case 3:
 			Log.d(TAG+owner.shortName, "Hearts size="+heartCards.getSize());
 			if(heartCards.getSize()==0){
+				Log.d(TAG, "hearts void");
 				return true;
 			}
 		break;

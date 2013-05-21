@@ -47,7 +47,7 @@ public class Game extends Activity {
 	public String name;
 	
 	private GameDeck gameDeck;
-	public Trick tableTrick=new Trick();
+	public Trick tableTrick;
 	
     public Player p1;
 	public Player p2;
@@ -163,7 +163,7 @@ public class Game extends Activity {
 		cardOptions = new BitmapFactory.Options();
 //		cardOptions.inJustDecodeBounds = true;
 //		BitmapFactory.decodeResource(main.getResources(), R.drawable.c3, cardOptions);
-		cardOptions.inSampleSize = calculateInSampleSize(cardOptions, screenWidth/7, screenHeight/8)+1;
+		cardOptions.inSampleSize = calculateInSampleSize(cardOptions, screenWidth/7, screenHeight/8);
 		Log.d(TAG, "inSampleSize="+cardOptions.inSampleSize);
         Log.d(TAG, "Text in player name box is "+this.name);
         if (this.name.equalsIgnoreCase("Your name")||this.name.equals("")){
@@ -238,9 +238,9 @@ public class Game extends Activity {
             bottomText.setText("No Trading!");	
         	playCard.setText("Play Card");
         	playCard.setEnabled(true);
-        	checkForTwoMethod();	//This more or less starts the game.
+        	checkForTwoOfClubs();	//This more or less starts the game.
         }
-        slidingDeckHolder.addDeck(p1.getArrayListDeck());
+        slidingDeckHolder.setDeck(p1.getArrayListDeck());
         update();
 	}
 		
@@ -383,9 +383,9 @@ public class Game extends Activity {
 //		p3.sortHandFromDeck();
 //		p4.sortHandFromDeck();
 		this.trading=false;
-		slidingDeckHolder.addDeck(p1.getArrayListDeck());
+		slidingDeckHolder.setDeck(p1.getArrayListDeck());
 		playCard.setEnabled(true);
-		checkForTwoMethod();
+		checkForTwoOfClubs();
 //		update();
 
 	}
@@ -401,7 +401,7 @@ public class Game extends Activity {
 	 * Then advances the curPlayer
 	 * Checks all players for Voids and the queen of Spades
 	 */
-	public void checkForTwoMethod(){
+	public void checkForTwoOfClubs(){
 		Log.d(TAG, "checkForTwoMethod() called");
 		if(p1.checkForTwo()){
 			Log.d(TAG, "p1 played the 2 of clubs");
@@ -447,7 +447,7 @@ public class Game extends Activity {
 		curPlayer.removeCardFromDeck(nextCard);
 //		curPlayer.updateSuitsFast();//TODO make sure call to deck is clean.
 		if(curPlayer==p1){
-			slidingDeckHolder.addDeck(p1.getArrayListDeck());
+			slidingDeckHolder.setDeck(p1.getArrayListDeck());
 		}
 		Log.d(TAG, "Game started by "+curPlayer.getRealName());
 		tableTrick.addCard(nextCard);
@@ -504,8 +504,7 @@ public class Game extends Activity {
 				if(curPlayer!=p1||cardToPlay==null){// If null then it is a AUTO play.  This is also GO for BOTS.
 					Log.d(TAG, "normal GO()");
 					Card nextCard=(curPlayer.go(round, tableTrick));
-					Log.d(TAG, "###"+curPlayer.realName);
-					Log.d(TAG, "###"+curPlayer.realName+" choose the "+nextCard.name+". Pile size="+tableTrick.getSize() );
+					Log.d(TAG, curPlayer.realName+" choose the "+nextCard.name+". Pile size="+tableTrick.getSize() );
 					playCard(nextCard);
 				}
 				else {
@@ -537,15 +536,14 @@ public class Game extends Activity {
 	public void playCard(Card nextCard){
 		nextCard.setOwner(curPlayer);
 		nextCard.setTouched(false);
+		Log.d(TAG, "Adding card to Trick="+nextCard.name);
 		tableTrick.addCard(nextCard);
-		playCardBottomText(nextCard);	//Keep below tableTrick.addCard();  Logic depends on it.
-		Log.d(TAG, "Playing card="+nextCard.name);
+		setBottomText(nextCard);	//Keep below tableTrick.addCard();  Logic depends on it.
 		tableHolder.addCard(nextCard);		
 		curPlayer.removeCardFromDeck(nextCard);
 
-//		curPlayer.updateSuitsFast(); //Should not need to
 		if(curPlayer==p1){
-			slidingDeckHolder.addDeck(curPlayer.getArrayListDeck());
+			slidingDeckHolder.setDeck(curPlayer.getArrayListDeck());
 		}
 		if(tableTrick.getSize()>=4){
 			pickUpHand();//This sets the next player
@@ -632,7 +630,6 @@ public class Game extends Activity {
 		switch(highSeat){
 		case 1:
 			curPlayer=p1;
-			p1Holder.addBlankCard(0);
 			p1.addToScore(points);
 			roundScoreP1+=points;
 			playing = true;
@@ -644,7 +641,6 @@ public class Game extends Activity {
 			break;
 		case 2:
 			curPlayer=p2;
-			p2Holder.addBlankCard(0);
 			p2.addToScore(points);
 			roundScoreP2+=points;
 			playCard.setText("Next");
@@ -654,7 +650,6 @@ public class Game extends Activity {
 			break;
 		case 3:
 			curPlayer=p3;
-			p3Holder.addBlankCard(0);
 			p3.addToScore(points);
 			roundScoreP3+=points;
 			playCard.setText("Next");
@@ -664,7 +659,6 @@ public class Game extends Activity {
 			break;
 		case 4: 
 			curPlayer=p4;
-			p4Holder.addBlankCard(0);
 			p4.addToScore(points);
 			roundScoreP4+=points;
 			playCard.setText("Next");
@@ -1166,7 +1160,7 @@ public class Game extends Activity {
 		Log.d(TAG, "P4 points="+p4.getScore());
 	}
 
-	public void playCardBottomText(Card nextCard){
+	public void setBottomText(Card nextCard){
 		//TODO set text to scroll to bottom.
 		if(tableTrick.getSize()==1){	//first card was just laid down.
 			if(round==1){

@@ -9,8 +9,10 @@ import game.shad.tempus.hearts.R.drawable;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Paint.Style;
 import android.util.Log;
 
 public class Card {
@@ -35,12 +37,15 @@ public class Card {
 	private int y2;
 	private int z;
 	private Rect r;
+	protected long lastHighlight = 0;
+	protected boolean highlighted = false;
 	
 	private int value  = 0;
 	private int suit = 4;
 	private Game game;
 	public String name = "";
     
+	
 	public Card( int value, int suit, Game game){
 	    this.game = game;
 		this.value = value;
@@ -57,15 +62,35 @@ public class Card {
         //paint.setColor(Color.CYAN);
         //canvas.drawRect(150,350,400,600, paint);
         //canvas.drawBitmap(bitmap, x - (bitmap.getWidth() /2), y - (bitmap.getHeight() /2), null);
-        //Rect r = new Rect(x, y, x + bitmap.getWidth()/2, y + bitmap.getHeight()/2);
-        r = new Rect(x1, y1, x2,  y2);
-        if(touched!=lastTouched){
-        	Log.d(TAG, "Card touched--- changing Image");
-        	refreshBitmap();
-        	lastTouched=touched;
-        }
-        canvas.drawBitmap(bitmap, null, r, null);
+        //Rect r = new Rect(x, y, x + bitmap.getWidth()/2, y + bitmap.getHeight()/2)
+//        r = new Rect(x1, y1, x2,  y2);
+//        if(touched!=lastTouched){
+//        	Log.d(TAG, "Card touched--- changing Image");
+//        	refreshBitmap();
+//        	lastTouched=touched;
+//        }
+//        canvas.drawBitmap(bitmap, null, r, null);
+       r = new Rect(x1, y1, x2,  y2);
+       if(touched!=lastTouched){
+       	Log.d(TAG, "Card touched--- changing Image");
+       	refreshBitmap();
+       	lastTouched=touched;
+       }
+       canvas.drawBitmap(bitmap, null, r, null);
+		Paint paint = new Paint();
+		paint.setColor(Color.argb((int) (255 - Math.min((System.currentTimeMillis() - lastHighlight) / 4, 255)), 222, 222, 25));
+		paint.setStyle(Style.FILL);
+		paint.setAlpha(100);
+		canvas.drawRect(r, paint);
+
+		if ((System.currentTimeMillis() - lastHighlight) > 1000)
+			highlighted = false;
     }
+   
+	public void highlight() {
+		highlighted = true;
+		lastHighlight = System.currentTimeMillis();
+	}
    
 	public Bitmap getImageFromSuitAndValue(){
 		if(!touched){
@@ -448,7 +473,6 @@ public class Card {
 	
     public Bitmap getBitmap(){
 		return getImageFromSuitAndValue();
-//		return bitmap;
 	}
     public Rect getBounds(){
     	return new Rect(x1, y1, x2, y2);
@@ -564,7 +588,7 @@ public class Card {
 	 * Hearts   = 3
 	 * @return
 	 */
-	public String suittoString(int suit){
+	public static String suittoString(int suit){
 		String sSuit = null;
 		switch(suit){
 		case -1:
@@ -598,7 +622,7 @@ public class Card {
 	 * Ace   = 14
 	 * @return
 	 */
-	public String valueToString(int value){
+	public static String valueToString(int value){
 		String sValue = null;
 		switch (value){
 		case 0: 
@@ -710,6 +734,11 @@ public class Card {
 		//this.y = eventY;
 	}
 	
+	/**
+	 * 
+	 * @param eventX
+	 * @param eventY
+	 */
 	public void handleActionUp(int eventX, int eventY){
 		setTouched(false);
 		this.x = eventX;

@@ -1,6 +1,11 @@
 package game.shad.tempus.hearts;
 
 
+
+import game.shad.tempus.hearts.Game;
+import game.shad.tempus.hearts.Player;
+import game.shad.tempus.hearts.R;
+import game.shad.tempus.hearts.R.drawable;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;

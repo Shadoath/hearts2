@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.view.View;
 
 public class SlidingDeckHolder extends LinearLayout  
 {

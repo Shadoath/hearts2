@@ -1,0 +1,4 @@
+.settings/*.prefs
+bin/*
+gen/*
+

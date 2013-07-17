@@ -204,10 +204,10 @@ public class GameDeck{
 	 * @param a The Deck to be split
 	 * @return	ArrayList<Deck>(size = 11)
 	 */
-	private ArrayList<oldDeck> splitDeck(oldDeck a) {
-		ArrayList<oldDeck> decks = new ArrayList<oldDeck>();
+	private ArrayList<OldDeck> splitDeck(OldDeck a) {
+		ArrayList<OldDeck> decks = new ArrayList<OldDeck>();
 		for(int i =0; i<10;i++){
-			oldDeck deck2 = new oldDeck();
+			OldDeck deck2 = new OldDeck();
 	
 			int t=0;
 			while(t<5){
@@ -233,14 +233,14 @@ public class GameDeck{
 	 * @param a
 	 * @return
 	 */
-	private oldDeck mixOutIn(ArrayList<oldDeck> a){
+	private OldDeck mixOutIn(ArrayList<OldDeck> a){
 		int size = a.size();
 		boolean extra=false;
 		if(size%2==1){
 			size--;
 			extra=true;
 		}
-		oldDeck d= new oldDeck();
+		OldDeck d= new OldDeck();
 		for(int i =0;i<size/2;i++){
 			d.addAllCards(mixDecks(a.get(i), a.get(size-i-1)));
 		}
@@ -249,7 +249,7 @@ public class GameDeck{
 		return d;
 	}
 	
-	public oldDeck mixDecks(oldDeck a, oldDeck b){
+	public OldDeck mixDecks(OldDeck a, OldDeck b){
 		for(int i=0; i<a.getSize();i++){
 			b.addCardAtIndex(i+i, a.getCard(i));
 		}

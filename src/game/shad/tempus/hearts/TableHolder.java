@@ -15,7 +15,7 @@ public class TableHolder extends SurfaceView implements Callback, OnTouchListene
 	public static final String TAG = "Hearts--TableHolder";
 
 	
-    private oldDeck deck;
+    private OldDeck deck;
     private Card Card;
     private Card firstCardTouched;
     private int screenWidth;
@@ -41,7 +41,7 @@ public class TableHolder extends SurfaceView implements Callback, OnTouchListene
         surfaceHolder.addCallback(this);
         this.screenWidth = sW;
         this.screenHeight = sH;
-        this.deck = new oldDeck();
+        this.deck = new OldDeck();
         Log.d(TAG, "ScreenWidth="+screenWidth);
         Log.d(TAG, "screenHeight="+screenHeight);
         addBlankCards();
@@ -57,7 +57,7 @@ public class TableHolder extends SurfaceView implements Callback, OnTouchListene
         return this.deck.getCard(i);
     }
     
-    public void addDeck(oldDeck deck){
+    public void addDeck(OldDeck deck){
         this.deck = deck;
     }
     
@@ -100,7 +100,7 @@ public class TableHolder extends SurfaceView implements Callback, OnTouchListene
     }
     
     
-    public void updateDeck(oldDeck deck){
+    public void updateDeck(OldDeck deck){
         this.deck = deck;
     }
     

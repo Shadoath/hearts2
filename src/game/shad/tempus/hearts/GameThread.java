@@ -85,11 +85,8 @@ public class GameThread extends Thread
 							}
 						});
 						updateLastTime();
-					}
-					
-					
-				}
-  
+					}					
+				}  
             } catch(InterruptedException e){
 				Log.d(TAG, "Interrupted Exception!!! state=" + state.get(), e);
             }

@@ -16,6 +16,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -1081,7 +1082,7 @@ public class Game extends Activity {
 		}
 		else{
 			tableHolderCanvas = tableHolder.getHolder().lockCanvas();
-			tableHolder.onDraw(tableHolderCanvas);
+			tableHolder.draw(tableHolderCanvas);
 			tableHolder.getHolder().unlockCanvasAndPost(tableHolderCanvas);
 			}
 	}
@@ -1093,7 +1094,7 @@ public class Game extends Activity {
 		else{
 			p1Holder.invalidate();
 			p1HolderCanvas = p1Holder.getHolder().lockCanvas();
-			p1Holder.onDraw(p1HolderCanvas);
+			p1Holder.draw(p1HolderCanvas);
 			p1Holder.getHolder().unlockCanvasAndPost(p1HolderCanvas);
 			}
 		if (!p2Holder.initialized){
@@ -1102,7 +1103,7 @@ public class Game extends Activity {
 		else{
 			p2Holder.invalidate();
 			p2HolderCanvas = p2Holder.getHolder().lockCanvas();
-			p2Holder.onDraw(p2HolderCanvas);
+			p2Holder.draw(p2HolderCanvas);
 			p2Holder.getHolder().unlockCanvasAndPost(p2HolderCanvas);
 			}
 		if (!p3Holder.initialized){
@@ -1110,7 +1111,7 @@ public class Game extends Activity {
 		}
 		else{
 			p3HolderCanvas = p3Holder.getHolder().lockCanvas();
-			p3Holder.onDraw(p3HolderCanvas);
+			p3Holder.draw(p3HolderCanvas);
 			p3Holder.getHolder().unlockCanvasAndPost(p3HolderCanvas);
 			}
 		if (!p4Holder.initialized){
@@ -1118,7 +1119,7 @@ public class Game extends Activity {
 		}
 		else{
 			p4HolderCanvas = p4Holder.getHolder().lockCanvas();
-			p4Holder.onDraw(p4HolderCanvas);
+			p4Holder.draw(p4HolderCanvas);
 			p4Holder.getHolder().unlockCanvasAndPost(p4HolderCanvas);
 			}
 	}
@@ -1917,70 +1918,70 @@ public class Game extends Activity {
 		getBitmap(R.drawable.ha);
     	Log.d(TAG, "Hearts loaded");
 		main.updateProgressBar(50);
-
-		getBitmap(R.drawable.hc2);
-		getBitmap(R.drawable.hc3);
-		getBitmap(R.drawable.hc4);
-		getBitmap(R.drawable.hc5);
-		getBitmap(R.drawable.hc6);
-		getBitmap(R.drawable.hc7);
-		getBitmap(R.drawable.hc8);
-		getBitmap(R.drawable.hc9);
-		getBitmap(R.drawable.hc10);
-		getBitmap(R.drawable.hcj);
-		getBitmap(R.drawable.hcq);
-		getBitmap(R.drawable.hck);
-		getBitmap(R.drawable.hca);
-    	Log.d(TAG, "Highlighted Clubs loaded");
-		main.updateProgressBar(65);
-
-		getBitmap(R.drawable.hd2);
-		getBitmap(R.drawable.hd3);
-		getBitmap(R.drawable.hd4);
-		getBitmap(R.drawable.hd5);
-		getBitmap(R.drawable.hd6);
-		getBitmap(R.drawable.hd7);
-		getBitmap(R.drawable.hd8);
-		getBitmap(R.drawable.hd9);
-		getBitmap(R.drawable.hd10);
-		getBitmap(R.drawable.hdj);
-		getBitmap(R.drawable.hdq);
-		getBitmap(R.drawable.hdk);
-		getBitmap(R.drawable.hda);
-    	Log.d(TAG, "Diamonds Hearts loaded");
-		main.updateProgressBar(72);
-
-		getBitmap(R.drawable.hs2);
-		getBitmap(R.drawable.hs3);
-		getBitmap(R.drawable.hs4);
-		getBitmap(R.drawable.hs5);
-		getBitmap(R.drawable.hs6);
-		getBitmap(R.drawable.hs7);
-		getBitmap(R.drawable.hs8);
-		getBitmap(R.drawable.hs9);
-		getBitmap(R.drawable.hs10);
-		getBitmap(R.drawable.hsj);
-		getBitmap(R.drawable.hsq);
-		getBitmap(R.drawable.hsk);
-		getBitmap(R.drawable.hsa);
-    	Log.d(TAG, "Highlighted Spades loaded");
-		main.updateProgressBar(84);
-
-
-		getBitmap(R.drawable.hh2);
-		getBitmap(R.drawable.hh3);
-		getBitmap(R.drawable.hh4);
-		getBitmap(R.drawable.hh5);
-		getBitmap(R.drawable.hh6);
-		getBitmap(R.drawable.hh7);
-		getBitmap(R.drawable.hh8);
-		getBitmap(R.drawable.hh9);
-		getBitmap(R.drawable.hh10);
-		getBitmap(R.drawable.hhj);
-		getBitmap(R.drawable.hhq);
-		getBitmap(R.drawable.hhk);
-		getBitmap(R.drawable.hha);
-    	Log.d(TAG, "Highlighted Hearts loaded");
+//
+//		getBitmap(R.drawable.hc2);
+//		getBitmap(R.drawable.hc3);
+//		getBitmap(R.drawable.hc4);
+//		getBitmap(R.drawable.hc5);
+//		getBitmap(R.drawable.hc6);
+//		getBitmap(R.drawable.hc7);
+//		getBitmap(R.drawable.hc8);
+//		getBitmap(R.drawable.hc9);
+//		getBitmap(R.drawable.hc10);
+//		getBitmap(R.drawable.hcj);
+//		getBitmap(R.drawable.hcq);
+//		getBitmap(R.drawable.hck);
+//		getBitmap(R.drawable.hca);
+//    	Log.d(TAG, "Highlighted Clubs loaded");
+//		main.updateProgressBar(65);
+//
+//		getBitmap(R.drawable.hd2);
+//		getBitmap(R.drawable.hd3);
+//		getBitmap(R.drawable.hd4);
+//		getBitmap(R.drawable.hd5);
+//		getBitmap(R.drawable.hd6);
+//		getBitmap(R.drawable.hd7);
+//		getBitmap(R.drawable.hd8);
+//		getBitmap(R.drawable.hd9);
+//		getBitmap(R.drawable.hd10);
+//		getBitmap(R.drawable.hdj);
+//		getBitmap(R.drawable.hdq);
+//		getBitmap(R.drawable.hdk);
+//		getBitmap(R.drawable.hda);
+//    	Log.d(TAG, "Diamonds Hearts loaded");
+//		main.updateProgressBar(72);
+//
+//		getBitmap(R.drawable.hs2);
+//		getBitmap(R.drawable.hs3);
+//		getBitmap(R.drawable.hs4);
+//		getBitmap(R.drawable.hs5);
+//		getBitmap(R.drawable.hs6);
+//		getBitmap(R.drawable.hs7);
+//		getBitmap(R.drawable.hs8);
+//		getBitmap(R.drawable.hs9);
+//		getBitmap(R.drawable.hs10);
+//		getBitmap(R.drawable.hsj);
+//		getBitmap(R.drawable.hsq);
+//		getBitmap(R.drawable.hsk);
+//		getBitmap(R.drawable.hsa);
+//    	Log.d(TAG, "Highlighted Spades loaded");
+//		main.updateProgressBar(84);
+//
+//
+//		getBitmap(R.drawable.hh2);
+//		getBitmap(R.drawable.hh3);
+//		getBitmap(R.drawable.hh4);
+//		getBitmap(R.drawable.hh5);
+//		getBitmap(R.drawable.hh6);
+//		getBitmap(R.drawable.hh7);
+//		getBitmap(R.drawable.hh8);
+//		getBitmap(R.drawable.hh9);
+//		getBitmap(R.drawable.hh10);
+//		getBitmap(R.drawable.hhj);
+//		getBitmap(R.drawable.hhq);
+//		getBitmap(R.drawable.hhk);
+//		getBitmap(R.drawable.hha);
+//    	Log.d(TAG, "Highlighted Hearts loaded");
 		main.updateProgressBar(95);
 
 	}	
@@ -1988,15 +1989,39 @@ public class Game extends Activity {
 	    final String imageKey = String.valueOf(resId);
 
 	    Bitmap bitmap = getBitmapFromMemCache(imageKey);
-	    if (bitmap ==null){
+	    if (bitmap ==null){	    	
+	    	BitmapFactory.Options options = new BitmapFactory.Options();
+	    	options.inJustDecodeBounds = true;
+	    	BitmapFactory.decodeResource(getResources(), resId, options);
+	    	int imageHeight = options.outHeight;
+	    	int imageWidth = options.outWidth;
+	    	String imageType = options.outMimeType;
+	    	Log.d(TAG, "imageHeight:"+imageHeight+" imageWidth:"+imageWidth+""+" imageType:"+imageType);	    	
 	    	bitmap = BitmapFactory.decodeResource(main.getResources(), resId, cardOptions);
 	        addBitmapToMemoryCache(String.valueOf(resId), bitmap);
 	    }
 	    return bitmap;
 	}
+	
+	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+	        int reqWidth, int reqHeight) {
+
+	    // First decode with inJustDecodeBounds=true to check dimensions
+	    final BitmapFactory.Options options = new BitmapFactory.Options();
+	    options.inJustDecodeBounds = true;
+	    BitmapFactory.decodeResource(res, resId, options);
+
+	    // Calculate inSampleSize
+	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+	    // Decode bitmap with inSampleSize set
+	    options.inJustDecodeBounds = false;
+	    return BitmapFactory.decodeResource(res, resId, options);
+	}
+	
 	public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
 	    if (getBitmapFromMemCache(key) == null) {
-	        mMemoryCache.put(key, bitmap);
+			mMemoryCache.put(key, bitmap);
 	    }
 	}
 	

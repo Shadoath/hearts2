@@ -1,11 +1,5 @@
 package game.shad.tempus.hearts;
 
-
-
-
-
-
-
 import game.shad.tempus.hearts.GameThread.AutoRunState;
 import game.shad.tempus.hearts.GameThread.State;
 import android.app.Activity;
@@ -98,7 +92,6 @@ public class MainActivity extends Activity {
 		myToast  = Toast.makeText(getBaseContext(), "", Toast.LENGTH_SHORT);
 		gt = new GameThread(myContext, main, game, gameBundle.getInt("aiTime"));
 
-
 		new LoadResources().execute();
 
 
@@ -109,9 +102,8 @@ public class MainActivity extends Activity {
 			Log.d(TAG, "update 15");
     		updateProgressBar(15);
             Log.d(TAG, "initialized game view");
-    		game.loadResources(MainActivity.this);
+//    		game.loadResources(MainActivity.this);
             Log.d(TAG, "created Views");
-
 			updateProgressBar(99);
 			
             Log.d(TAG, "created sound service");
@@ -121,11 +113,9 @@ public class MainActivity extends Activity {
     	@Override
     	protected void onPostExecute(Integer result) {
             if(gameBundle.getBoolean("screenMode", true)){
-            	Log.d(TAG, "Portait Mode");
-            	
+            	Log.d(TAG, "Portait Mode");            	
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 MainActivity.this.setContentView(R.layout.tableportrait);
-
             }
             else{
             	Log.d(TAG, "LandScape Mode");
@@ -316,8 +306,7 @@ public class MainActivity extends Activity {
 	public void onExitPressed(View v){
 		finish();
 	}
-	
-	
+		
 	public boolean onTouchEvent(MotionEvent e){
 		//TODO fix gestures
 		return false;

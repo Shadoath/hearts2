@@ -149,15 +149,13 @@ public abstract class SuperDeck {
 			if(diamondCards.getCard(i).getValue()==11){
 				points-=10;
 				break;
-
 			}
 		}
 		for(int i=0; i<spadeCards.getSize();i++){
 			if(spadeCards.getCard(i).getValue()==12){
 				points+=13;
 				break;
-			}
-			
+			}			
 		}
 		for(int i=0; i<heartCards.getSize();i++){
 				points++;

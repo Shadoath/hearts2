@@ -16,7 +16,7 @@ public class OldPlayer {
 	ArrayList<Card> hand;
     public ArrayList<Card> cardsToTrade=new ArrayList<Card>();
 
-	private OldDeck deck =new OldDeck();
+	private oldDeck deck =new oldDeck();
 	public int seat=0; //position
 	public String realName = "";
 	public String shortName = "";
@@ -26,16 +26,16 @@ public class OldPlayer {
 	public int score = 0;
 	public int totalScore=0;
 	public int passTo = 0;
-	public OldDeck clubs = new OldDeck();     //0
+	public oldDeck clubs = new oldDeck();     //0
 	int highClub = 0;
 	int lowClub = 0;
-	public OldDeck diamonds = new OldDeck();  //1
+	public oldDeck diamonds = new oldDeck();  //1
 	int highDiamonds = 0;
 	int lowDiamonds = 0;
-	public OldDeck spades = new OldDeck();	   //2
+	public oldDeck spades = new oldDeck();	   //2
 	int highSpades = 0;
 	int lowSpades = 0;
-	public OldDeck hearts = new OldDeck();    //3
+	public oldDeck hearts = new oldDeck();    //3
 	int highHearts = 0;
 	int lowHearts = 0;
 	boolean winner = false;
@@ -57,7 +57,7 @@ public class OldPlayer {
 	public View textEntryView;
 	public Card twoOfClubs = null;
 	
-	public OldPlayer(MainActivity main, Game game, OldDeck deck, int AISmarts, int seat, String name, int color){
+	public OldPlayer(MainActivity main, Game game, oldDeck deck, int AISmarts, int seat, String name, int color){
 		this.main =main;
 		this.game = game;
 		this.deck = deck;
@@ -745,7 +745,7 @@ public class OldPlayer {
 	 * Also sorts the suit decks.
 	 */
 	public void sortSuitsFromDeck(){
-		OldDeck thand = new OldDeck();
+		oldDeck thand = new oldDeck();
 		thand.addAllCards(deck);
 		Log.d(TAG+this.getRealName(), "sorting hand for "+this.realName);
 		Log.d(TAG+this.getRealName(), "deck size is "+thand.getSize());
@@ -761,10 +761,10 @@ public class OldPlayer {
 		int dc2 = 0;
 		int sc2 = 0;
 		int hc2 = 0;
-        OldDeck c = new OldDeck();  
-        OldDeck d = new OldDeck();
-        OldDeck s = new OldDeck();
-        OldDeck h = new OldDeck();
+        oldDeck c = new oldDeck();  
+        oldDeck d = new oldDeck();
+        oldDeck s = new oldDeck();
+        oldDeck h = new oldDeck();
         for(int i=0;i<thand.getSize();i++){
         	int ncard=thand.getCard(i).getValue();
         	switch(thand.getCard(i).getSuit()){
@@ -840,7 +840,7 @@ public class OldPlayer {
 	public void updateDeckFromSuits(){
 		Log.d(TAG+this.getRealName(), "updateDeckfromSuits for "+this.realName);
 		this.deck.clearALL();
-        OldDeck newDeck = new  OldDeck();
+        oldDeck newDeck = new  oldDeck();
         newDeck.addAllCards(this.clubs);
         newDeck.addAllCards(this.diamonds);
         newDeck.addAllCards(this.spades);
@@ -853,9 +853,9 @@ public class OldPlayer {
 	 
 	/**
 	 * Updates deck with new cards then calls sortSuitsFromDeck()
-	 * @param OldDeck of cards
+	 * @param oldDeck of cards
 	 */
-	public void updateDeckCards(OldDeck cards){
+	public void updateDeckCards(oldDeck cards){
 		Log.d(TAG+this.getRealName(), "updateDeckCards for "+this.realName);
 		deck.clearALL();
 		for(int i = 0; i<cards.getSize();i++){
@@ -1249,7 +1249,7 @@ public class OldPlayer {
 		state = c;
 	}
 		
-	public OldDeck getDeck(){
+	public oldDeck getDeck(){
 		return this.deck;
 	}
 	public void removeCardFromDeck(Card card){
@@ -1272,7 +1272,7 @@ public class OldPlayer {
 	 * 
 	 * @param deck1
 	 */
-	public void sethand(OldDeck deck1) {
+	public void sethand(oldDeck deck1) {
 		this.deck = deck1;
 		sortHandFromDeck();
 	}
@@ -1288,7 +1288,7 @@ public class OldPlayer {
 	 * Out puts log of how many cards were in the new deck
 	 * @param c Deck to be added
 	 */
-	public void setClubs(OldDeck c){
+	public void setClubs(oldDeck c){
 		this.clubs.clearALL();
 		this.clubs.addAllCards(c);
 		Log.d(TAG+this.getRealName(), "clubs.size="+clubs.getSize());
@@ -1298,7 +1298,7 @@ public class OldPlayer {
 	 * Out puts log of how many cards were in the new deck
 	 * @param d Deck to be added
 	 */
-	public void setDiamonds(OldDeck d){
+	public void setDiamonds(oldDeck d){
 		this.diamonds.clearALL();
 		this.diamonds.addAllCards(d);
 		Log.d(TAG+this.getRealName(), "Diamonds.size="+diamonds.getSize());
@@ -1308,7 +1308,7 @@ public class OldPlayer {
 	 * Out puts log of how many cards were in the new deck
 	 * @param s Deck to be added
 	 */
-	public void setSpades(OldDeck s){
+	public void setSpades(oldDeck s){
 		this.spades.clearALL();
 		this.spades.addAllCards(s);
 		Log.d(TAG+this.getRealName(), "Spades.size="+spades.getSize());
@@ -1318,22 +1318,22 @@ public class OldPlayer {
 	 * Out puts log of how many cards were in the new deck
 	 * @param h Deck to be added
 	 */
-	public void setHearts(OldDeck h){
+	public void setHearts(oldDeck h){
 		this.hearts.clearALL();
 		this.hearts.addAllCards(h);
 		Log.d(TAG+this.getRealName(), "Hearts.size="+hearts.getSize());
 	}
 	
-	public OldDeck getClubs(){
+	public oldDeck getClubs(){
 		return clubs;
 	}
-	public OldDeck getDiamonds(){
+	public oldDeck getDiamonds(){
 		return diamonds;
 	}
-	public OldDeck getSpades(){
+	public oldDeck getSpades(){
 		return spades;
 	}
-	public OldDeck getHearts(){
+	public oldDeck getHearts(){
 		return hearts;
 	}
 	

@@ -57,8 +57,7 @@ public class Player {
 		setShortName();
 		this.realName = name;
 		this.colorInt = color;
-		takenTricks=new ArrayList<Trick>();
-		
+		takenTricks=new ArrayList<Trick>();		
 	}
 	/**
 	 * Used when Saving game data, for consistancy.
@@ -79,8 +78,7 @@ public class Player {
 			shortName="P4";
 			break;
 		}
-		Log.d(TAG, "shortName="+this.shortName);
-		
+		Log.d(TAG, "shortName="+this.shortName);		
 	}
 	
 	/**
@@ -103,7 +101,6 @@ public class Player {
 			return goNormal(round, trick);
 		}
 		return goNormal(round, trick);
-
 	}
 	
 	/**

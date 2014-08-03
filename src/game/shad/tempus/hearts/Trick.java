@@ -25,7 +25,6 @@ public class Trick{
 	
 	public Deck TrickToDeck(){
 		Deck deck= new Deck();
-		deck.setSingleSuit(false);
 		deck.setDeck(trick);
 		return deck;
 	}

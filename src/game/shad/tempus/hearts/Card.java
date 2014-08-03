@@ -2,20 +2,18 @@ package game.shad.tempus.hearts;
 
 
 
-import game.shad.tempus.hearts.Game;
-import game.shad.tempus.hearts.Player;
-import game.shad.tempus.hearts.R;
-import game.shad.tempus.hearts.R.drawable;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.Paint.Style;
+import android.graphics.Rect;
 import android.util.Log;
+import android.widget.LinearLayout;
 
-public class Card {
+public class Card implements Comparable<Card>{
 	public static final String TAG = "Hearts--Card";
     private Bitmap bitmap;
     public int bitmapID;
@@ -24,11 +22,13 @@ public class Card {
     public boolean inView=false;
     private Player owner = null;
     public boolean played = false;
+    
 	final static int CLUBS = 0;
 	final static int DIAMONDS = 1;
 	final static int SPADES = 2;
 	final static int HEARTS = 3;
 	final static int NOTSET = 4;
+	
 	private int x;
 	private int y;
 	private int x1;
@@ -40,21 +40,28 @@ public class Card {
 	protected long lastHighlight = 0;
 	protected boolean highlighted = false;
 	
-	private int value  = 0;
-	private int suit = 4;
-	private Game game;
+	public int value  = 0;
+	public int suit = 4;
+	public int orderValue = 0;
+	public Game game;
 	public String name = "";
+	private Context context;
     
 	
-	public Card( int value, int suit, Game game){
+	public Card( int value, int suit, Game game, Context c){
 	    this.game = game;
+	    this.context = c;
 		this.value = value;
 		this.suit = suit;
-//	    this.bitmap = getImageFromSuitAndValue();
+		orderValue = value + suit*13;
+	    this.bitmapID = getImageFromSuitAndValue();
 		this.name = toString();
+   		Log.d(TAG, "Card created="+toString());
+
 	}
 	 
-   public void draw(Canvas canvas) {
+    public void draw(Canvas canvas, Paint paint) {
+
 //		Log.d(TAG, "OnDraw Card");
 		//Add z layer
         //Paint paint = new Paint();
@@ -78,11 +85,13 @@ public class Card {
         }
         int height = x2-x1;
         int width = y2-y1;
-       	bitmap = Game.decodeSampledBitmapFromResource(game.getResources(), bitmapID, width, height);
-       	canvas.drawBitmap(bitmap, null, r, null);
-		Paint paint = new Paint();
-		paint.setColor(Color.argb((int) (255 - Math.min((System.currentTimeMillis() - lastHighlight) / 4, 255)), 222, 222, 25));
+        if(bitmap == null){
+        	bitmap = Game.decodeSampledBitmapFromResource(context.getResources(), bitmapID, width, height);
+        }
 		paint.setStyle(Style.FILL);
+
+       	canvas.drawBitmap(bitmap, null, r, paint);
+		paint.setColor(Color.argb((int) (255 - Math.min((System.currentTimeMillis() - lastHighlight) / 4, 255)), 222, 222, 25));
 		paint.setAlpha(100);
 		canvas.drawRect(r, paint);
 
@@ -474,12 +483,21 @@ public class Card {
 		}
 		}
 	
-    public Bitmap getBitmap(){
+    public Bitmap getBitmap(LinearLayout.LayoutParams lp){
+    	Log.d(TAG, "getBitmap ="+bitmap+" bitmapID="+bitmapID);
+    	Log.d(TAG, "LayoutParams ="+lp.toString());
+    	if(bitmap == null){
+        	bitmap = Game.decodeSampledBitmapFromResource(context.getResources(), bitmapID, lp.width, lp.height);
+        	Log.d(TAG, "Attempted to Decode, bitmap="+bitmap);
+
+    	}
 		return bitmap;
 	}
+    
     public Integer getBitmapID(){
     	return getImageFromSuitAndValue();
     }
+    
     public Rect getBounds(){
     	return new Rect(x1, y1, x2, y2);
     }
@@ -491,6 +509,9 @@ public class Card {
 	}
 	
 	public void resizeBitmap(int width, int height){
+		if(bitmap == null){
+			bitmap = BitmapFactory.decodeResource(context.getResources(), bitmapID);
+		}
 		Bitmap.createScaledBitmap(this.bitmap, width, height, true);
 	}
 
@@ -695,7 +716,7 @@ public class Card {
     }
     
     public void setTouched(boolean touched){
-		Log.d(TAG, "Setting Card Touched to--"+touched);
+		Log.d(TAG, "Setting Card Touched to="+touched);
         this.touched = touched;
         refreshBitmap();
     }
@@ -752,6 +773,11 @@ public class Card {
         }        
         return false;
     }
+    
+    public int compareTo(Card other) {
+        return String.valueOf(orderValue).compareTo(String.valueOf(other.orderValue));
+    }
+    
 
 
 	

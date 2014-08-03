@@ -10,13 +10,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-public class SlidingDeckHolder extends LinearLayout  
-{
-	private static final String TAG = "Hearts--DeckHolder";
+public class SlidingDeckHolder extends LinearLayout {
+	private static final String TAG = "Hearts--SlidingDeckHolder";
 	private float xDistance, yDistance, lastX, lastY;
     private static final int SWIPE_MIN_DISTANCE = 5;
     private static final int SWIPE_THRESHOLD_VELOCITY = 300;
-
 	
     private ArrayList<Card> deck;
     private CardView viewSelected;
@@ -28,9 +26,9 @@ public class SlidingDeckHolder extends LinearLayout
     private int screenHeight;
     private int position=0;
     private int cardWidth=0;
+    private int cardHeight=0;
 
-	private SlidingDeckHolder self;
-	private Context mContext;
+	private Context context;
 	private Game game;
 	private int initialX = 0, initialY = 0;	//the first point in a swipe or touch gesture
 	private float t1x, t1y, t2x, t2y; // the initial coordinates for touch 1 and touch 2 when the player begins to pinch-zoom
@@ -38,32 +36,30 @@ public class SlidingDeckHolder extends LinearLayout
 
     public SlidingDeckHolder(Context context, Game game, int sW, int sH){
         super(context);
-        this.mContext=context;
-        self=this;
+        this.context=context;
         this.game = game;
 	    this.screenWidth = sW;
         this.screenHeight = sH;
        	cardWidth=screenWidth/7;
+       	cardHeight=screenHeight;
        	params = new LinearLayout.LayoutParams(cardWidth, screenHeight);
        	params.setMargins(0, 0, 0, 0);
        	
        	this.deck = new ArrayList<Card>();
-        //addBlankCards();
-        //this.addCardViews(cardView);
-
-
+        addBlankCards();
+//        setDeck(deck);
     }
         
     public void addBlankCards(){
     	this.deck.clear();
     	int i = 0;
     	while(i  < 12){
-    		ImageView cView= new ImageView(mContext);
+    		ImageView cView= new ImageView(context);
 			cView.setMaxHeight(screenHeight-10);
 			cView.setMaxWidth(cardWidth-10);
 			cView.setVisibility(View.VISIBLE);
 			cView.setLayoutParams(params);
-			cView.setImageBitmap(game.getBitmap(R.drawable.black_back));
+			cView.setImageBitmap(Game.decodeSampledBitmapFromResource(context.getResources(), R.drawable.green_back, cardWidth, cardWidth));
 			cView.setPadding(10,10,10,10);
 			addView(cView);
 	        i++;
@@ -110,9 +106,7 @@ public class SlidingDeckHolder extends LinearLayout
 		while(it.hasNext()){
 			Card card = it.next();
 			Log.d(TAG, "Card added to sliding deckholder="+card.name);
-			CardView cView= new CardView(mContext, card, params);
-			cView.setTag(card.name);
-
+			CardView cView= new CardView(context, card, params);
 			cView.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -218,13 +212,9 @@ public class SlidingDeckHolder extends LinearLayout
     	this.deck.remove(c);
     	this.deck.add(c);
     }
+    
     public ArrayList<Card> getDeck(){
         return this.deck;
     }
     
-
-
-
-	
-
 }

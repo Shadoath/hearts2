@@ -16,7 +16,7 @@ GestureDetector.OnDoubleTapListener
     private static final int SWIPE_THRESHOLD_VELOCITY = 75;
     
     private DeckHolder deckView = null;
-    private TableHolder tableView = null;
+    private HeartsTableHolder tableView = null;
     public Gestures(Game game, MainActivity main)
     {
        this.game = game;

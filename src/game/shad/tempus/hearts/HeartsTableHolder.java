@@ -1,21 +1,28 @@
 package game.shad.tempus.hearts;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Paint.Style;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
-public class TableHolder extends SurfaceView implements Callback, OnTouchListener{
+public class HeartsTableHolder extends LinearLayout implements OnTouchListener{
 	public static final String TAG = "Hearts--TableHolder";
-
 	
-    private Deck deck;
+    private ArrayList<Card> tableCards;
     private Card Card;
     private Card firstCardTouched;
     private int screenWidth;
@@ -24,85 +31,122 @@ public class TableHolder extends SurfaceView implements Callback, OnTouchListene
 	private SurfaceHolder surfaceHolder;
 	private int initialX = 0, initialY = 0;	//the first point in a swipe or touch gesture
 	private float t1x, t1y, t2x, t2y; // the initial coordinates for touch 1 and touch 2 when the player begins to pinch-zoom
-    private Context mContext;
+    private Context context;
 	private Game game;
+	private Paint paint = new Paint();
 
     private boolean full=false;
 	public boolean initialized = false; //made true on surfaceCreated()
+    private LinearLayout.LayoutParams tableParams;
+    private LinearLayout.LayoutParams cardParams;
+    private int cardWidth=0;
+    private int cardHeight=0;
 
     //Holds players deck, class to call for updates about deck and drawing the deck
    
-    public TableHolder(Context context, Game game, int sW, int sH){
+    public HeartsTableHolder(Context context, Game game, int sW, int sH){
     	super(context);
-        this.mContext=context;
+        this.context=context;
         this.game = game;
-
-        surfaceHolder = this.getHolder();
-        surfaceHolder.addCallback(this);
         this.screenWidth = sW;
         this.screenHeight = sH;
-        this.deck = new Deck();
+		paint.setStyle(Style.FILL);
+        Log.d(TAG, "Table Holder w="+sW+" h="+sH);
+        this.tableCards = new ArrayList<Card>();
+        cardWidth=screenWidth/4;
+        cardHeight=(int) (screenHeight/1.1);
+       	tableParams = new LinearLayout.LayoutParams(screenWidth, screenHeight);
+       	cardParams = new LinearLayout.LayoutParams(cardWidth, cardHeight);
+       	cardParams.setMargins(5, 5, 5, 5);
+
+       	tableParams.setMargins(0, 0, 0, 0);
         Log.d(TAG, "ScreenWidth="+screenWidth);
         Log.d(TAG, "screenHeight="+screenHeight);
         addBlankCards();
     }
     
-    
-    //protected void onMeasure(int width, int height){
-    //    setMeasuredDimension(measureWidth(width),measureHeight(height));
-    //}
-
-	
     public Card getCard(int i){
-        return this.deck.getCard(i);
+        return this.tableCards.get(i);
     }
-    
-    public void addDeck(Deck deck){
-        this.deck = deck;
-    }
-    
 
     public void addCard(Card c){
     	Log.d(TAG, "CARD added to table, "+c.name);
-    	this.deck.removeCardAtIndex(position);
-    	this.deck.addCardAtIndex(position, c);
-    	this.position++;
-    	postInvalidate();
+    	Log.d(TAG, "Table card count ="+tableCards.size());
+    	Log.d(TAG, "getTouchables ="+getTouchables().size());
+
+//    	this.tableCards.removeCardAtIndex(position);
+//    	this.tableCards.addCardAtIndex(position, c);
+//    	this.position++;
+//    	postInvalidate();
+//    	CardView cView= new CardView(context, card, params);
+
+    	
+    	CardView cView= new CardView(context, c, cardParams);
+
+		cView.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+				String t = v.getTag().toString();
+				CardView cv = (CardView) v;
+				Log.d(TAG, "tag="+t);
+				game.slidingDeckViewTouched(cv);
+				
+			}
+		});
+		addView(cView);
     }
+    
     public void removeAll(){
-    	this.deck.clear();
+    	Log.d(TAG, "removeAll");
+    	this.tableCards.clear();
+    	removeAllViews();
+
     }
     
     public void addBlankCards(){
-    	this.deck.clear();;
-    	this.position=0;
+//    	this.tableCards.clear();;
+//    	this.position=0;
+//    	int i = 0;
+//    	while(i  < 4){
+//	        this.tableCards.addCard(new Card(1, 0, game, context));
+//	        i++;
+//    	}     
+      Log.d(TAG, "addBlankCards() ");
+
+    	removeAllViews();
+    	this.tableCards.clear();
     	int i = 0;
     	while(i  < 4){
-	        this.deck.addCard(new Card(1, 0, game));
+    		Card card = new Card(1, 0, game, context);
+    		CardView cView= new CardView(context, card, cardParams);		
+			addView(cView);
 	        i++;
-    	}
-        
-      
+    	}   	
     }
-    @Override
-    protected void onDraw(Canvas canvas){
-    	super.onDraw(canvas);
-//       Log.d(TAG, "painting, deck size= "+deck.getSize());
-        full=false;
-        int cardWidth=(int) (screenWidth/4);
-        for (int i=0;i<this.deck.getSize();i++){
-    		Card c=this.deck.getCard(i);
-    		c.resizeBitmap(cardWidth, screenHeight);
-    		c.setCoords(cardWidth*(i), 0, cardWidth+cardWidth*(i), screenHeight);
-    		c.draw(canvas);
-        	
-        }
-    }
-    
-    
-    public void updateDeck(Deck deck){
-        this.deck = deck;
-    }
+
+	/**
+	 * Clears the deck then adds a new one.
+	 * @param deck: new deck to be drawn in this view.
+	 */
+	private void setDeck(ArrayList<Card> deck){
+    	removeAllViews();
+		Iterator<Card> it = deck.iterator();
+		while(it.hasNext()){
+			Card card = it.next();
+			Log.d(TAG, "Card added to table ="+card.name);
+			CardView cView= new CardView(context, card, cardParams);
+			cView.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+					String t = v.getTag().toString();
+					CardView cv = (CardView) v;
+					Log.d(TAG, "tag="+t);
+					game.slidingDeckViewTouched(cv);					
+				}
+			});
+			addView(cView);
+		}
+	}		
     
     public void updateCurrentCard(Card Card){
         this.Card = Card;
@@ -110,34 +154,9 @@ public class TableHolder extends SurfaceView implements Callback, OnTouchListene
 
 	public Rect getBounds() {
 		return new Rect(0, 0, this.screenWidth, this.screenHeight);
-
-	}  
+	}	
 	
-	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {
-		
-	}
-
-
-	@Override
-	public void surfaceCreated(SurfaceHolder holder) {
-		Log.d(TAG, "surface Created");
-		initialized = true;
-		setOnTouchListener(this);
-		game.updateTH();
-			
-	}
-
-
-	@Override
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		Log.d(TAG, "surface Destroyed");
-		initialized = false;
-			
-	}
 	private int touchID = -1; // the int identifier of the main touch, or -1 if there is no main touch
-
 	@Override
 	public boolean onTouch(View v, MotionEvent e) {
 		Log.d(TAG, "Touching at x="+e.getX()+", y="+e.getY());
@@ -149,13 +168,12 @@ public class TableHolder extends SurfaceView implements Callback, OnTouchListene
 				initialX =  (int) t1x;
 				initialY =  (int) t1y;
 				if(firstCardTouched==null){
-					for(Card card : this.deck.getDeck()){
+					for(Card card : this.tableCards){
 				    	if(card.getBounds().contains(initialX, initialY)){
 				    		firstCardTouched=card;  //record first touch location
 				    	}
 					}
-				}
-				
+				}				
 				if (e.getPointerCount() == 1){	//if only one finger down, send touch event to game.
 					//game.deckViewTouched((int)e.getX(), (int)e.getY());
 					//touch(e.getX(), e.getY());	//Get a chip from the chip rack
@@ -164,7 +182,6 @@ public class TableHolder extends SurfaceView implements Callback, OnTouchListene
 					t2x = (e.getX(touchID+1));
 					t2y = (e.getY(touchID+1));
 					Log.d(TAG, "Touching Second Finger at x="+t2x+", y="+t2y);
-
 				}
 			}
 		} else {	//first finger has touched screen
@@ -178,27 +195,21 @@ public class TableHolder extends SurfaceView implements Callback, OnTouchListene
 		}
 		if (e.getActionMasked() == MotionEvent.ACTION_UP || e.getActionMasked() == MotionEvent.ACTION_POINTER_UP) {
 			Log.d(TAG, "Untouch at x="+e.getX()+", y="+e.getY());
-
 			if (e.getActionIndex() == touchID) {
 				touchID = -1;
 				if(firstCardTouched!=null){
 			    	if(firstCardTouched.getBounds().contains(initialX, initialY)){
 		    			Log.d(TAG, "Player tapped a CARD");
 		    			game.tableViewTouched(initialX, initialY);  //record first touch location
-		    			firstCardTouched=null;
-		    		
-			    	}
-				    	
+		    			firstCardTouched=null;		    		
+			    	}				    	
 				}
 			}
 			firstCardTouched=null;
-			//unTouch(e.getX(touchID), e.getY(touchID), initialX, initialY);
-		
+			//unTouch(e.getX(touchID), e.getY(touchID), initialX, initialY);		
 		} 
 		//game.deckViewTouched((int)e.getX(), (int)e.getY());
+		initialized = true;
 		return true;
 	}
-
-    
-
 }

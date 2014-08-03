@@ -317,7 +317,9 @@ public class MainActivity extends Activity {
 	public void onPlayCardPressed(View v){
 		if(game.trading){
 			//Player picked the cards
+			
 			game.p1.tradingCardsRemoved=false;
+			
 			game.tradeCards();
 			return;
 		}
@@ -351,6 +353,7 @@ public class MainActivity extends Activity {
 		}
 
 	public void onFixHandPressed(View v){
+		game.p1.sortPlayerDeck();
 		game.slidingDeckHolder.setDeck(game.p1.getArrayListDeck());
 	}
 	

@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.concurrent.atomic.AtomicReference;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.util.Log;
 
 public class GameThread extends Thread
@@ -66,7 +67,6 @@ public class GameThread extends Thread
 				pause(42);
 				if(autoRunState.get() == AutoRunState.RUNNING){
 					if(lastTime <= System.currentTimeMillis()){
-						Log.d(TAG, "Looping autorun");
 						if(game.curPlayer!=null){
 							if(fullAutoRun||!game.curPlayer.equals(game.p1)&&!game.trading){
 								main.handler.post(new Runnable() {
@@ -75,7 +75,6 @@ public class GameThread extends Thread
 										game.GO();								
 									}
 								});
-
 							}
 						}
 						main.handler.post(new Runnable() {

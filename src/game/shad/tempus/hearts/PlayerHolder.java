@@ -11,8 +11,9 @@ import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.widget.LinearLayout;
 
-public class PlayerHolder extends SurfaceView implements Callback, OnTouchListener{
+public class PlayerHolder extends LinearLayout implements OnTouchListener{
 	public static final String TAG = "Hearts--PlayerHolder--";
 
     private Deck deck;
@@ -25,7 +26,7 @@ public class PlayerHolder extends SurfaceView implements Callback, OnTouchListen
 	private SurfaceHolder surfaceHolder;
 	private Paint paint = new Paint();
 
-    private Context mContext;
+    private Context context;
 	private Game game;
     public int cardWidth=0;
     public int textWidth=0;
@@ -37,12 +38,10 @@ public class PlayerHolder extends SurfaceView implements Callback, OnTouchListen
    
     public PlayerHolder(Context context, MainActivity main, Game game, int sW, int sH, Player p1){
     	super(context);
-        this.mContext=context;
+        this.context=context;
         this.main= main;
         this.game = game;
         this.player = p1;
-        surfaceHolder = this.getHolder();
-        surfaceHolder.addCallback(this);
         this.screenWidth = sW;
         this.screenHeight = sH;
         cardWidth=(int) (screenWidth/2);
@@ -61,17 +60,18 @@ public class PlayerHolder extends SurfaceView implements Callback, OnTouchListen
      * @param color
      */
     public void addBlankCard(int color){
-        Card c = new Card(0, color, game);
-    	c.resizeBitmap(cardWidth, screenHeight);
+        Card c = new Card(0, color, game, context);
+    	c.resizeBitmap(cardWidth, screenHeight);    	
 		c.setCoords(cardWidth/2, 0, (int)(cardWidth*1.5), screenHeight);
 	    card=c;
         
     }
-    @Override
+//    @Override
     protected void onDraw(Canvas canvas){
-    	super.onDraw(canvas);
+//    	super.onDraw(canvas);
+
 //        Log.d(TAG, "onDraw, PH for "+player.getRealName());
-        card.draw(canvas);
+        card.draw(canvas, paint);
         paint.setColor(player.colorInt);
      	canvas.drawText(player.getRealName(), textWidth, 15, paint);
     	canvas.drawText(player.getScore()+"", textWidth, 35, paint);
@@ -81,39 +81,15 @@ public class PlayerHolder extends SurfaceView implements Callback, OnTouchListen
     public Rect getBounds() {
 		return new Rect(0, 0, this.screenWidth, this.screenHeight);
 
-	}  
-	
-	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {
-		
-	}
-
-
-	@Override
-	public void surfaceCreated(SurfaceHolder holder) {
-		Log.d(TAG, "surface Created");
-		initialized = true;
-		setOnTouchListener(this);
-		if(player.seat==4){
-			game.updatePH();
-		}
-			
-	}
-
-	@Override
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		Log.d(TAG, "surface Destroyed");
-		initialized = false;
-			
-	}
+    }
+    
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
-		Log.d(TAG, "Touching at x="+event.getX()+", y="+event.getY()+" For "+player.getRealName());
+//		Log.d(TAG, "Touching at x="+event.getX()+", y="+event.getY()+" For "+player.getRealName());
 
 		if(event.getAction()==MotionEvent.ACTION_UP){
-			main.displayPlayerInfo(this.player, game.displayPlayerCards(this.player), player.sneakPeak);
+			main.displayPlayerInfo(this.player, Game.displayPlayerCards(this.player), player.sneakPeak);
 			if(player.seat!=1){
 				player.sneakPeak=true;
 			}
@@ -121,6 +97,8 @@ public class PlayerHolder extends SurfaceView implements Callback, OnTouchListen
 		return true;
 
 	}
+	
+
 
    
 

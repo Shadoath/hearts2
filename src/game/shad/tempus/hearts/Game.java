@@ -38,7 +38,10 @@ import android.widget.Toast;
 public class Game extends Activity {
 	public static final String TAG = "Hearts--Game";
 	public static final int pointsTillEndGame = 50;
-    
+    public static final int CLUBS = 0;
+    public static final int DIAMONDS = 1;
+    public static final int SPADES = 2;
+    public static final int HEARTS = 3;
 	private Context context;
     private File path;
 
@@ -48,14 +51,13 @@ public class Game extends Activity {
 	public String name;
 	
 	private GameDeck gameDeck;
-	public Trick tableTrick;
 	
     public Player p1;
 	public Player p2;
 	public Player p3;
 	public Player p4;
 	public Player curPlayer;
-	
+	public Trick tableTrick;
 //	public GameDeck gameDeck;
 	public Card cardToPlay;
 	public Canvas canvas = new Canvas();
@@ -122,7 +124,7 @@ public class Game extends Activity {
     
     public DeckHolder deckHolder;
     public SlidingDeckHolder slidingDeckHolder;
-    private TableHolder tableHolder;
+    public HeartsTableHolder tableHolder;
     
     private PlayerHolder p1Holder;
     private PlayerHolder p2Holder;
@@ -161,6 +163,8 @@ public class Game extends Activity {
         this.cardCounterB = (Boolean) b.get("cardCounter");
         this.screenHeight = (int) b.getInt("height");
         this.screenWidth = (int) b.getInt("width");
+        Log.d(TAG, "screen H="+screenHeight);
+        Log.d(TAG, "screen W="+screenWidth);
 		cardOptions = new BitmapFactory.Options();
 //		cardOptions.inJustDecodeBounds = true;
 //		BitmapFactory.decodeResource(main.getResources(), R.drawable.c3, cardOptions);
@@ -196,6 +200,7 @@ public class Game extends Activity {
 	    // Use 1/2th of the available memory for this memory cache.
 		Log.d(TAG, "mem cache size="+memClass);
 	   final int cacheSize = 1024 * 1024 * memClass / 2;
+	   Log.d(TAG, "cacheSize="+cacheSize);
 	   mMemoryCache = new LruCache<String, Bitmap>(cacheSize);
 	}
 
@@ -241,7 +246,7 @@ public class Game extends Activity {
         	playCard.setEnabled(true);
         	checkForTwoOfClubs();	//This more or less starts the game.
         }
-        slidingDeckHolder.setDeck(p1.getArrayListDeck());
+        slidingDeckHolder.setDeck(p1.getDeck().deck);
         update();
 	}
 		
@@ -255,7 +260,7 @@ public class Game extends Activity {
 
 		for(int suit=0;suit<4;suit++){			
 			for(int value=2;value<15;value++){
-				Card cd = new Card(value, suit, this);
+				Card cd = new Card(value, suit, this, context);
 				Log.d(TAG, cd.name);
 				gameDeck.addGameDeckCard(cd);
 			}
@@ -279,16 +284,18 @@ public class Game extends Activity {
 	public void dealing() {
 		Log.d(TAG, "Game dealing");
 		ArrayList<ArrayList<Card>> playerDecks=gameDeck.deal();
+		Log.d(TAG, "playerDecks="+playerDecks.toString());
 //		displayDeckCards(playerDecks.get(0));	//changed to arraylists
 		if(p1==null){//first Start 
 			Log.d(TAG, "Creating new players and giving each person a hand.");
 			int color1 = Color.parseColor("#FF7711");
 			int color2 = Color.rgb(0, 50 , 200);
-			p1 = new Player(main, this, playerDecks.get(0), 0, 1, name, Color.GREEN); 
-			p2 = new Player(main, this, playerDecks.get(1), difficulty, 2, "(P2)", color1);
-			p3 = new Player(main, this, playerDecks.get(2), difficulty, 3, "(P3)", color2);
-			p4 = new Player(main, this, playerDecks.get(3), difficulty, 4, "(P4)", Color.RED);
+			p1 = new Player(context, main, this, playerDecks.get(0), 0, 1, name, Color.GREEN); 
+			p2 = new Player(context, main, this, playerDecks.get(1), difficulty, 2, "(P2)", color1);
+			p3 = new Player(context, main, this, playerDecks.get(2), difficulty, 3, "(P3)", color2);
+			p4 = new Player(context, main, this, playerDecks.get(3), difficulty, 4, "(P4)", Color.RED);
 //			slidingDeckHolder.addDeck(playerDecks.get(0));
+			Log.d(TAG, "Players Created");
 			createPlayerViews();
 			updatePlayerInfo();
 		}
@@ -326,38 +333,52 @@ public class Game extends Activity {
 			Log.d(TAG, "Trading Left");
 			//Trade Left p4->p3->p2->p1
 			p4.addCardsToDeck(p1.cardsToTrade);
+			p4.sortPlayerDeck();
 			
 			p3.addCardsToDeck(p4.cardsToTrade);
-			
+			p3.sortPlayerDeck();
+
 			p2.addCardsToDeck(p3.cardsToTrade);
-			
+			p1.sortPlayerDeck();
+
 			p1.addCardsToDeck(p2.cardsToTrade);
+			p1.sortPlayerDeck();
 			updateBottomTextWithTradingCards(false, p2.cardsToTrade);
 		break;
 		case 2:
 			Log.d(TAG, "Trading Right");
 			//Trade right p1->p2->p3->p4
 			p2.addCardsToDeck(p1.cardsToTrade);
-			
+			p2.sortPlayerDeck();
+
 			p1.addCardsToDeck(p4.cardsToTrade);
+			p1.sortPlayerDeck();
 			updateBottomTextWithTradingCards(false, p4.cardsToTrade);
 			
 			p4.addCardsToDeck(p3.cardsToTrade);
+			p4.sortPlayerDeck();
 			
 			p3.addCardsToDeck(p2.cardsToTrade);
+			p3.sortPlayerDeck();
+
 		break;
 		case 3:
 			Log.d(TAG, "Trading Across");
 			//across p2 to p4
 			p4.addCardsToDeck(p2.cardsToTrade);
-			
+			p4.sortPlayerDeck();
+
 			p2.addCardsToDeck(p4.cardsToTrade);
-			
+			p2.sortPlayerDeck();
+
 			//across p1 to p3
 			p1.addCardsToDeck(p3.cardsToTrade);
 			updateBottomTextWithTradingCards(false, p3.cardsToTrade);
-			
+			p1.sortPlayerDeck();
+
 			p3.addCardsToDeck(p1.cardsToTrade);
+			p3.sortPlayerDeck();
+
 		break;
 		case 4:
 			Log.d(TAG, "Error there should not be trading now!");
@@ -384,6 +405,7 @@ public class Game extends Activity {
 //		p3.sortHandFromDeck();
 //		p4.sortHandFromDeck();
 		this.trading=false;
+		tableTrick = new Trick(round);
 		slidingDeckHolder.setDeck(p1.getArrayListDeck());
 		playCard.setEnabled(true);
 		checkForTwoOfClubs();
@@ -498,6 +520,7 @@ public class Game extends Activity {
 			}
 			if(curPlayer!=null){
 				if(justPickedUpPile){//
+					tableHolder.removeAll();
 					tableTrick.clearALL();
 					clearTableCards();
 					this.justPickedUpPile=false;
@@ -505,6 +528,10 @@ public class Game extends Activity {
 				if(curPlayer!=p1||cardToPlay==null){// If null then it is a AUTO play.  This is also GO for BOTS.
 					Log.d(TAG, "normal GO()");
 					Card nextCard=(curPlayer.go(round, tableTrick));
+					if(nextCard == null){
+						Log.e(TAG, "Null card PICK!!!");
+						nextCard = curPlayer.getFirstCard();
+					}
 					Log.d(TAG, curPlayer.realName+" choose the "+nextCard.name+". Pile size="+tableTrick.getSize() );
 					playCard(nextCard);
 				}
@@ -548,6 +575,7 @@ public class Game extends Activity {
 		}
 		if(tableTrick.getSize()>=4){
 			pickUpHand();//This sets the next player
+
 		}
 		else{
 			nextPlayer();	
@@ -561,7 +589,7 @@ public class Game extends Activity {
 	 */
 	public void pickUpHand(){
 		Log.d(TAG, "Picking up hand.");
-		
+		//TODO test this for validity
 		justPickedUpPile=true;
 		playing=false;	//Is set back to true later if trick is won.
 		boolean jackFound = false;
@@ -571,6 +599,8 @@ public class Game extends Activity {
 		String cardRoundString = "";
 //		String cardRoundString = "Round="+round+"\n";
 		int firstSuit=tableTrick.getCard(0).getSuit();
+		String firstPlayer=tableTrick.getCard(0).getOwner().shortName;
+
 		for(int i=0;i<tableTrick.getSize();i++){		// maybe start at the back of the pile...yet it does not really matter
 			Card currentCard=tableTrick.getCard(i);
 			int curSuit=currentCard.getSuit();
@@ -675,12 +705,22 @@ public class Game extends Activity {
 		roundScore+=points;
 		roundWinnerAndPoints.add(new TrickStats(points, curPlayer, tableTrick));  
 
-		roundCardString+="Round="+round+" Won by="+curPlayer.shortName+"\n"+cardRoundString+"\n";
+		roundCardString+="Round="+round+" Started by="+firstPlayer+" Won by="+curPlayer.shortName+"\n"+cardRoundString+"\n";
 
 		if(cardToPlay!=null){
 			cardToPlay.setTouched(false);
 			cardToPlay=null;
 		}
+		main.handler.postDelayed(new Runnable() {
+			
+			@Override
+			public void run() {
+				clearTableCards();
+				
+			}
+		}, 4000);
+		
+		
 		if(endGameCheck()){
 			gameOver();
 			return;
@@ -707,18 +747,11 @@ public class Game extends Activity {
 			voidCheckAllPlayers();
 			
 		}
-		main.handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				if(justPickedUpPile){
-					clearTableCards();			
-					tableTrick.clearALL();
-					update();					
-					justPickedUpPile=false;
-				}
-			}
-		}, main.gt.getAutoRunTimeinMilli());
-		//;
+//		tableHolder.removeAll();
+		tableTrick.clearALL();
+		update();					
+		justPickedUpPile=false;
+
 
 				
 	}
@@ -1005,7 +1038,7 @@ public class Game extends Activity {
 		slidingDeckHolder = new SlidingDeckHolder(context, this, screenWidth, screenHeight/8);
         slidingDeckHolderlayoutParams = new LinearLayout.LayoutParams(screenWidth, screenHeight/8);
 
-        tableHolder = new TableHolder(context, this, (int) (screenWidth*.75), (int) (screenHeight/6));
+        tableHolder = new HeartsTableHolder(context, this, (int) (screenWidth*.75), (int) (screenHeight/6));
         tableHolderlayoutParams = new LinearLayout.LayoutParams((int) (screenWidth*.75), (int) (screenHeight/6));
 
 //        deckHolder.setLayoutParams(deckHolderlayoutParams);
@@ -1014,8 +1047,8 @@ public class Game extends Activity {
 
 //        deckHolderLayout.addView(this.deckHolder);
         deckHolderLayout.addView(slidingDeckHolder);
-        tableHolderLayout.addView(this.tableHolder);
-        tableHolderLayout.setLayoutParams(tableHolderlayoutParams);
+        tableHolderLayout.addView(tableHolder);
+        //tableHolderLayout.setLayoutParams(tableHolderlayoutParams);
         this.initialized=true;
     }
 	
@@ -1025,6 +1058,7 @@ public class Game extends Activity {
 	public void createPlayerViews(){
 		LayoutParams playerLayout = new LinearLayout.LayoutParams((int) (screenWidth*.25), screenHeight/10);
 		//New code to add player info
+		Log.d(TAG, "playerLayout ="+playerLayout.toString());
 		p1Holder = new PlayerHolder(context, main, this, (int) (screenWidth*.25), screenHeight/10, p1);
 	    p2Holder = new PlayerHolder(context, main, this, (int) (screenWidth*.25), screenHeight/10, p2);
 	    p3Holder = new PlayerHolder(context, main, this, (int) (screenWidth*.25), screenHeight/10, p3);
@@ -1034,10 +1068,10 @@ public class Game extends Activity {
         p3Holder.setLayoutParams(playerLayout);
         p4Holder.setLayoutParams(playerLayout);
         topLayout.removeAllViews();
-        topLayout.addView(this.p1Holder);
-        topLayout.addView(this.p2Holder);
-        topLayout.addView(this.p3Holder);
-        topLayout.addView(this.p4Holder);
+        topLayout.addView(p1Holder);
+        topLayout.addView(p2Holder);
+        topLayout.addView(p3Holder);
+        topLayout.addView(p4Holder);
 	}
 	 
 	////////////////////////////////////////Start Updates//////////////////////////////////////////////////////////////////////
@@ -1047,10 +1081,10 @@ public class Game extends Activity {
 	public synchronized void update() {
 		if(this.initialized){
 			//updateDH();
-			slidingDeckHolder.invalidate();
 			updateTH();
 			updatePH();
 			updateTable();
+			slidingDeckHolder.invalidate();
 			//p1.updateDeckFromSuits();
 			//deckHolder.addDeck(p1.getDeck());
 		}
@@ -1077,35 +1111,35 @@ public class Game extends Activity {
 	}
 
 	public synchronized void updateTH(){
-		if (!tableHolder.initialized){
-			Log.d(TAG, "TableHolder not initialized");
-		}
-		else{
-			tableHolderCanvas = tableHolder.getHolder().lockCanvas();
-			tableHolder.draw(tableHolderCanvas);
-			tableHolder.getHolder().unlockCanvasAndPost(tableHolderCanvas);
-			}
+		tableHolder.invalidate();
 	}
 	
 	public void updatePH(){
+		p1Holder.invalidate();
+		p2Holder.invalidate();
+		p3Holder.invalidate();
+		p4Holder.invalidate();
+		/*
+		
 		if (!p1Holder.initialized){
 			Log.d(TAG, "p1HolderCanvas not initialized");
 		}
 		else{
-			p1Holder.invalidate();
 			p1HolderCanvas = p1Holder.getHolder().lockCanvas();
 			p1Holder.draw(p1HolderCanvas);
 			p1Holder.getHolder().unlockCanvasAndPost(p1HolderCanvas);
-			}
+//			p1Holder.invalidate();
+			
+		}
 		if (!p2Holder.initialized){
 			Log.d(TAG, "p2HolderCanvas not initialized");
 		}
 		else{
-			p2Holder.invalidate();
 			p2HolderCanvas = p2Holder.getHolder().lockCanvas();
 			p2Holder.draw(p2HolderCanvas);
 			p2Holder.getHolder().unlockCanvasAndPost(p2HolderCanvas);
-			}
+//			p2Holder.invalidate();
+		}
 		if (!p3Holder.initialized){
 			Log.d(TAG, "p3HolderCanvas not initialized");
 		}
@@ -1122,6 +1156,7 @@ public class Game extends Activity {
 			p4Holder.draw(p4HolderCanvas);
 			p4Holder.getHolder().unlockCanvasAndPost(p4HolderCanvas);
 			}
+		*/
 	}
 	
 	public void updatePlayerInfo(){
@@ -1132,15 +1167,16 @@ public class Game extends Activity {
 	}
 	
 	private void updateTable() {
-
      	roundView.invalidate();
     	bottomText.invalidate();
     	bottomText2.invalidate();
-	    	
+	    
         clubsPlayed.invalidate();
         diamondsPlayed.invalidate();
         spadesPlayed.invalidate();
         heartsPlayed.invalidate();
+		tableHolder.invalidate();
+
 
 	}
 	
@@ -1177,45 +1213,35 @@ public class Game extends Activity {
 	}
 	
 	/**
-	 * @param p12 the player who's deck is about to be printed
+	 * @param p the player who's deck is about to be printed
 	 */
-	public String displayPlayerCards(Player p12){ 
-		Log.d(TAG, "displayCards for "+p12.getRealName());
-		Log.d(TAG, "points="+p12.getScore());
-		PlayerDeck playerDeck = p12.getPlayerDeck();
-		Deck c = playerDeck.getClubs();
-		Deck d = playerDeck.getDiamonds();
-		Deck s = playerDeck.getSpades();
-		Deck h = playerDeck.getHearts();
-		int deckSize = p12.getDeck().getSize();
-		int totalSize=c.getSize()+d.getSize()+s.getSize()+h.getSize();
-		String clubs = "";
-		String diamonds = "";
-		String spades = "";
-		String hearts = "";
-		for(int i=0; i<c.getSize();i++){
-			clubs+=c.getCard(i).getShortReadableValue()+", ";
+	public static String displayPlayerCards(Player p){ 
+		Log.d(TAG, "displayCards for "+p.getRealName());
+		Log.d(TAG, "points="+p.getScore());
+		Deck playerDeck = p.getDeck();
+		int deckSize = playerDeck.getSize();
+		String cards = "";
+		int suit = -1;
+		for(int i=0; i<playerDeck.getSize();i++){
+			if(suit !=playerDeck.getCard(i).getSuit()){
+				if(suit== -1){
+					cards += ""+Card.suittoString(playerDeck.getCard(i).getSuit())+"(";
+				}
+				else{
+					cards+=") "+Card.suittoString(playerDeck.getCard(i).getSuit())+"(";
+
+				}
+				suit = playerDeck.getCard(i).getSuit();
+			}
+			cards+=playerDeck.getCard(i).getShortReadableValue()+", ";
 		}
-		for(int i=0; i<d.getSize();i++){
-			diamonds+=d.getCard(i).getShortReadableValue()+", ";
-		}
-		for(int i=0; i<s.getSize();i++){
-			spades+=s.getCard(i).getShortReadableValue()+", ";
-		}
-		for(int i=0; i<h.getSize();i++){
-			hearts+=h.getCard(i).getShortReadableValue()+", ";
-		}
-		Log.d(TAG, "clubs=" + clubs);
-		Log.d(TAG, "diamonds=" + diamonds);
-		Log.d(TAG, "spades=" + spades);
-		Log.d(TAG, "hearts=" + hearts);
-		Log.d(TAG, "Size=" + totalSize+" Deck Size ="+deckSize);
-		String sDeck= "The deck of "+p12.getRealName()+"\n";
-		sDeck+="clubs=" + clubs+"\n";
-		sDeck+="diamonds=" + diamonds+"\n";
-		sDeck+="spades=" + spades+"\n";
-		sDeck+="hearts=" + hearts+"\n";
-		return sDeck;
+		cards += ")";
+		
+		
+		Log.d(TAG, "cards=" + cards);		
+		Log.d(TAG, "Size=" +playerDeck.getSize());
+		String sDeck= "The deck of "+p.getRealName()+"\n";
+		return cards;
 		//TODO update gameView in thread.
 	}
 	
@@ -1240,7 +1266,7 @@ public class Game extends Activity {
 		return deckHolder;
 	}
 
-	public TableHolder getTableHolder() {
+	public HeartsTableHolder getTableHolder() {
 		return tableHolder;
 	}
 
@@ -1395,10 +1421,9 @@ public class Game extends Activity {
 	 */
   	public void clearTableCards(){
 		tableHolder.removeAll();
-		tableHolder.addBlankCards();
+//		tableHolder.addBlankCards();
 	    
 	}
-
   	
   	///////////////////////////////////////////////////////////////////////Save Game//////////////////////////////////////////////////////////////////////////////
   	/**
@@ -1522,6 +1547,10 @@ public class Game extends Activity {
 		  return object;
 	}
 	
+	/**
+	 * Save game to a text file.
+	 * @return TextFile
+	 */
 	public String writeTextFile() {
 		Log.d(TAG, "writeJSON()");
 		String tricks = "";
@@ -1986,6 +2015,7 @@ public class Game extends Activity {
 
 	}	
 	public Bitmap getBitmap(int resId) {
+		Log.d(TAG, "getBitmap id="+resId);
 	    final String imageKey = String.valueOf(resId);
 
 	    Bitmap bitmap = getBitmapFromMemCache(imageKey);

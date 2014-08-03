@@ -3,6 +3,7 @@ package game.shad.tempus.hearts;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -30,6 +31,7 @@ public class DeckHolder extends SurfaceView  implements Callback, OnTouchListene
 	public boolean initialized = false; //made true on surfaceCreated()
 	private boolean doneTouching = false;
 	private SurfaceHolder surfaceHolder;
+	private Paint paint = new Paint();
 
 	private Context mContext;
 	private Game game;
@@ -57,7 +59,7 @@ public class DeckHolder extends SurfaceView  implements Callback, OnTouchListene
     	this.position=0;
     	int i = 0;
     	while(i  < 12){
-	        this.deck.addCard(new Card(0,1, game));
+	        this.deck.addCard(new Card(0,1, game, mContext));
 	        i++;
     	}
     }
@@ -146,7 +148,7 @@ public class DeckHolder extends SurfaceView  implements Callback, OnTouchListene
         		c.inView=true;
         		c.resizeBitmap(cardWidth, screenHeight);
         		c.setCoords(cardWidth*((i+loop)-getPosition()), 0, cardWidth+cardWidth*((i+loop)-getPosition()), screenHeight);
-        		c.draw(canvas);
+        		c.draw(canvas, paint);
            		i++;
            		displayed++;
         	}
@@ -183,8 +185,7 @@ public class DeckHolder extends SurfaceView  implements Callback, OnTouchListene
 
 
 	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		
 	}
 

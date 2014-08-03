@@ -15,11 +15,10 @@ public class CardView extends ImageView{
 		super(context);
 		this.card=card;
 		setVisibility(View.VISIBLE);
-		setImageBitmap(card.getBitmap());
+		setImageBitmap(card.getBitmap(layoutParams));
 		setLayoutParams(layoutParams);
 		setPadding(0, 0, 0, 0);
 		setTag(card.name);
-		// TODO Auto-generated constructor stub
 	}
 	
 	public Card getCard(){
@@ -28,13 +27,11 @@ public class CardView extends ImageView{
 	
 	public void setCard(Card card){
 		this.card=card;
-	}
-	
+	}	
 
 	public void setTouched(boolean touched){
 		Log.d(TAG, "Setting Touched to:"+touched);
 		card.setTouched(touched);
-		setImageBitmap(card.getBitmap());
 		this.refreshDrawableState();
 	}
 	
